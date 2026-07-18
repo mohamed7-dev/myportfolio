@@ -1,8 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { paginatedListInputSchema } from "@/lib/dto/paginated-list";
+import { paginatedSoftDeletableListInputSchema } from "@/lib/dto/paginated-list";
 import {
   createProjectInputSchema,
+  deleteProjectsInputSchema,
   projectListOutputSchema,
+  updateProjectInputSchema,
 } from "@/lib/dto/project";
 import { authorize } from "@/lib/helpers/authorize";
 import { validateInput } from "@/lib/helpers/validate-input";
@@ -21,12 +23,36 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(result);
 }
 
+export async function PUT(req: NextRequest) {
+  await authorize();
+
+  const body = await req.json();
+
+  const parsedData = validateInput(body, updateProjectInputSchema);
+
+  const result = await projectService().update(parsedData);
+
+  return NextResponse.json(result);
+}
+
+export async function DELETE(req: NextRequest) {
+  await authorize();
+
+  const body = await req.json();
+
+  const parsedData = validateInput(body, deleteProjectsInputSchema);
+
+  const result = await projectService().softDeleteProjects(parsedData);
+
+  return NextResponse.json(result);
+}
+
 export async function GET(req: NextRequest) {
   await authorize();
 
   const parsedSearchParams = validateInput(
     Object.fromEntries(req.nextUrl.searchParams.entries()),
-    paginatedListInputSchema,
+    paginatedSoftDeletableListInputSchema,
   );
 
   const result = await projectService().projects(parsedSearchParams);

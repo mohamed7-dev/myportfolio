@@ -62,6 +62,7 @@ export const project = z.object({
   translations: z.array(projectTranslationSchema),
   assets: z.array(projectAssetSchema),
   featuredAsset: asset,
+  deletedAt: z.coerce.date().nullable(),
 });
 
 export type Project = z.infer<typeof project>;
@@ -92,6 +93,16 @@ export const updateProjectInputSchema = z.object({
 });
 
 export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;
+
+//####################### Delete #######################
+
+export const deleteProjectsInputSchema = z.object({
+  ids: z.array(z.string()),
+});
+
+export type DeleteProjectsInputSchema = z.infer<
+  typeof deleteProjectsInputSchema
+>;
 
 //###################### List #######################
 export const projectListOutputSchema = createPaginatedListOutputSchema(project);

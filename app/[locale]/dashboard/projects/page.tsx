@@ -16,10 +16,18 @@ import { ProjectsDataTable } from "./_components/projects-data-table";
 export default async function ProjectsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ pageSize: number; skip: number }>;
+  searchParams: Promise<{
+    pageSize: string;
+    skip: string;
+    includeSoftDeleted: string;
+  }>;
 }) {
-  const { skip, pageSize } = await searchParams;
-  const result = await projectService().projects({ take: pageSize, skip });
+  const { skip, pageSize, includeSoftDeleted } = await searchParams;
+  const result = await projectService().projects({
+    take: Number(pageSize),
+    skip: skip ? Number(skip) : undefined,
+    includeSoftDeleted: includeSoftDeleted === "true" ? true : false,
+  });
 
   const projects = validateOutput(result, projectListOutputSchema);
 
@@ -38,7 +46,7 @@ export default async function ProjectsPage({
           <ProjectsDataTable
             projects={projects?.items}
             totalItemsCount={projects.itemsCount}
-            pageSize={pageSize}
+            pageSize={Number(pageSize)}
           />
         </PageBlock>
       </PageLayout>

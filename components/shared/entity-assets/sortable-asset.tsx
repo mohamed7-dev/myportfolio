@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { EllipsisIcon } from "lucide-react";
+import { BinaryIcon, EllipsisIcon, VideoIcon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Asset } from "@/lib/dto/asset";
+import { AssetDisplay } from "../assets/asset-display";
 
 export function SortableAsset({
   asset,
@@ -58,18 +59,13 @@ export function SortableAsset({
         className={`
                     flex items-center justify-center
                     ${compact ? "w-12 h-12" : "w-16 h-16"}
-                    border rounded-md overflow-hidden cursor-grab
+                    border rounded-base overflow-hidden cursor-grab
                     ${isFeatured ? "border-primary ring-1 ring-primary/30" : "border-border"}
                     ${updatePermissions ? "hover:border-muted-foreground" : ""}
                     ${isDragging ? "opacity-50 cursor-grabbing" : ""}
                 `}
       >
-        <Image
-          src={asset.sourceIdentifier}
-          alt={asset.name}
-          width={50}
-          height={50}
-        />
+        <AssetDisplay asset={asset} image={{ width: 50, height: 50 }} />
       </div>
 
       {/* Menu Trigger */}

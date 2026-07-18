@@ -50,6 +50,7 @@ export class ProjectTranslation
   @ManyToOne(
     () => Project,
     (base) => base.translations,
+    { onDelete: "CASCADE" },
   )
   base: Project;
 }

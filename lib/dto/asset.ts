@@ -11,6 +11,14 @@ const assetTranslationSchema = z.object({
   updatedAt: z.date(),
 });
 
+export enum AssetType {
+  IMAGE = "IMAGE",
+  VIDEO = "VIDEO",
+  BINARY = "BINARY",
+}
+
+const assetTypeSchema = z.nativeEnum(AssetType);
+
 export const asset = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -18,6 +26,7 @@ export const asset = z.object({
   name: z.string(),
   languageCode: languageCodeSchema,
   mimetype: z.string(),
+  type: assetTypeSchema,
   width: z.number(),
   height: z.number(),
   fileSize: z.number(),

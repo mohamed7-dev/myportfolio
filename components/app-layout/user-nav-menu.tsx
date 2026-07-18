@@ -18,6 +18,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { AccentSwitcher } from "./accent-switcher";
 
 export function UserNavMenu() {
   const router = useRouter();
@@ -44,10 +45,6 @@ export function UserNavMenu() {
       },
     );
   };
-  //   const {
-  //     state: { settings },
-  //     actions: { setTheme },
-  //   } = useUserSettings("UserNavMenu");
 
   const avatar = React.useMemo(() => {
     return (user.firstName?.charAt(0) ?? "") + (user.lastName?.charAt(0) ?? "");
@@ -94,11 +91,13 @@ export function UserNavMenu() {
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+            <AccentSwitcher />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href="/profile">Profile</Link>
+                <Link href="/dashboard/about">Profile</Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon />

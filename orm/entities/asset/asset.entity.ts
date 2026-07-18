@@ -1,4 +1,5 @@
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
+import type { AssetType } from "@/lib/dto/asset";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type {
   LocaleString,
@@ -21,6 +22,9 @@ export class Asset extends AppEntity implements Translatable {
 
   @Column()
   mimetype: string;
+
+  @Column({ type: "varchar" })
+  type: AssetType;
 
   @Column()
   fileKey: string;

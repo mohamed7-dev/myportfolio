@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import "reflect-metadata";
+import { cookies } from "next/headers";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { QueryClientProvider } from "@/components/providers/query-client-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -34,10 +35,14 @@ export default async function RootLayout({
 
   await initializationService().onInit();
 
+  const cookieStore = await cookies();
+
+  const accent = cookieStore.get("accent")?.value ?? "";
+
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased ${accent}`}
     >
       <body className="min-h-full flex flex-col">
         <Toaster />

@@ -10,13 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { StyledUploadDropzone } from "@/components/ut-components";
 import type {
   Asset as AssetEntity,
   AssetListOutputSchema,
   CreateAssetInputSchema,
   CreateAssetOutputSchema,
 } from "@/lib/dto/asset";
-import { UploadDropzone } from "@/lib/helpers/ut-components";
 import { AssetBulkActions } from "../asset-bulk-actions";
 import { DeleteAssetsBulkAction } from "../delete-assets-bulk-action";
 import { ActionsBar } from "./actions-bar";
@@ -154,8 +154,7 @@ export function AssetGallery({
           refetch={refetch}
         />
       )}
-      <UploadDropzone
-        className="border-2 border-border border-solid"
+      <StyledUploadDropzone
         endpoint="imageUploader"
         onClientUploadComplete={(res) => {
           const file = res[0];

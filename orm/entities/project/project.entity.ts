@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
+import type { SoftDeletable } from "@/lib/types/soft-deletable";
 import type {
   LocaleString,
   Translatable,
@@ -21,11 +22,14 @@ import type { ProjectAsset } from "./project-asset.entity";
 import type { ProjectTranslation } from "./project-translation.entity";
 
 @Entity()
-export class Project extends AppEntity implements Translatable {
+export class Project extends AppEntity implements Translatable, SoftDeletable {
   constructor(input?: DeepPartial<Project>) {
     super();
     this.initialize(input);
   }
+
+  @Column({ type: "date", nullable: true })
+  deletedAt: Date | null;
 
   name: LocaleString;
 

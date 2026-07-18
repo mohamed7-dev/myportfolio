@@ -1,6 +1,6 @@
 import { ImageIcon } from "lucide-react";
-import Image from "next/image";
 import type { Asset } from "@/lib/dto/asset";
+import { AssetDisplay } from "../assets/asset-display";
 
 interface FeaturedAssetProps {
   featuredAsset?: Asset | null;
@@ -20,13 +20,14 @@ export function FeaturedAsset({
       className={`flex items-center justify-center ${compact ? "h-40" : "h-64"} border border-dashed rounded-md`}
     >
       {featuredAsset ? (
-        <Image
-          src={featuredAsset.sourceIdentifier}
-          alt={featuredAsset.name}
-          width={300}
-          height={300}
-          loading="eager"
-          className="max-w-full max-h-full object-contain cursor-pointer"
+        <AssetDisplay
+          asset={featuredAsset}
+          image={{
+            width: 300,
+            height: 300,
+            loading: "eager",
+            className: "max-w-full max-h-full object-contain cursor-pointer",
+          }}
         />
       ) : (
         // biome-ignore lint/a11y/noStaticElementInteractions: none

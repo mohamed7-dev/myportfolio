@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import {
   Page,
   PageActionBar,
@@ -31,6 +32,10 @@ export default async function ProjectPage({
     project = validateOutput(result, projectSchema);
   }
 
+  if (!project && !creatingNewEntity) {
+    notFound();
+  }
+
   return (
     <ProjectForm initialValues={project}>
       <Page pageId="new-project">
@@ -49,7 +54,7 @@ export default async function ProjectPage({
           <PageBlock column="side" id="project-assets">
             <ProjectFormAssetField
               projectAssets={project?.assets ?? []}
-              featuredAsset={project?.featuredAsset}
+              featuredAsset={project?.featuredAsset ?? undefined}
             />
           </PageBlock>
           <PageBlock column="side" id="project-status">

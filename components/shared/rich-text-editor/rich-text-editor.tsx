@@ -49,6 +49,7 @@ export function RichTextEditor({
 
   const editor = useEditor(
     {
+      immediatelyRender: false,
       parseOptions: {
         preserveWhitespace: "full",
       },

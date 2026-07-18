@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   Page,
@@ -8,6 +7,7 @@ import {
 } from "@/components/page-layout/page";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { AssetDisplay } from "@/components/shared/assets/asset-display";
 import { type Asset, asset as assetSchema } from "@/lib/dto/asset";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/asset.service";
@@ -41,13 +41,15 @@ export default async function AssetDetailPage({
         <PageLayout>
           <PageBlock id="asset-preview" column="main">
             <div className="relative flex items-center justify-center bg-secondary-background/50 rounded-lg min-h-75 overflow-auto resize-y">
-              <Image
-                src={asset.sourceIdentifier}
-                alt={asset.name}
-                width={500}
-                height={500}
-                loading="eager"
-                className="max-w-full object-contain"
+              TODO: replace with actual display of video, and pdf
+              <AssetDisplay
+                asset={asset}
+                image={{
+                  width: 500,
+                  height: 500,
+                  loading: "eager",
+                  className: "max-w-full object-contain",
+                }}
               />
             </div>
           </PageBlock>

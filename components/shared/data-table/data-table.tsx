@@ -6,7 +6,6 @@ import {
   type Row,
   useReactTable,
 } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -27,6 +26,12 @@ interface DataTableProps<TData, TValue> {
   pageSize: number;
   onPageSizeChange: (newPageSize: number) => void;
   resetPage: () => void;
+  actionBarItems?: [
+    {
+      component: React.FunctionComponent;
+      id: string;
+    },
+  ];
 }
 
 export function DataTable<TData, TValue>({
@@ -39,6 +44,7 @@ export function DataTable<TData, TValue>({
   pageSize,
   onPageSizeChange,
   resetPage,
+  actionBarItems,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -48,7 +54,15 @@ export function DataTable<TData, TValue>({
   });
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-hidden rounded-base border-2 border-border">
+      <div className="overflow-hidden space-y-2">
+        <div className="w-full flex items-center justify-between">
+          <div />
+          <div className="">
+            {actionBarItems?.map((item) => (
+              <item.component key={item.id} />
+            ))}
+          </div>
+        </div>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -107,24 +121,6 @@ export function DataTable<TData, TValue>({
         onPageSizeChange={onPageSizeChange}
         resetPage={resetPage}
       />
-      {/* <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="neutral"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="neutral"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div> */}
     </div>
   );
 }

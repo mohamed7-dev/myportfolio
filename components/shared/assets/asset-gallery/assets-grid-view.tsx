@@ -1,11 +1,11 @@
 import { ChevronRightIcon, Loader2Icon } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { formatBytes } from "@/lib/utils/format-bytes";
+import { AssetDisplay } from "../asset-display";
 import type { Asset } from "./asset-gallery";
 
 export interface AssetViewProps {
@@ -152,13 +152,14 @@ export function AssetNavigateAction({
 export function AssetThumbnail({ asset }: { asset: Asset }) {
   return (
     <div className="relative aspect-square overflow-hidden bg-background">
-      <Image
-        src={asset.sourceIdentifier}
-        alt={asset.name}
-        loading="eager"
-        fill
-        sizes="15vw"
-        className="absolute size-full object-cover"
+      <AssetDisplay
+        asset={asset}
+        image={{
+          loading: "eager",
+          fill: true,
+          sizes: "15vw",
+          className: "absolute size-full object-cover",
+        }}
       />
     </div>
   );

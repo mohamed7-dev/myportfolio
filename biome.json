@@ -23,7 +23,8 @@
         "noExplicitAny": "off"
       },
       "complexity": {
-        "noUselessConstructor": "off"
+        "noUselessConstructor": "off",
+        "noUselessTernary": "off"
       },
       "correctness": {
         "noChildrenProp": "off"

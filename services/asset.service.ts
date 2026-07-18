@@ -6,6 +6,7 @@ import { In } from "typeorm";
 import { camelCase } from "typeorm/util/StringUtils.js";
 import { getCurrentLocale } from "@/i18n/server";
 import type {
+  AssetType,
   CreateAssetInputSchema,
   DeleteAssetsInputSchema,
   UpdateAssetInputSchema,
@@ -94,7 +95,7 @@ async function _createAsset(input: CreateAssetInputSchema) {
 
   const normalizedMimeTypes = normalizeFileTypes(allowedFileTypes);
 
-  // 1. validate mimetype
+  // 1. validate mimetype and get asset type
   const isValidMimetype = validateMimeType(input.mimetype, normalizedMimeTypes);
   if (!isValidMimetype) {
     throw new UserInputError("Invalid mimetype", {
@@ -102,6 +103,7 @@ async function _createAsset(input: CreateAssetInputSchema) {
       fileName: input.filename,
     });
   }
+  const type = getAssetType(input.mimetype);
 
   // 2. calculate dimensions
   const fileBuffer = await getFileAsBuffer(input.key);
@@ -114,6 +116,7 @@ async function _createAsset(input: CreateAssetInputSchema) {
     width: dimensions.width,
     height: dimensions.height,
     mimetype: input.mimetype,
+    type: type,
     fileSize: input.size,
     fileKey: input.key,
   });
@@ -281,6 +284,18 @@ function validateMimeType(
   }
 
   return false;
+}
+
+export function getAssetType(mimeType: string): AssetType {
+  const type = mimeType.split("/")[0];
+  switch (type) {
+    case "image":
+      return "IMAGE";
+    case "video":
+      return "VIDEO";
+    default:
+      return "BINARY";
+  }
 }
 
 function normalizeFileTypes(

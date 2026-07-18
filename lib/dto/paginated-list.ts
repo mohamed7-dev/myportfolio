@@ -7,6 +7,15 @@ export const paginatedListInputSchema = z.object({
 
 export type PaginatedListInputSchema = z.infer<typeof paginatedListInputSchema>;
 
+export const paginatedSoftDeletableListInputSchema =
+  paginatedListInputSchema.extend({
+    includeSoftDeleted: z.boolean().optional(),
+  });
+
+export type PaginatedSoftDeletableListInputSchema = z.infer<
+  typeof paginatedSoftDeletableListInputSchema
+>;
+
 export function createPaginatedListOutputSchema<Item = any>(
   schema: ZodSchema<Item>,
 ) {

@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
@@ -24,6 +24,7 @@ export function ProjectForm({
 }) {
   const params = useParams();
   const creatingNewEntity = params.id === NEW_ENTITY_PATH;
+  const router = useRouter();
 
   const form = useForm<CreateProjectInputSchema>({
     defaultValues: {
@@ -40,9 +41,10 @@ export function ProjectForm({
     defaultValues: {
       id: initialValues?.id ?? "",
       assetIds: initialValues?.assets?.map((asset) => asset.asset.id) ?? [],
+      featuredAssetId: initialValues?.featuredAsset?.id ?? "",
       liveDemoUrl: initialValues?.liveDemoUrl ?? "",
       repoUrl: initialValues?.repoUrl ?? "",
-      enabled: initialValues?.enabled ?? true,
+      enabled: initialValues?.enabled === false ? false : true,
       translations: initialValues?.translations ?? [],
     },
     resolver: zodResolver(updateProjectInputSchema),
@@ -62,6 +64,8 @@ export function ProjectForm({
     },
     onSuccess: () => {
       toast.success("Project was created successfully");
+      form.reset();
+      router.refresh();
     },
     onError: () => {
       toast.success("Something went wrong while creating the project");
@@ -70,16 +74,27 @@ export function ProjectForm({
 
   const { mutate: updateProject } = useMutation({
     mutationKey: ["update-project"],
-    mutationFn: async (input) => {},
-    onSuccess: () => {},
-    onError: () => {},
+    mutationFn: async (input: UpdateProjectInputSchema) => {
+      const res = await fetch("/api/projects", {
+        method: "PUT",
+        credentials: "include",
+        body: JSON.stringify(input),
+      });
+
+      const data = (await res.json()) as Project;
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Project was updated successfully");
+    },
+    onError: () => {
+      toast.success("Something went wrong while updating the project");
+    },
   });
 
   const onSubmit = (
     values: CreateProjectInputSchema | UpdateProjectInputSchema,
   ) => {
-    console.log(values);
-
     if (creatingNewEntity) {
       createProject({
         ...values,
@@ -89,7 +104,14 @@ export function ProjectForm({
         })) as any,
       });
     } else {
-      console.log(values);
+      updateProject({
+        ...values,
+        id: params.id as string,
+        translations: values.translations.map((t) => ({
+          ...t,
+          slug: normalizeString(form.getValues("translations.0.name"), "-"),
+        })) as any,
+      });
     }
   };
 
