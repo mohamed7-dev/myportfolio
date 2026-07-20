@@ -1,29 +1,22 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
 import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { BinaryIcon, MoreHorizontal, VideoIcon } from "lucide-react";
-import Image from "next/image";
+import { TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 import { AssetDisplay } from "@/components/shared/assets/asset-display";
 import { DataTable } from "@/components/shared/data-table/data-table";
+import { RowActions } from "@/components/shared/data-table/row-actions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { useRouterUtils } from "@/hooks/use-router-utils";
 import type { DeletionResponse } from "@/lib/dto/common";
 import type { DeleteProjectsInputSchema, Project } from "@/lib/dto/project";
+import { DeleteRowAction } from "./delete-row-action";
 
 export const columns: ColumnDef<Project>[] = [];
 
@@ -175,50 +168,57 @@ export function ProjectsDataTable({
       {
         id: "actions",
         cell: ({ row }) => {
-          // TODO: add dropdown menu items for un-soft delete and delete
-
           return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="neutralNoShadow" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[18rem]">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() =>
-                    deleteProjects({ ids: [row.original.id], softDelete: true })
-                  }
-                  disabled={
-                    (isPending && !!row.original.deletedAt) ||
-                    !!row.original.deletedAt
-                  }
-                >
-                  Soft Delete Project
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() =>
-                    deleteProjects({
-                      ids: [row.original.id],
-                      softDelete: false,
-                    })
-                  }
-                  disabled={isPending && !row.original.deletedAt}
-                >
-                  Delete Project
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() =>
-                    router.push(`/dashboard/projects/${row.original.id}`)
-                  }
-                >
-                  View/Edit Project Details
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <RowActions
+              actions={[
+                {
+                  component: () => (
+                    <DeleteRowAction
+                      label="Soft Delete Project"
+                      confirm={`Are you sure you want to soft delete project?`}
+                      icon={TrashIcon}
+                      disabled={
+                        (isPending && !!row.original.deletedAt) ||
+                        !!row.original.deletedAt
+                      }
+                      onExecute={() =>
+                        deleteProjects({
+                          ids: [row.original.id],
+                          softDelete: true,
+                        })
+                      }
+                    />
+                  ),
+                },
+                {
+                  component: () => (
+                    <DeleteRowAction
+                      label="Delete Project"
+                      confirm={"Are you sure you want to delete project?"}
+                      icon={TrashIcon}
+                      disabled={isPending && !row.original.deletedAt}
+                      onExecute={() =>
+                        deleteProjects({
+                          ids: [row.original.id],
+                          softDelete: false,
+                        })
+                      }
+                    />
+                  ),
+                },
+                {
+                  component: () => (
+                    <DropdownMenuItem
+                      onClick={() =>
+                        router.push(`/dashboard/projects/${row.original.id}`)
+                      }
+                    >
+                      View/Edit Project Details
+                    </DropdownMenuItem>
+                  ),
+                },
+              ]}
+            />
           );
         },
       },

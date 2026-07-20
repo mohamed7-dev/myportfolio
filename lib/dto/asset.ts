@@ -1,7 +1,10 @@
 import { z } from "@/lib/helpers/zod";
 import { deletionResponseSchema } from "./common";
 import { languageCodeSchema } from "./language-code";
-import { createPaginatedListOutputSchema } from "./paginated-list";
+import {
+  createPaginatedListOutputSchema,
+  paginatedListInputSchema,
+} from "./paginated-list";
 
 const assetTranslationSchema = z.object({
   languageCode: languageCodeSchema,
@@ -30,8 +33,10 @@ export const asset = z.object({
   width: z.number(),
   height: z.number(),
   fileSize: z.number(),
-  fileKey: z.string(),
+  sourceFileKey: z.string(),
+  previewFileKey: z.string(),
   sourceIdentifier: z.string(),
+  previewIdentifier: z.string(),
   tags: z.array(z.any()).optional(), // TODO: change to tag schema
   translations: z.array(assetTranslationSchema),
 });
@@ -46,10 +51,12 @@ const assetTranslationInputSchema = z.object({
 
 export const createAssetInputSchema = z.object({
   sourceIdentifier: z.string(),
-  filename: z.string(),
-  mimetype: z.string(),
-  key: z.string(),
-  size: z.number(),
+  previewIdentifier: z.string(),
+  sourceFilename: z.string(),
+  sourceFileMimetype: z.string(),
+  sourceFileKey: z.string(),
+  previewFileKey: z.string(),
+  sourceFileSize: z.number(),
   tags: z.array(z.string()).optional(),
   translations: z.array(assetTranslationInputSchema).optional(),
 });
@@ -76,8 +83,17 @@ export type UpdateAssetOutputSchema = z.infer<typeof updateAssetOutputSchema>;
 // ################## List ####################
 
 export const assetListOutputSchema = createPaginatedListOutputSchema(asset);
-
 export type AssetListOutputSchema = z.infer<typeof assetListOutputSchema>;
+
+export const assetListInputSchema = paginatedListInputSchema.extend({
+  filter: z
+    .object({
+      name: z.object({ contains: z.string() }).optional(),
+      type: z.object({ equals: assetTypeSchema }).optional(),
+    })
+    .optional(),
+});
+export type AssetListInputSchema = z.infer<typeof assetListInputSchema>;
 
 // ################## Delete ####################
 

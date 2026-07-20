@@ -27,7 +27,10 @@ export class Asset extends AppEntity implements Translatable {
   type: AssetType;
 
   @Column()
-  fileKey: string;
+  sourceFileKey: string;
+
+  @Column()
+  previewFileKey: string;
 
   @Column({
     default: 0,
@@ -44,6 +47,9 @@ export class Asset extends AppEntity implements Translatable {
 
   @Column()
   sourceIdentifier: string;
+
+  @Column()
+  previewIdentifier: string;
 
   @OneToMany(
     "AssetTranslation",

@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import {
   asset,
+  assetListInputSchema,
   assetListOutputSchema,
   createAssetInputSchema,
   deleteAssetsInputSchema,
@@ -55,9 +56,12 @@ export async function DELETE(req: NextRequest) {
 export async function GET(req: NextRequest) {
   await authorize();
 
+  const searchParams = Object.fromEntries(req.nextUrl.searchParams.entries());
   const parsedSearchParams = validateInput(
-    Object.fromEntries(req.nextUrl.searchParams.entries()),
-    paginatedListInputSchema,
+    "filter" in searchParams && searchParams.filter
+      ? { ...searchParams, filter: JSON.parse(searchParams.filter) }
+      : searchParams,
+    assetListInputSchema,
   );
 
   const result = await assetService().assets(parsedSearchParams);

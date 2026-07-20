@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 
-interface BulkActionProps {
+export interface ActionMenuItemWithConfirmationProps {
   label: React.ReactNode;
   icon?: LucideIcon;
   confirm?: React.ReactNode;
@@ -23,7 +23,9 @@ interface BulkActionProps {
   className?: string;
 }
 
-export function BulkAction(props: BulkActionProps) {
+export function ActionMenuItemWithConfirmation(
+  props: ActionMenuItemWithConfirmationProps,
+) {
   const [confirming, setConfirming] = React.useState(false);
 
   const execute = () => {
@@ -58,7 +60,7 @@ export function BulkAction(props: BulkActionProps) {
 
 interface MenuItemProps
   extends Pick<
-    BulkActionProps,
+    ActionMenuItemWithConfirmationProps,
     "icon" | "label" | "disabled" | "className" | "keepMenuOpen"
   > {
   onSelect: () => void;

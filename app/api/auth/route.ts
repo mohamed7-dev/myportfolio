@@ -17,13 +17,6 @@ export const POST = async (req: NextRequest) => {
   return NextResponse.json(clientSafeProfile(result.profile));
 };
 
-function clientSafeProfile(profile: Profile) {
-  return {
-    summary: profile.summary,
-    username: profile.username,
-  };
-}
-
 export const PUT = async () => {
   const res: { success: boolean } = { success: false };
   const sessionToken = (await cookies()).get("session");
@@ -35,3 +28,11 @@ export const PUT = async () => {
 
   return NextResponse.json(res);
 };
+
+function clientSafeProfile(profile: Profile) {
+  return {
+    summary: profile.summary,
+    username: profile.username,
+    displayName: profile.displayName,
+  };
+}

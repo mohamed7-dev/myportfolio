@@ -3,11 +3,15 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import type { FindOptionsRelations } from "typeorm";
+import { getCurrentLocale } from "@/i18n/server";
 import { ADMIN_CREDENTIALS } from "@/lib/config/server-config";
 import type { AuthenticateAdminUserInputSchema } from "@/lib/dto/auth";
 import { UnAuthorizedError } from "@/lib/errors/errors";
 import { Profile } from "@/orm/entities/profile/profile.entity";
+import { ProfileTranslation } from "@/orm/entities/profile/profile-translation.entity";
 import { ormService } from "@/orm/orm.service";
+import { translator } from "./translator.service";
 
 export function profileService() {
   return {
@@ -26,7 +30,19 @@ export function profileService() {
     async logoutAdminUser(token: string) {
       return await _logoutAdminUser(token);
     },
+    async me() {
+      return await _me();
+    },
   };
+}
+
+async function _me() {
+  const session = await _getSession();
+  const currentLanguageCode = await getCurrentLocale();
+  return translator().translate(
+    currentLanguageCode,
+    session.profile as Profile,
+  );
 }
 
 async function initAdminProfile() {
@@ -42,12 +58,22 @@ async function initAdminProfile() {
       ADMIN_CREDENTIALS.password,
       await bcrypt.genSalt(10),
     );
+
     const newAdmin = new Profile({
-      summary: "",
       username: ADMIN_CREDENTIALS.username,
       password: hashedPassword,
     });
     await repo.save(newAdmin);
+
+    const currentLanguageCode = await getCurrentLocale();
+    const translation = new ProfileTranslation({
+      displayName: "?",
+      summary: "?",
+      languageCode: currentLanguageCode,
+      base: newAdmin,
+    });
+    const transRepo = await ormService.getRepository(ProfileTranslation);
+    await transRepo.save(translation);
   }
 }
 
@@ -66,18 +92,9 @@ async function _authenticateAdminUser(
     throw new UnAuthorizedError("Invalid credentials");
   }
 
-  const foundAdminWithPasswd = await repo.findOne({
-    where: {
-      username: credentials.username,
-    },
-    select: {
-      password: true,
-    },
-  });
-
   const isPasswordValid = await bcrypt.compare(
     credentials.password,
-    (foundAdminWithPasswd as Profile).password,
+    (foundAdmin as Profile).password,
   );
 
   if (!isPasswordValid) {
@@ -93,7 +110,10 @@ async function _authenticateAdminUser(
   return { profile: foundAdmin, token };
 }
 
-async function _findAdminUserByToken(token: string) {
+async function _findAdminUserByToken(
+  token: string,
+  relations?: FindOptionsRelations<Profile>,
+) {
   if (!token) {
     return undefined;
   }
@@ -103,6 +123,10 @@ async function _findAdminUserByToken(token: string) {
   const foundAdmin = await repo.findOne({
     where: {
       token: token,
+    },
+    relations: {
+      ...relations,
+      translations: true,
     },
   });
 
@@ -129,9 +153,11 @@ async function _logoutAdminUser(token: string) {
 async function _getSession() {
   const sessionToken = (await cookies()).get("session");
 
-  const profile = await profileService().findAdminUserByToken(
-    sessionToken?.value as string,
-  );
+  const profile = await _findAdminUserByToken(sessionToken?.value as string, {
+    assets: {
+      asset: true,
+    },
+  });
 
   return { token: sessionToken?.value, profile };
 }

@@ -5,15 +5,15 @@ import mime from "mime-types";
 import { In } from "typeorm";
 import { camelCase } from "typeorm/util/StringUtils.js";
 import { getCurrentLocale } from "@/i18n/server";
-import type {
+import {
+  type AssetListInputSchema,
   AssetType,
-  CreateAssetInputSchema,
-  DeleteAssetsInputSchema,
-  UpdateAssetInputSchema,
+  type CreateAssetInputSchema,
+  type DeleteAssetsInputSchema,
+  type UpdateAssetInputSchema,
 } from "@/lib/dto/asset";
 import type { DeletionResponse } from "@/lib/dto/common";
 import type { LanguageCode } from "@/lib/dto/language-code";
-import type { PaginatedListInputSchema } from "@/lib/dto/paginated-list";
 import {
   EntityNotFoundError,
   InternalServerError,
@@ -69,7 +69,7 @@ export function assetService() {
     async deleteAssets(input: DeleteAssetsInputSchema["input"]) {
       return await _deleteAssets(input);
     },
-    async assets(options: PaginatedListInputSchema) {
+    async assets(options: AssetListInputSchema) {
       return await _assets(options);
     },
     async asset(id: string) {
@@ -96,33 +96,40 @@ async function _createAsset(input: CreateAssetInputSchema) {
   const normalizedMimeTypes = normalizeFileTypes(allowedFileTypes);
 
   // 1. validate mimetype and get asset type
-  const isValidMimetype = validateMimeType(input.mimetype, normalizedMimeTypes);
+  const isValidMimetype = validateMimeType(
+    input.sourceFileMimetype,
+    normalizedMimeTypes,
+  );
   if (!isValidMimetype) {
     throw new UserInputError("Invalid mimetype", {
-      mimeType: input.mimetype,
-      fileName: input.filename,
+      mimeType: input.sourceFileMimetype,
+      fileName: input.sourceFilename,
     });
   }
-  const type = getAssetType(input.mimetype);
+  const type = getAssetType(input.sourceFileMimetype);
 
   // 2. calculate dimensions
-  const fileBuffer = await getFileAsBuffer(input.key);
+  const fileBuffer = await getFileAsBuffer(
+    type === AssetType.IMAGE ? input.sourceFileKey : input.previewFileKey,
+  );
   const dimensions = calculateDimensions(fileBuffer);
 
   const repo = await ormService.getRepository(Asset);
 
   const newAsset = new Asset({
     sourceIdentifier: input.sourceIdentifier,
+    previewIdentifier: input.previewIdentifier,
     width: dimensions.width,
     height: dimensions.height,
-    mimetype: input.mimetype,
+    mimetype: input.sourceFileMimetype,
     type: type,
-    fileSize: input.size,
-    fileKey: input.key,
+    fileSize: input.sourceFileSize,
+    sourceFileKey: input.sourceFileKey,
+    previewFileKey: input.previewFileKey,
   });
 
   const asset = await repo.save(newAsset);
-  const defaultName = await getSourceFileName(input.filename);
+  const defaultName = await getSourceFileName(input.sourceFilename);
   const currentLanguageCode = await getCurrentLocale();
   let assetTranslations: AssetTranslation[];
   if (input.translations?.length) {
@@ -203,7 +210,7 @@ async function _deleteAssets(
 
   return await Promise.all(
     foundAssets.map(async (asset) => {
-      await utApi.deleteFiles(asset.fileKey);
+      await utApi.deleteFiles([asset.sourceFileKey, asset.previewFileKey]);
       await repo.remove(asset);
       return {
         result: "DELETED",
@@ -213,18 +220,32 @@ async function _deleteAssets(
   );
 }
 
-async function _assets(options: PaginatedListInputSchema) {
+async function _assets(options: AssetListInputSchema) {
   const currentLanguageCode = await getCurrentLocale();
-  return (await listQueryBuilder().build(Asset, options))
-    .getManyAndCount()
-    .then((result) => {
-      return {
-        items: result[0].flatMap((asset) =>
-          translator().translate(currentLanguageCode as LanguageCode, asset),
-        ),
-        itemsCount: result[1],
-      };
+  const qb = await listQueryBuilder().build(Asset, options, {
+    alias: "asset",
+    relations: {
+      translations: true,
+    },
+  });
+  if (options?.filter?.type) {
+    qb.andWhere("asset.type = :type", { type: options.filter.type.equals });
+  }
+  if (options?.filter?.name) {
+    // TODO: fix bug: missing FROM-clause entry for table "__translations"
+    const name = options.filter.name.contains;
+    qb.andWhere("asset.__translations.name LIKE :name", {
+      name: `%${typeof name === "string" ? name.trim() : name}%`,
     });
+  }
+  return await qb.getManyAndCount().then((result) => {
+    return {
+      items: result[0].flatMap((asset) =>
+        translator().translate(currentLanguageCode as LanguageCode, asset),
+      ),
+      itemsCount: result[1],
+    };
+  });
 }
 
 async function _findOne(id: string) {
@@ -290,11 +311,11 @@ export function getAssetType(mimeType: string): AssetType {
   const type = mimeType.split("/")[0];
   switch (type) {
     case "image":
-      return "IMAGE";
+      return AssetType.IMAGE;
     case "video":
-      return "VIDEO";
+      return AssetType.VIDEO;
     default:
-      return "BINARY";
+      return AssetType.BINARY;
   }
 }
 

@@ -1,8 +1,8 @@
 import { type ZodSchema, z } from "@/lib/helpers/zod";
 
 export const paginatedListInputSchema = z.object({
-  take: z.number().optional(),
-  skip: z.number().optional(),
+  take: z.coerce.number().optional(),
+  skip: z.coerce.number().optional(),
 });
 
 export type PaginatedListInputSchema = z.infer<typeof paginatedListInputSchema>;

@@ -1,22 +1,29 @@
 import { Column, Entity, OneToMany } from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
+import type {
+  LocaleString,
+  Translatable,
+  TranslationEntity,
+} from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
 import type { ProfileAsset } from "./profile-asset.entity";
+import type { ProfileTranslation } from "./profile-translation.entity";
 
 @Entity()
-export class Profile extends AppEntity {
+export class Profile extends AppEntity implements Translatable {
   constructor(input?: DeepPartial<Profile>) {
     super();
     this.initialize(input);
   }
 
-  @Column({ type: "text" })
-  summary: string;
+  summary: LocaleString;
+
+  displayName: LocaleString;
 
   @Column()
   username: string;
 
-  @Column({ select: false })
+  @Column()
   password: string;
 
   @Column({ nullable: true })
@@ -27,4 +34,11 @@ export class Profile extends AppEntity {
     (profileAsset: ProfileAsset) => profileAsset.profile,
   )
   assets: ProfileAsset[];
+
+  @OneToMany(
+    "ProfileTranslation",
+    (translations: TranslationEntity<ProfileTranslation>) => translations.base,
+    { eager: true },
+  )
+  translations: TranslationEntity<ProfileTranslation>[];
 }

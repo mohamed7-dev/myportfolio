@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
-import { BulkAction } from "@/components/shared/bulk-action";
+import { ActionMenuItemWithConfirmation } from "@/components/shared/action-menu-item-with-confirmation";
 import type { Asset, DeleteAssetsOutputSchema } from "@/lib/dto/asset";
 
 type AssetsInput = Array<Pick<Asset, "id">>;
@@ -39,7 +39,7 @@ export function DeleteAssetsBulkAction({
   });
 
   return (
-    <BulkAction
+    <ActionMenuItemWithConfirmation
       onExecute={() =>
         mutate({
           input: {

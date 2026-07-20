@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
+import { toast } from "sonner";
+import type { ClientUploadedFileData } from "uploadthing/types";
 import {
   Select,
   SelectContent,
@@ -19,7 +21,8 @@ import type {
 } from "@/lib/dto/asset";
 import { AssetBulkActions } from "../asset-bulk-actions";
 import { DeleteAssetsBulkAction } from "../delete-assets-bulk-action";
-import { ActionsBar } from "./actions-bar";
+import { ActionsBar, AssetType, type AssetTypeUnion } from "./actions-bar";
+import { AssetPreviewUploadDialog } from "./asset-preview-upload-dialog";
 import { AssetGridView } from "./assets-grid-view";
 import { AssetsPagination } from "./assets-pagination";
 
@@ -43,6 +46,14 @@ export function AssetGallery({
   const qClient = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
+  const [openAssetPreviewDialog, setOpenAssetPreviewDialog] =
+    React.useState(false);
+  const previewFileInfo = React.useRef<ClientUploadedFileData<any> | undefined>(
+    undefined,
+  );
+  const [assetType, setAssetType] = React.useState<AssetTypeUnion>(
+    AssetType.ALL,
+  );
   const [searchInput, setSearchInput] = React.useState("");
   const debouncedSearch = useDebounce(searchInput, 500);
   const [selectedAssets, setSelectedAssets] = React.useState<Asset[]>(
@@ -50,7 +61,13 @@ export function AssetGallery({
   );
   const [page, setPage] = React.useState(1);
 
-  const queryKey = ["asset-gallery", debouncedSearch, page, pageSize];
+  const queryKey = [
+    "asset-gallery",
+    assetType,
+    debouncedSearch,
+    page,
+    pageSize,
+  ];
 
   const { mutate } = useMutation({
     mutationFn: async (input: CreateAssetInputSchema) => {
@@ -74,17 +91,40 @@ export function AssetGallery({
   } = useQuery({
     queryKey,
     queryFn: async () => {
+      const filter: Record<string, any> = {};
+
+      if (debouncedSearch) {
+        filter.name = {
+          contains: debouncedSearch,
+        };
+      }
+
+      if (assetType !== AssetType.ALL) {
+        filter.type = {
+          equals: assetType,
+        };
+      }
+
       const options: any = {
         skip: (page - 1) * pageSize,
         take: pageSize,
+        filter: Object.keys(filter).length > 0 ? filter : undefined,
       };
-      const res = await fetch(
-        `/api/assets?skip=${options.skip}&take=${options.take}`,
-        {
-          method: "get",
-          credentials: "include",
-        },
-      );
+      const searchParams = new URLSearchParams();
+      Object.entries(options).forEach(([key, value]) => {
+        if (value) {
+          searchParams.set(
+            key,
+            typeof value === "object"
+              ? JSON.stringify(value)
+              : (value as string),
+          );
+        }
+      });
+      const res = await fetch(`/api/assets?${searchParams.toString()}`, {
+        method: "get",
+        credentials: "include",
+      });
       const data = (await res.json()) as AssetListOutputSchema;
       return data;
     },
@@ -146,6 +186,8 @@ export function AssetGallery({
       <ActionsBar
         searchInput={searchInput}
         onSearchInputChange={(value) => setSearchInput(value)}
+        assetType={assetType}
+        onAssetTypeChange={(value) => setAssetType(value)}
       />
       {displayBulkActions && !!selectedAssets.length && (
         <AssetBulkActions
@@ -155,16 +197,25 @@ export function AssetGallery({
         />
       )}
       <StyledUploadDropzone
-        endpoint="imageUploader"
+        endpoint="assetUploader"
+        onChange={(acceptedFiles) => {
+          if (acceptedFiles.length) {
+            setOpenAssetPreviewDialog(true);
+          }
+        }}
         onClientUploadComplete={(res) => {
           const file = res[0];
-          mutate({
-            sourceIdentifier: file.ufsUrl,
-            mimetype: file.type,
-            size: file.size,
-            key: file.key,
-            filename: file.name,
-          });
+          if (file && previewFileInfo.current) {
+            mutate({
+              sourceIdentifier: file.ufsUrl,
+              previewIdentifier: previewFileInfo.current.ufsUrl,
+              sourceFileMimetype: file.type,
+              sourceFileSize: file.size,
+              sourceFileKey: file.key,
+              previewFileKey: previewFileInfo.current.key,
+              sourceFilename: file.name,
+            });
+          }
         }}
         onUploadError={(error: Error) => {
           alert(`ERROR! ${error.message}`);
@@ -222,6 +273,15 @@ export function AssetGallery({
           />
         )}
       </div>
+      <AssetPreviewUploadDialog
+        open={openAssetPreviewDialog}
+        onClose={() => setOpenAssetPreviewDialog(false)}
+        onUploadComplete={(info) => {
+          previewFileInfo.current = info;
+          setOpenAssetPreviewDialog(false);
+          toast.success("Preview file was uploaded successfully");
+        }}
+      />
     </div>
   );
 }
