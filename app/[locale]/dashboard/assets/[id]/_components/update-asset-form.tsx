@@ -31,7 +31,7 @@ export function UpdateAssetForm({
     mutationKey: ["update-asset"],
     mutationFn: async (input: UpdateAssetInputSchema) => {
       const res = await fetch("/api/assets", {
-        method: "PUT",
+        method: "PATCH",
         credentials: "include",
         body: JSON.stringify(input),
       });

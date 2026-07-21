@@ -76,7 +76,7 @@ export function ProjectForm({
     mutationKey: ["update-project"],
     mutationFn: async (input: UpdateProjectInputSchema) => {
       const res = await fetch("/api/projects", {
-        method: "PUT",
+        method: "PATCH",
         credentials: "include",
         body: JSON.stringify(input),
       });

@@ -27,6 +27,7 @@ import { omit } from "@/lib/utils/omit";
 import type { AppEntity } from "@/orm/entities/app-entity";
 import { AssetTranslation } from "@/orm/entities/asset/asset-translation.entity";
 import type { OrderableAsset } from "@/orm/entities/asset/orderable-asset.entity";
+import { ProfileAsset } from "@/orm/entities/profile/profile-asset.entity";
 import { ProjectAsset } from "@/orm/entities/project/project-asset.entity";
 import { ormService } from "@/orm/orm.service";
 import { patchEntity } from "@/orm/utils/patch-entity";
@@ -36,7 +37,7 @@ import { translatableSaver } from "./translatable-saver/translatable-saver.servi
 import { translator } from "./translator.service";
 
 export interface EntityWithAssets extends AppEntity {
-  featuredAsset: Asset | null;
+  featuredAsset?: Asset | null;
   assets: OrderableAsset[];
 }
 
@@ -498,6 +499,8 @@ async function getOrderableAssetType(
     switch (assetRelation.type) {
       case "ProjectAsset":
         return ProjectAsset;
+      case "ProfileAsset":
+        return ProfileAsset;
       default:
         throw new InternalServerError("Couldn't find matching orderable asset");
     }

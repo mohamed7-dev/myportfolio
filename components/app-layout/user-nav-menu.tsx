@@ -2,7 +2,7 @@
 import { LogOutIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +19,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { AccentSwitcher } from "./accent-switcher";
+import { LanguageSwitcher } from "./language-switcher";
 
 export function UserNavMenu() {
   const router = useRouter();
@@ -91,13 +92,16 @@ export function UserNavMenu() {
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <AccentSwitcher />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/about">Profile</Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
-
+            <DropdownMenuSeparator />
+            <AccentSwitcher />
+            <Suspense>
+              <LanguageSwitcher />
+            </Suspense>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon />

@@ -7,10 +7,13 @@ import type { FindOptionsRelations } from "typeorm";
 import { getCurrentLocale } from "@/i18n/server";
 import { ADMIN_CREDENTIALS } from "@/lib/config/server-config";
 import type { AuthenticateAdminUserInputSchema } from "@/lib/dto/auth";
-import { UnAuthorizedError } from "@/lib/errors/errors";
+import type { UpdateProfileInputSchema } from "@/lib/dto/profile";
+import { EntityNotFoundError, UnAuthorizedError } from "@/lib/errors/errors";
 import { Profile } from "@/orm/entities/profile/profile.entity";
 import { ProfileTranslation } from "@/orm/entities/profile/profile-translation.entity";
 import { ormService } from "@/orm/orm.service";
+import { assetService } from "./asset.service";
+import { translatableSaver } from "./translatable-saver/translatable-saver.service";
 import { translator } from "./translator.service";
 
 export function profileService() {
@@ -33,16 +36,55 @@ export function profileService() {
     async me() {
       return await _me();
     },
+    async update(input: UpdateProfileInputSchema) {
+      return await _update(input);
+    },
   };
+}
+
+async function _update(input: UpdateProfileInputSchema) {
+  const session = await _getSession();
+  if (!session.profile) {
+    throw new EntityNotFoundError("Profile not found");
+  }
+
+  await translatableSaver().update({
+    input,
+    entityType: Profile,
+    translationEntityType: ProfileTranslation,
+    beforeSave: async (p) => {
+      await assetService().updateEntityAssets(p, input);
+    },
+  });
+
+  return _me();
 }
 
 async function _me() {
   const session = await _getSession();
   const currentLanguageCode = await getCurrentLocale();
-  return translator().translate(
-    currentLanguageCode,
-    session.profile as Profile,
-  );
+  if (session.profile) {
+    const translatedProfile = translator().translate(
+      currentLanguageCode,
+      session.profile,
+    );
+    const translatedAssets = translatedProfile.assets.flatMap(
+      (profileAsset) => {
+        return {
+          ...profileAsset,
+          asset: translator().translate(
+            currentLanguageCode,
+            profileAsset.asset,
+          ),
+        };
+      },
+    );
+
+    return {
+      ...translatedProfile,
+      assets: translatedAssets,
+    };
+  }
 }
 
 async function initAdminProfile() {

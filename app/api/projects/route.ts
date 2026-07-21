@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(result);
 }
 
-export async function PUT(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   await authorize();
 
   const body = await req.json();
