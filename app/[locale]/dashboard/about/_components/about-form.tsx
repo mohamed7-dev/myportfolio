@@ -22,6 +22,7 @@ export function AboutForm({
     defaultValues: {
       id: initialValues.id,
       assetIds: initialValues?.assets?.map((asset) => asset.asset.id) ?? [],
+      featuredAssetId: initialValues?.featuredAsset?.id ?? "",
       translations: initialValues?.translations ?? [],
     },
     resolver: zodResolver(updateProfileInputSchema),

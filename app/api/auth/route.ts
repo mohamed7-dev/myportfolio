@@ -1,38 +1,40 @@
 import { cookies } from "next/headers";
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { createRouter } from "@/api/common/create-router";
 import { authenticateAdminUserInputSchema } from "@/lib/dto/auth";
+import { clientSafeSchema } from "@/lib/dto/profile";
 import { validateInput } from "@/lib/helpers/validate-input";
-import type { Profile } from "@/orm/entities/profile/profile.entity";
-import { profileService } from "@/services/profile.service";
+import { validateOutput } from "@/lib/helpers/validate-output";
+import { authService } from "@/services/domain/auth.service";
 
-export const POST = async (req: NextRequest) => {
-  const body = await req.json();
+export const { POST } = createRouter({
+  POST: {
+    authenticatedOnly: false,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
 
-  const parsedBody = validateInput(body, authenticateAdminUserInputSchema);
+      const parsedBody = validateInput(body, authenticateAdminUserInputSchema);
 
-  const result = await profileService().authenticateAdminUser(parsedBody);
+      const result = await authService.authenticateAdminUser(ctx, parsedBody);
 
-  (await cookies()).set("session", result.token);
+      (await cookies()).set("session", result.token, { httpOnly: true });
 
-  return NextResponse.json(clientSafeProfile(result.profile));
-};
+      const parsedOutput = validateOutput(result.profile, clientSafeSchema);
 
-export const PUT = async () => {
-  const res: { success: boolean } = { success: false };
-  const sessionToken = (await cookies()).get("session");
-  if (sessionToken) {
-    await profileService().logoutAdminUser(sessionToken.value);
-    (await cookies()).delete("session");
-    res.success = true;
-  }
+      return NextResponse.json(parsedOutput);
+    },
+  },
+  PUT: {
+    authenticatedOnly: true,
+    handler: async (_req, _, ctx) => {
+      const res: { success: boolean } = { success: false };
+      if (ctx.session?.token) {
+        await authService.logoutAdminUser(ctx, { token: ctx.session.token });
+        (await cookies()).delete("session");
+        res.success = true;
+      }
 
-  return NextResponse.json(res);
-};
-
-function clientSafeProfile(profile: Profile) {
-  return {
-    summary: profile.summary,
-    username: profile.username,
-    displayName: profile.displayName,
-  };
-}
+      return NextResponse.json(res);
+    },
+  },
+});

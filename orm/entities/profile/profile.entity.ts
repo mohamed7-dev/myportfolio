@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type {
   LocaleString,
@@ -6,6 +6,7 @@ import type {
   TranslationEntity,
 } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
+import { Asset } from "../asset/asset.entity";
 import type { ProfileAsset } from "./profile-asset.entity";
 import type { ProfileTranslation } from "./profile-translation.entity";
 
@@ -34,6 +35,14 @@ export class Profile extends AppEntity implements Translatable {
     (profileAsset: ProfileAsset) => profileAsset.profile,
   )
   assets: ProfileAsset[];
+
+  @Index()
+  @ManyToOne(
+    () => Asset,
+    (asset) => asset.featuredInProfile,
+    { onDelete: "SET NULL" },
+  )
+  featuredAsset: Asset;
 
   @OneToMany(
     "ProfileTranslation",

@@ -11,7 +11,7 @@ export function NameField() {
   return (
     <TranslatableFormField
       control={form.control}
-      name={"name"}
+      name="name"
       label="Asset Name"
       render={({ field }) => <Input {...(field as any)} />}
     />

@@ -1,66 +1,48 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { paginatedSoftDeletableListInputSchema } from "@/lib/dto/paginated-list";
+import { NextResponse } from "next/server";
+import { createRouter } from "@/api/common/create-router";
 import {
   createProjectInputSchema,
-  deleteProjectsInputSchema,
-  projectListOutputSchema,
+  softDeleteProjectsInputSchema,
   updateProjectInputSchema,
 } from "@/lib/dto/project";
-import { authorize } from "@/lib/helpers/authorize";
 import { validateInput } from "@/lib/helpers/validate-input";
-import { validateOutput } from "@/lib/helpers/validate-output";
-import { projectService } from "@/services/project.service";
+import { projectService } from "@/services/domain/project.service";
 
-export async function POST(req: NextRequest) {
-  await authorize();
+export const { POST, PATCH, DELETE } = createRouter({
+  POST: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
 
-  const body = await req.json();
+      const parsedData = validateInput(body, createProjectInputSchema);
 
-  const parsedData = validateInput(body, createProjectInputSchema);
+      const result = await projectService.create(ctx, parsedData);
 
-  const result = await projectService().create(parsedData);
+      return NextResponse.json(result);
+    },
+  },
+  PATCH: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
 
-  return NextResponse.json(result);
-}
+      const parsedData = validateInput(body, updateProjectInputSchema);
 
-export async function PATCH(req: NextRequest) {
-  await authorize();
+      const result = await projectService.update(ctx, parsedData);
 
-  const body = await req.json();
+      return NextResponse.json(result);
+    },
+  },
+  DELETE: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
 
-  const parsedData = validateInput(body, updateProjectInputSchema);
+      const parsedData = validateInput(body, softDeleteProjectsInputSchema);
 
-  const result = await projectService().update(parsedData);
+      const result = await projectService.softDelete(ctx, parsedData);
 
-  return NextResponse.json(result);
-}
-
-export async function DELETE(req: NextRequest) {
-  await authorize();
-
-  const body = await req.json();
-
-  const parsedData = validateInput(body, deleteProjectsInputSchema);
-
-  const result = await projectService().softDeleteProjects(parsedData);
-
-  return NextResponse.json(result);
-}
-
-export async function GET(req: NextRequest) {
-  await authorize();
-
-  const parsedSearchParams = validateInput(
-    Object.fromEntries(req.nextUrl.searchParams.entries()),
-    paginatedSoftDeletableListInputSchema,
-  );
-
-  const result = await projectService().projects(parsedSearchParams);
-
-  const parsedData = validateOutput(result, projectListOutputSchema);
-
-  return NextResponse.json({
-    items: parsedData.items,
-    itemsCount: parsedData.itemsCount,
-  });
-}
+      return NextResponse.json(result);
+    },
+  },
+});

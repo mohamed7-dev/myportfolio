@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { wrapService } from "@/api/common/create-router";
 import {
   Page,
   PageActionBar,
@@ -10,7 +11,7 @@ import { PageLayout } from "@/components/page-layout/page-layout";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import { type Project, project as projectSchema } from "@/lib/dto/project";
 import { validateOutput } from "@/lib/helpers/validate-output";
-import { projectService } from "@/services/project.service";
+import { projectService } from "@/services/domain/project.service";
 import { ProjectForm } from "./_components/project-form";
 import { ProjectFormAssetField } from "./_components/project-form-asset-field";
 import { ProjectFormMainFields } from "./_components/project-form-main-fields";
@@ -28,7 +29,11 @@ export default async function ProjectPage({
   let project: Project | undefined;
   if (!creatingNewEntity) {
     // get the project
-    const result = await projectService().project(id);
+    const findOne = wrapService({
+      authenticatedOnly: true,
+      handler: projectService.findOne,
+    });
+    const result = await findOne({ id });
     project = validateOutput(result, projectSchema);
   }
 

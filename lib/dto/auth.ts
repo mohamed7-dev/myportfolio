@@ -8,3 +8,9 @@ export const authenticateAdminUserInputSchema = z.object({
 export type AuthenticateAdminUserInputSchema = z.infer<
   typeof authenticateAdminUserInputSchema
 >;
+
+//######################## Logout #########################
+export const logoutInputSchema = z.object({
+  token: z.string(),
+});
+export type LogoutInputSchema = z.infer<typeof logoutInputSchema>;

@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/login-form/login-form";
-import { profileService } from "@/services/profile.service";
+import { requestContextService } from "@/services/helpers/request-context.service";
 
 export default async function LoginPage() {
-  const session = await profileService().getSession();
+  const requestContext = await requestContextService.create();
 
-  if (session.profile) {
+  if (requestContext.isAuthenticated) {
     redirect("/dashboard");
   }
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { wrapService } from "@/api/common/create-router";
 import {
   Page,
   PageActionBar,
@@ -10,7 +11,7 @@ import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { type Asset, AssetType, asset as assetSchema } from "@/lib/dto/asset";
 import { validateOutput } from "@/lib/helpers/validate-output";
-import { assetService } from "@/services/asset.service";
+import { assetService } from "@/services/domain/asset.service";
 import { DownloadButton } from "./_components/download-button";
 import { NameField } from "./_components/name-field";
 import { SubmitButton } from "./_components/submit-button";
@@ -23,9 +24,13 @@ export default async function AssetDetailPage({
 }) {
   const { id } = await params;
 
-  const result = await assetService().asset(id);
-  const asset = validateOutput(result, assetSchema);
+  const findOne = wrapService({
+    authenticatedOnly: true,
+    handler: assetService.findOne,
+  });
 
+  const result = await findOne({ id });
+  const asset = validateOutput(result, assetSchema);
   if (!asset) return notFound();
 
   return (

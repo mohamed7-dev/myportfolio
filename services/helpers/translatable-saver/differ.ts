@@ -1,4 +1,5 @@
 import "server-only";
+import type { RequestContext } from "@/api/request-context/request-context";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type {
   Translatable,
@@ -64,12 +65,16 @@ export class TranslationDiffer<
   }
 
   public async applyDiff(
+    ctx: RequestContext,
     entity: Entity,
     diff: TranslationDiff<Entity>,
   ): Promise<Entity> {
     const { toAdd, toUpdate } = diff;
 
-    const repo = await ormService.getRepository(this.translationEntityType);
+    const repo = await ormService.getRepository(
+      ctx,
+      this.translationEntityType,
+    );
 
     if (toAdd.length) {
       for (const translation of toAdd) {

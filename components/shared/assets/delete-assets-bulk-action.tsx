@@ -2,7 +2,11 @@ import { useMutation } from "@tanstack/react-query";
 import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 import { ActionMenuItemWithConfirmation } from "@/components/shared/action-menu-item-with-confirmation";
-import type { Asset, DeleteAssetsOutputSchema } from "@/lib/dto/asset";
+import type {
+  Asset,
+  DeleteAssetsInputSchema,
+  DeleteAssetsOutputSchema,
+} from "@/lib/dto/asset";
 
 type AssetsInput = Array<Pick<Asset, "id">>;
 
@@ -15,7 +19,7 @@ export function DeleteAssetsBulkAction({
 }) {
   const selectionLength = selection.length;
   const { mutate } = useMutation({
-    mutationFn: async (input: { input: { ids: string[] } }) => {
+    mutationFn: async (input: DeleteAssetsInputSchema) => {
       const res = await fetch("/api/assets", {
         method: "delete",
         body: JSON.stringify(input),
@@ -42,9 +46,7 @@ export function DeleteAssetsBulkAction({
     <ActionMenuItemWithConfirmation
       onExecute={() =>
         mutate({
-          input: {
-            ids: selection.map((s) => s.id),
-          },
+          ids: selection.map((s) => s.id),
         })
       }
       label="Delete"

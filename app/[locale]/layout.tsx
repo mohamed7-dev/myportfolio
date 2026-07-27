@@ -7,7 +7,6 @@ import { I18nProvider } from "@/components/providers/i18n-provider";
 import { QueryClientProvider } from "@/components/providers/query-client-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { initializationService } from "@/services/initialization.service";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +31,6 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
-
-  await initializationService().onInit();
 
   const cookieStore = await cookies();
 

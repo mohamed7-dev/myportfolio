@@ -15,6 +15,7 @@ import { ProjectAsset } from "./project/project-asset.entity";
 import { ProjectTranslation } from "./project/project-translation.entity";
 import { Skill } from "./skill/skill.entity";
 import { SkillAsset } from "./skill/skill-asset.entity";
+import { SkillTranslation } from "./skill/skill-translation.entity";
 import { Tag } from "./tag/tag.entity";
 
 export const entitiesMap = {
@@ -26,6 +27,7 @@ export const entitiesMap = {
   ProfileTranslation,
   Skill,
   SkillAsset,
+  SkillTranslation,
   Asset,
   AssetTranslation,
   ContactMethod,

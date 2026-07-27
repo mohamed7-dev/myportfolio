@@ -1,7 +1,8 @@
-import { cookies } from "next/headers";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-import { profileService } from "@/services/profile.service";
+import { RequestContext } from "@/api/request-context/request-context";
+import { getCurrentLocale } from "@/i18n/server";
+import { authService } from "@/services/domain/auth.service";
 
 const f = createUploadthing();
 
@@ -23,12 +24,13 @@ export const ourFileRouter = {
     // Set permissions and file types for this FileRoute
     .middleware(async () => {
       // This code RUNS ON YOUR SERVER before upload
-
-      console.log(await cookies());
-      const session = await profileService().getSession();
+      const ctx = new RequestContext({
+        languageCode: await getCurrentLocale(),
+      });
+      const session = await authService.getSession(ctx);
 
       // If you throw, the user will not be able to upload
-      if (!session.token) throw new UploadThingError("Unauthorized");
+      if (!session?.token) throw new UploadThingError("Unauthorized");
 
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return {};
@@ -54,11 +56,13 @@ export const ourFileRouter = {
     .middleware(async () => {
       // This code RUNS ON YOUR SERVER before upload
 
-      console.log(await cookies());
-      const session = await profileService().getSession();
+      const ctx = new RequestContext({
+        languageCode: await getCurrentLocale(),
+      });
+      const session = await authService.getSession(ctx);
 
       // If you throw, the user will not be able to upload
-      if (!session.token) throw new UploadThingError("Unauthorized");
+      if (!session?.token) throw new UploadThingError("Unauthorized");
 
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return {};

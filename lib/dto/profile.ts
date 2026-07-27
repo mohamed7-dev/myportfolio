@@ -31,6 +31,7 @@ export const profile = z.object({
   languageCode: languageCodeSchema,
   translations: z.array(profileTranslationSchema),
   assets: z.array(profileAssetSchema),
+  featuredAsset: asset.nullish(),
 });
 
 export type Profile = z.infer<typeof profile>;
@@ -45,6 +46,7 @@ const profileTranslationInputSchema = z.object({
 export const updateProfileInputSchema = z.object({
   id: z.string(),
   assetIds: z.array(z.string()),
+  featuredAssetId: z.string().optional(),
   translations: z.array(profileTranslationInputSchema).nonempty(),
 });
 
@@ -58,6 +60,7 @@ export const clientSafeSchema = z.object({
   languageCode: languageCodeSchema,
   username: z.string(),
   assets: z.array(profileAssetSchema).optional(),
+  featuredAsset: asset.nullable().optional(),
   translations: z.array(profileTranslationSchema),
 });
 

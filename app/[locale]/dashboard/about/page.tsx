@@ -1,3 +1,4 @@
+import { wrapService } from "@/api/common/create-router";
 import {
   Page,
   PageActionBar,
@@ -9,14 +10,19 @@ import { PageLayout } from "@/components/page-layout/page-layout";
 import { type ClientSafeProfile, clientSafeSchema } from "@/lib/dto/profile";
 import { InternalServerError } from "@/lib/errors/errors";
 import { validateOutput } from "@/lib/helpers/validate-output";
-import { profileService } from "@/services/profile.service";
+import { authService } from "@/services/domain/auth.service";
 import { AboutForm } from "./_components/about-form";
 import { AssetField } from "./_components/asset-field";
 import { MainFields } from "./_components/main-fields";
 import { SubmitButton } from "./_components/submit-button";
 
 export default async function AboutPage() {
-  const result = await profileService().me();
+  const me = wrapService({
+    authenticatedOnly: true,
+    handler: authService.me,
+  });
+
+  const result = await me();
 
   let profile: ClientSafeProfile | undefined;
   if (result) {
@@ -39,7 +45,10 @@ export default async function AboutPage() {
             <MainFields />
           </PageBlock>
           <PageBlock column="side" id="project-assets">
-            <AssetField profileAssets={profile.assets ?? []} />
+            <AssetField
+              profileAssets={profile.assets ?? []}
+              featuredAsset={profile.featuredAsset ?? undefined}
+            />
           </PageBlock>
         </PageLayout>
       </Page>

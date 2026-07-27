@@ -1,7 +1,10 @@
 import { z } from "@/lib/helpers/zod";
 import { asset } from "./asset";
 import { languageCodeSchema } from "./language-code";
-import { createPaginatedListOutputSchema } from "./paginated-list";
+import {
+  createPaginatedListOutputSchema,
+  paginatedSoftDeletableListInputSchema,
+} from "./paginated-list";
 
 const projectTranslationInputSchema = z.object({
   languageCode: languageCodeSchema,
@@ -96,15 +99,28 @@ export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;
 
 //####################### Delete #######################
 
-export const deleteProjectsInputSchema = z.object({
+export const softDeleteProjectsInputSchema = z.object({
   ids: z.array(z.string()),
 });
 
-export type DeleteProjectsInputSchema = z.infer<
-  typeof deleteProjectsInputSchema
+export type SoftDeleteProjectsInputSchema = z.infer<
+  typeof softDeleteProjectsInputSchema
 >;
 
 //###################### List #######################
+export const projectListInputSchema =
+  paginatedSoftDeletableListInputSchema.extend({
+    filter: z
+      .object({
+        name: z.object({ contains: z.string() }).optional(),
+        enabled: z.object({ equals: z.boolean() }).optional(),
+        liveDemoUrl: z.object({ contains: z.string() }).optional(),
+        repoUrl: z.object({ contains: z.string() }).optional(),
+      })
+      .optional(),
+  });
+export type ProjectListInputSchema = z.infer<typeof projectListInputSchema>;
+
 export const projectListOutputSchema = createPaginatedListOutputSchema(project);
 
 export type ProjectListOutputSchema = z.infer<typeof projectListOutputSchema>;

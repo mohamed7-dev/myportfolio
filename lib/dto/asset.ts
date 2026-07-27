@@ -98,9 +98,7 @@ export type AssetListInputSchema = z.infer<typeof assetListInputSchema>;
 // ################## Delete ####################
 
 export const deleteAssetsInputSchema = z.object({
-  input: z.object({
-    ids: z.array(z.string()),
-  }),
+  ids: z.array(z.string()),
 });
 
 export type DeleteAssetsInputSchema = z.infer<typeof deleteAssetsInputSchema>;

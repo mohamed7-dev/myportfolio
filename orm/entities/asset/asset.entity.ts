@@ -7,7 +7,9 @@ import type {
   TranslationEntity,
 } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
+import type { Profile } from "../profile/profile.entity";
 import type { Project } from "../project/project.entity";
+import type { Skill } from "../skill/skill.entity";
 import { Tag } from "../tag/tag.entity";
 import type { AssetTranslation } from "./asset-translation.entity";
 
@@ -64,4 +66,10 @@ export class Asset extends AppEntity implements Translatable {
 
   @OneToMany("Project", (project: Project) => project.featuredAsset)
   featuredInProjects?: Project[];
+
+  @OneToMany("Profile", (profile: Profile) => profile.featuredAsset)
+  featuredInProfile?: Profile[];
+
+  @OneToMany("Skill", (skill: Skill) => skill.featuredAsset)
+  featuredInSkill?: Skill[];
 }

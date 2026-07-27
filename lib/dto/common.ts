@@ -6,3 +6,10 @@ export const deletionResponseSchema = z.object({
 });
 
 export type DeletionResponse = z.infer<typeof deletionResponseSchema>;
+
+//############################ One ##########################
+export const inputIdSchema = z.object({
+  id: z.string(),
+});
+
+export type InputIdSchema = z.infer<typeof inputIdSchema>;

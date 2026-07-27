@@ -1,16 +1,16 @@
 import { redirect } from "next/navigation";
 import type React from "react";
 import { DashboardLayout as DashboardLayoutImpl } from "@/components/app-layout/dashboard-layout";
-import { profileService } from "@/services/profile.service";
+import { requestContextService } from "@/services/helpers/request-context.service";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await profileService().getSession();
+  const requestContext = await requestContextService.create();
 
-  if (!session.profile) {
+  if (!requestContext.isAuthenticated) {
     redirect("/login");
   }
 

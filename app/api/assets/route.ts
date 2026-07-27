@@ -1,4 +1,5 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { createRouter } from "@/api/common/create-router";
 import {
   asset,
   assetListInputSchema,
@@ -7,69 +8,74 @@ import {
   deleteAssetsInputSchema,
   updateAssetInputSchema,
 } from "@/lib/dto/asset";
-import { paginatedListInputSchema } from "@/lib/dto/paginated-list";
-import { authorize } from "@/lib/helpers/authorize";
 import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
-import { assetService } from "@/services/asset.service";
+import { assetService } from "@/services/domain/asset.service";
 
-export async function POST(req: NextRequest) {
-  await authorize();
+export const { POST, PATCH, DELETE, GET } = createRouter({
+  POST: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
 
-  const body = await req.json();
+      const parsedData = validateInput(body, createAssetInputSchema);
 
-  const parsedData = validateInput(body, createAssetInputSchema);
+      const result = await assetService.create(ctx, parsedData);
 
-  const result = await assetService().createAsset(parsedData);
+      const parsedResult = validateOutput(result, asset);
 
-  const parsedResult = validateOutput(result, asset);
+      return NextResponse.json(parsedResult);
+    },
+  },
+  PATCH: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
 
-  return NextResponse.json(parsedResult);
-}
+      const parsedData = validateInput(body, updateAssetInputSchema);
 
-export async function PATCH(req: NextRequest) {
-  await authorize();
+      const result = await assetService.update(ctx, parsedData);
 
-  const body = await req.json();
+      const parsedResult = validateOutput(result, asset);
 
-  const parsedData = validateInput(body, updateAssetInputSchema);
+      return NextResponse.json(parsedResult);
+    },
+  },
+  DELETE: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
 
-  const result = await assetService().updateAsset(parsedData);
+      const parsedBody = validateInput(body, deleteAssetsInputSchema);
 
-  const parsedResult = validateOutput(result, asset);
+      const result = await assetService.delete(ctx, parsedBody);
 
-  return NextResponse.json(parsedResult);
-}
+      return NextResponse.json(result);
+    },
+  },
+  GET: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const searchParams = Object.fromEntries(
+        req.nextUrl.searchParams.entries(),
+      );
 
-export async function DELETE(req: NextRequest) {
-  await authorize();
+      // TODO: we need to find a way to make zod parse the JSON input before validation
+      const parsedSearchParams = validateInput(
+        "filter" in searchParams && searchParams.filter
+          ? { ...searchParams, filter: JSON.parse(searchParams.filter) }
+          : searchParams,
+        assetListInputSchema,
+      );
 
-  const body = await req.json();
+      const result = await assetService.find(ctx, parsedSearchParams);
 
-  const parsedBody = validateInput(body, deleteAssetsInputSchema);
+      const parsedData = validateOutput(result, assetListOutputSchema);
 
-  const result = await assetService().deleteAssets(parsedBody.input);
-
-  return NextResponse.json(result);
-}
-
-export async function GET(req: NextRequest) {
-  await authorize();
-
-  const searchParams = Object.fromEntries(req.nextUrl.searchParams.entries());
-  const parsedSearchParams = validateInput(
-    "filter" in searchParams && searchParams.filter
-      ? { ...searchParams, filter: JSON.parse(searchParams.filter) }
-      : searchParams,
-    assetListInputSchema,
-  );
-
-  const result = await assetService().assets(parsedSearchParams);
-
-  const parsedData = validateOutput(result, assetListOutputSchema);
-
-  return NextResponse.json({
-    items: parsedData.items,
-    itemsCount: parsedData.itemsCount,
-  });
-}
+      return NextResponse.json({
+        items: parsedData.items,
+        itemsCount: parsedData.itemsCount,
+      });
+    },
+  },
+});
