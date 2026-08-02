@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import {
   type Asset,
   type UpdateAssetInputSchema,
+  type UpdateAssetOutputSchema,
   updateAssetInputSchema,
 } from "@/lib/dto/asset";
 import { Form } from "@/lib/helpers/form";
@@ -21,7 +22,7 @@ export function UpdateAssetForm({
   const form = useForm<UpdateAssetInputSchema>({
     defaultValues: {
       id: asset.id,
-      tags: asset.tags,
+      tags: asset.tags ?? [],
       translations: asset.translations,
     },
     resolver: zodResolver(updateAssetInputSchema),
@@ -36,7 +37,7 @@ export function UpdateAssetForm({
         body: JSON.stringify(input),
       });
 
-      const data = (await res.json()) as Asset;
+      const data = (await res.json()) as UpdateAssetOutputSchema;
       return data;
     },
     onSuccess: () => {

@@ -50,7 +50,7 @@ export default async function ProjectsPage({
         contains: name,
       },
       enabled: {
-        equals: Boolean(enabled),
+        equals: enabled !== undefined ? Boolean(enabled) : true,
       },
       liveDemoUrl: { contains: liveDemoUrl },
       repoUrl: { contains: repoUrl },

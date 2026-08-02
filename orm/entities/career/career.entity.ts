@@ -1,23 +1,13 @@
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
+import type { CareerMode, CareerType } from "@/lib/dto/career";
 import type { DeepPartial } from "@/lib/types/shared-types";
+import type { LocaleString, TranslationEntity } from "@/lib/types/translatable";
 import { Achievement } from "../achievement/achievement.entity";
 import { AppEntity } from "../app-entity";
+import { Asset } from "../asset/asset.entity";
 import { Project } from "../project/project.entity";
+import type { CareerTranslation } from "./career.translation";
 import type { CareerAsset } from "./career-asset.entity";
-
-export enum CareerType {
-  FULL_TIME = "FULL_TIME",
-  PART_TIME = "PART_TIME",
-  FREELANCE = "FREELANCE",
-  INTERNSHIP = "INTERNSHIP",
-  TRAINING = "TRAINING",
-  CONTRACT = "CONTRACT",
-}
-
-export enum CareerMode {
-  ON_SITE = "ON_SITE",
-  REMOTE = "REMOTE",
-}
 
 @Entity()
 export class Career extends AppEntity {
@@ -26,38 +16,45 @@ export class Career extends AppEntity {
     this.initialize(input);
   }
 
-  @Column()
-  title: string;
+  name: LocaleString;
 
-  @Column()
-  organization: string;
+  slug: LocaleString;
+
+  location: LocaleString;
+
+  organization: LocaleString;
+
+  responsibilities: LocaleString;
+
+  impact: LocaleString;
+
+  learned: LocaleString;
 
   @Column({ type: "date" })
   startDate: Date;
 
-  @Column({ type: "date" })
-  endDate: Date;
+  @Column({ type: "date", nullable: true })
+  endDate: Date | null;
 
   @Column()
   isPresent: boolean;
 
-  @Column()
+  @Column({ type: "varchar" })
   mode: CareerMode;
 
-  @Column()
+  @Column({ type: "varchar" })
   type: CareerType;
-
-  @Column({ type: "text" })
-  responsibilities: string;
-
-  @Column({ type: "text" })
-  impact: string;
-
-  @Column({ type: "text" })
-  learned: string;
 
   @OneToMany("CareerAsset", (careerAsset: CareerAsset) => careerAsset.career)
   assets: CareerAsset[];
+
+  @Index()
+  @ManyToOne(
+    () => Asset,
+    (asset) => asset.featuredInCareers,
+    { onDelete: "SET NULL" },
+  )
+  featuredAsset: Asset;
 
   @OneToMany(
     () => Project,
@@ -70,4 +67,11 @@ export class Career extends AppEntity {
     (achievement) => achievement.career,
   )
   achievements: Achievement[];
+
+  @OneToMany(
+    "CareerTranslation",
+    (translations: CareerTranslation) => translations.base,
+    { eager: true },
+  )
+  translations: TranslationEntity<CareerTranslation>[];
 }

@@ -1,4 +1,4 @@
-import { Entity, Index, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import { OrderableAsset } from "../asset/orderable-asset.entity";
 import { Project } from "./project.entity";
@@ -9,6 +9,9 @@ export class ProjectAsset extends OrderableAsset {
     super();
     this.initialize(input);
   }
+
+  @Column({ type: "uuid", name: "projectId" })
+  projectId: string;
 
   @Index()
   @ManyToOne(

@@ -1,30 +1,24 @@
 import { z } from "@/lib/helpers/zod";
-import { asset } from "./asset";
+import { asset, entityAssetSchema } from "./asset";
+import {
+  baseSchema,
+  baseTranslationEntity,
+  baseTranslationEntityInput,
+} from "./common";
 import { languageCodeSchema } from "./language-code";
 
-const profileTranslationSchema = z.object({
-  languageCode: languageCodeSchema,
-  id: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+const profileTranslationSchema = baseTranslationEntity.extend({
   displayName: z.string(),
   summary: z.string(),
 });
 
-const profileAssetSchema = z.object({
-  position: z.number(),
-  asset: asset,
-  id: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+const profileAssetSchema = entityAssetSchema.extend({
+  profileId: z.string(),
 });
 
 export type ProfileAsset = z.infer<typeof profileAssetSchema>;
 
-export const profile = z.object({
-  id: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+export const profile = baseSchema.extend({
   displayName: z.string(),
   summary: z.string(),
   username: z.string(),
@@ -36,12 +30,12 @@ export const profile = z.object({
 
 export type Profile = z.infer<typeof profile>;
 
-// ######################## Update ############################
-const profileTranslationInputSchema = z.object({
-  languageCode: languageCodeSchema,
+const profileTranslationInputSchema = baseTranslationEntityInput.extend({
   displayName: z.string().nonempty(),
   summary: z.string().nonempty(),
 });
+
+// ######################## Update ############################
 
 export const updateProfileInputSchema = z.object({
   id: z.string(),

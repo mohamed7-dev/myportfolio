@@ -17,17 +17,18 @@ export function FeaturedAsset({
 }: FeaturedAssetProps) {
   return (
     <div
-      className={`flex items-center justify-center ${compact ? "h-40" : "h-64"} border border-dashed rounded-md`}
+      className={`flex items-center justify-center ${compact ? "h-40" : "h-64"} border border-dashed rounded-md overflow-hidden`}
     >
       {featuredAsset ? (
         <AssetDisplay
           asset={featuredAsset}
           image={{
-            width: 300,
-            height: 300,
+            fill: true,
+            sizes: "15rem",
             loading: "eager",
-            className: "max-w-full max-h-full object-contain cursor-pointer",
+            className: "object-contain cursor-pointer",
           }}
+          containerClassName="relative"
         />
       ) : (
         // biome-ignore lint/a11y/noStaticElementInteractions: none

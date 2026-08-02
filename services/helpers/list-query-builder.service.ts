@@ -4,6 +4,7 @@ import {
   type FindOptionsRelations,
   type SelectQueryBuilder,
 } from "typeorm";
+import { DateUtils } from "typeorm/util/DateUtils.js";
 import type { RequestContext } from "@/api/request-context/request-context";
 import { appConfig } from "@/lib/config/app-config";
 import { DEFAULT_ENTITY_TRANSLATION_LANGUAGE_CODE } from "@/lib/constants";
@@ -199,3 +200,10 @@ class ListQueryBuilder {
 }
 
 export const listQueryBuilder = new ListQueryBuilder();
+
+export function convertDate(input: Date | string | number): string | number {
+  if (input instanceof Date) {
+    return DateUtils.mixedDateToUtcDatetimeString(input);
+  }
+  return input;
+}

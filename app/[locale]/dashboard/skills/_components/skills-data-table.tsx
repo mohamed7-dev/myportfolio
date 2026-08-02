@@ -83,7 +83,7 @@ export function SkillsDataTable({
         enableSorting: false,
         enableHiding: false,
       },
-      columnHelper.accessor("featuredAsset.sourceIdentifier", {
+      columnHelper.accessor("featuredAsset", {
         header: "Featured Asset",
         cell: (info) => {
           if (info.row.original.featuredAsset) {

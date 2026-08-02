@@ -1,7 +1,7 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
 import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { TrashIcon } from "lucide-react";
+import { EditIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -15,7 +15,7 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { useRouterUtils } from "@/hooks/use-router-utils";
 import type { DeletionResponse } from "@/lib/dto/common";
-import type { DeleteProjectsInputSchema, Project } from "@/lib/dto/project";
+import type { Project, SoftDeleteProjectsInputSchema } from "@/lib/dto/project";
 import { DeleteRowAction } from "./delete-row-action";
 
 export const columns: ColumnDef<Project>[] = [];
@@ -37,7 +37,7 @@ export function ProjectsDataTable({
   // Delete Project
   const { mutate: deleteProjects, isPending } = useMutation({
     mutationFn: async (
-      input: DeleteProjectsInputSchema & { softDelete: boolean },
+      input: SoftDeleteProjectsInputSchema & { softDelete: boolean },
     ) => {
       const res = await fetch(
         input.softDelete ? "/api/projects" : `/api/projects/${input.ids[0]}`,
@@ -213,6 +213,7 @@ export function ProjectsDataTable({
                         router.push(`/dashboard/projects/${row.original.id}`)
                       }
                     >
+                      <EditIcon />
                       View/Edit Project Details
                     </DropdownMenuItem>
                   ),

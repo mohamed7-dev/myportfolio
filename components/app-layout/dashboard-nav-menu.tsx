@@ -5,6 +5,7 @@ import {
   ContactIcon,
   GraduationCapIcon,
   ImageIcon,
+  LayoutDashboardIcon,
   TrophyIcon,
   UserIcon,
 } from "lucide-react";
@@ -18,6 +19,12 @@ import {
 } from "../ui/sidebar";
 
 const sidebarItems = [
+  {
+    id: "insights",
+    title: "Insight",
+    icon: LayoutDashboardIcon,
+    path: "/",
+  },
   {
     id: "about",
     title: "About",

@@ -39,7 +39,7 @@ export class Profile extends AppEntity implements Translatable {
   @Index()
   @ManyToOne(
     () => Asset,
-    (asset) => asset.featuredInProfile,
+    (asset) => asset.featuredInProfiles,
     { onDelete: "SET NULL" },
   )
   featuredAsset: Asset;

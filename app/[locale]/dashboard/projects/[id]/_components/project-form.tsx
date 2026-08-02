@@ -7,9 +7,11 @@ import { toast } from "sonner";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type CreateProjectInputSchema,
+  type CreateProjectOutputSchema,
   createProjectInputSchema,
   type Project,
   type UpdateProjectInputSchema,
+  type UpdateProjectOutputSchema,
   updateProjectInputSchema,
 } from "@/lib/dto/project";
 import { Form } from "@/lib/helpers/form";
@@ -59,7 +61,7 @@ export function ProjectForm({
         body: JSON.stringify(input),
       });
 
-      const data = (await res.json()) as Project;
+      const data = (await res.json()) as CreateProjectOutputSchema;
       return data;
     },
     onSuccess: () => {
@@ -81,7 +83,7 @@ export function ProjectForm({
         body: JSON.stringify(input),
       });
 
-      const data = (await res.json()) as Project;
+      const data = (await res.json()) as UpdateProjectOutputSchema;
       return data;
     },
     onSuccess: () => {

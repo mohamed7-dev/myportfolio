@@ -64,19 +64,22 @@ export class SkillService {
       },
     });
 
-    // if (options?.filter?.category) {
-    //   qb.andWhere("skill.category = :category", {
-    //     category: options.filter.category.equals,
-    //   });
-    // }
-    // if (options?.filter?.name) {
-    //   const name = options.filter.name.contains;
-    //   if (name) {
-    //     qb.andWhere("skill.__translations.name LIKE :name", {
-    //       name: `%${typeof name === "string" ? name.trim() : name}%`,
-    //     });
-    //   }
-    // }
+    if (options?.filter?.category) {
+      const category = options.filter.category.equals;
+      if (category) {
+        qb.andWhere("skill.category = :category", {
+          category: options.filter.category.equals,
+        });
+      }
+    }
+    if (options?.filter?.name) {
+      const name = options.filter.name.contains;
+      if (name) {
+        qb.andWhere("skill.__translations.name LIKE :name", {
+          name: `%${typeof name === "string" ? name.trim() : name}%`,
+        });
+      }
+    }
 
     return await qb.getManyAndCount().then((result) => {
       return {

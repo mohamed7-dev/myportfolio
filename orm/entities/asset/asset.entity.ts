@@ -6,7 +6,11 @@ import type {
   Translatable,
   TranslationEntity,
 } from "@/lib/types/translatable";
+import type { Achievement } from "../achievement/achievement.entity";
 import { AppEntity } from "../app-entity";
+import type { Career } from "../career/career.entity";
+import type { ContactMethod } from "../contact-method/contact-method.entity";
+import type { Education } from "../education/education.entity";
 import type { Profile } from "../profile/profile.entity";
 import type { Project } from "../project/project.entity";
 import type { Skill } from "../skill/skill.entity";
@@ -68,8 +72,20 @@ export class Asset extends AppEntity implements Translatable {
   featuredInProjects?: Project[];
 
   @OneToMany("Profile", (profile: Profile) => profile.featuredAsset)
-  featuredInProfile?: Profile[];
+  featuredInProfiles?: Profile[];
 
   @OneToMany("Skill", (skill: Skill) => skill.featuredAsset)
-  featuredInSkill?: Skill[];
+  featuredInSkills?: Skill[];
+
+  @OneToMany("Career", (career: Career) => career.featuredAsset)
+  featuredInCareers?: Career[];
+
+  @OneToMany("Education", (education: Education) => education.featuredAsset)
+  featuredInEducations?: Education[];
+
+  @OneToMany("ContactMethod", (cm: ContactMethod) => cm.featuredAsset)
+  featuredInContactMethods?: ContactMethod[];
+
+  @OneToMany("Achievement", (cm: Achievement) => cm.featuredAsset)
+  featuredInAchievements?: Achievement[];
 }

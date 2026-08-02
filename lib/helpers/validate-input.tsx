@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import type { ZodError, ZodSchema } from "@/lib/helpers/zod";
 import { UserInputError } from "../errors/errors";
 
@@ -19,9 +18,7 @@ export function validateInput<Output = any>(
 ): Output {
   const r = schema.safeParse(input);
   if (!r.success)
-    NextResponse.json(
-      new UserInputError("Invalid input", mapZodError(r.error)),
-    );
+    throw new UserInputError("Invalid input", mapZodError(r.error));
 
   return r.data as Output;
 }

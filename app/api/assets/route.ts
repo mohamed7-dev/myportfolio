@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
 import {
-  asset,
   assetListInputSchema,
   assetListOutputSchema,
   createAssetInputSchema,
+  createAssetOutputSchema,
   deleteAssetsInputSchema,
+  deleteAssetsOutputSchema,
   updateAssetInputSchema,
+  updateAssetOutputSchema,
 } from "@/lib/dto/asset";
 import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
@@ -22,7 +24,7 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const result = await assetService.create(ctx, parsedData);
 
-      const parsedResult = validateOutput(result, asset);
+      const parsedResult = validateOutput(result, createAssetOutputSchema);
 
       return NextResponse.json(parsedResult);
     },
@@ -36,7 +38,7 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const result = await assetService.update(ctx, parsedData);
 
-      const parsedResult = validateOutput(result, asset);
+      const parsedResult = validateOutput(result, updateAssetOutputSchema);
 
       return NextResponse.json(parsedResult);
     },
@@ -50,7 +52,9 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const result = await assetService.delete(ctx, parsedBody);
 
-      return NextResponse.json(result);
+      const parsedResult = validateOutput(result, deleteAssetsOutputSchema);
+
+      return NextResponse.json(parsedResult);
     },
   },
   GET: {

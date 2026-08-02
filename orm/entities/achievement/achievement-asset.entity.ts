@@ -1,4 +1,4 @@
-import { Entity, Index, ManyToOne } from "typeorm";
+import { Column, Entity, Index, ManyToOne } from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import { OrderableAsset } from "../asset/orderable-asset.entity";
 import { Achievement } from "./achievement.entity";
@@ -9,6 +9,9 @@ export class AchievementAsset extends OrderableAsset {
     super();
     this.initialize(input);
   }
+
+  @Column({ type: "uuid", name: "achievementId" })
+  achievementId: string;
 
   @Index()
   @ManyToOne(

@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
 import {
   createSkillInputSchema,
+  createSkillOutputSchema,
   deleteSkillsInputSchema,
+  deleteSkillsOutputSchema,
   updateSkillInputSchema,
+  updateSkillOutputSchema,
 } from "@/lib/dto/skill";
 import { validateInput } from "@/lib/helpers/validate-input";
+import { validateOutput } from "@/lib/helpers/validate-output";
 import { skillService } from "@/services/domain/skill.service";
 
 export const { POST, PATCH, DELETE } = createRouter({
@@ -18,7 +22,9 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const result = await skillService.create(ctx, parsedData);
 
-      return NextResponse.json(result);
+      const parsedResult = validateOutput(result, createSkillOutputSchema);
+
+      return NextResponse.json(parsedResult);
     },
   },
   PATCH: {
@@ -30,7 +36,9 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const result = await skillService.update(ctx, parsedData);
 
-      return NextResponse.json(result);
+      const parsedResult = validateOutput(result, updateSkillOutputSchema);
+
+      return NextResponse.json(parsedResult);
     },
   },
   DELETE: {
@@ -42,7 +50,9 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const result = await skillService.delete(ctx, parsedData);
 
-      return NextResponse.json(result);
+      const parsedResult = validateOutput(result, deleteSkillsOutputSchema);
+
+      return NextResponse.json(parsedResult);
     },
   },
 });

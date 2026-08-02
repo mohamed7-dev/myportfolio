@@ -49,7 +49,6 @@ export function LoginForm() {
         const data = (await result.json()) as { username: string };
         if (data.username) {
           // show sonner
-          // localStorage.setItem("profile", JSON.stringify(result));
           router.replace("/dashboard");
         }
       })

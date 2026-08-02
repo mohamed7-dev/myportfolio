@@ -25,9 +25,13 @@ import { utApi } from "@/lib/helpers/utapi";
 import type { ClassType } from "@/lib/types/shared-types";
 import { notNullOrUndefined } from "@/lib/utils/not-null-or-undefined";
 import { omit } from "@/lib/utils/omit";
+import { AchievementAsset } from "@/orm/entities/achievement/achievement-asset.entity";
 import type { AppEntity } from "@/orm/entities/app-entity";
 import { AssetTranslation } from "@/orm/entities/asset/asset-translation.entity";
 import type { OrderableAsset } from "@/orm/entities/asset/orderable-asset.entity";
+import { CareerAsset } from "@/orm/entities/career/career-asset.entity";
+import { ContactMethodAsset } from "@/orm/entities/contact-method/contact-method-asset.entity";
+import { EducationAsset } from "@/orm/entities/education/education-asset.entity";
 import { ProfileAsset } from "@/orm/entities/profile/profile-asset.entity";
 import { ProjectAsset } from "@/orm/entities/project/project-asset.entity";
 import { SkillAsset } from "@/orm/entities/skill/skill-asset.entity";
@@ -490,6 +494,14 @@ class AssetService {
           return ProfileAsset;
         case "SkillAsset":
           return SkillAsset;
+        case "CareerAsset":
+          return CareerAsset;
+        case "EducationAsset":
+          return EducationAsset;
+        case "ContactMethodAsset":
+          return ContactMethodAsset;
+        case "AchievementAsset":
+          return AchievementAsset;
         default:
           throw new InternalServerError(
             "Couldn't find matching orderable asset",

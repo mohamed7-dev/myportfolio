@@ -1,0 +1,238 @@
+import { DateUtils } from "typeorm/util/DateUtils.js";
+import type { RequestContext } from "@/api/request-context/request-context";
+import { listQueryBuilder } from "../helpers/list-query-builder.service";
+import { translator } from "../helpers/translator.service";
+import "server-only";
+import type { DeletionResponse } from "@/lib/dto/common";
+import type {
+  CreateEducationInputSchema,
+  DeleteEducationsInputSchema,
+  EducationListInputSchema,
+  FindOneEducationInputSchema,
+  UpdateEducationInputSchema,
+} from "@/lib/dto/education";
+import { EntityNotFoundError } from "@/lib/errors/errors";
+import { Education } from "@/orm/entities/education/education.entity";
+import { EducationTranslation } from "@/orm/entities/education/education-translation.entity";
+import { ormService } from "@/orm/orm.service";
+import { slugValidator } from "../helpers/slug-validator.service";
+import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
+import { assetService } from "./asset.service";
+
+class EducationService {
+  public async findOne(
+    ctx: RequestContext,
+    input: FindOneEducationInputSchema,
+  ) {
+    const repo = await ormService.getRepository(ctx, Education);
+    const education = await repo.findOne({
+      where: {
+        id: input.id,
+      },
+      relations: {
+        assets: {
+          asset: true,
+        },
+        featuredAsset: true,
+      },
+    });
+
+    if (education) {
+      const translatedEdu = translator.translate(ctx.languageCode, education);
+      const translatedAssets = translatedEdu.assets.flatMap((eduAsset) => {
+        return {
+          ...eduAsset,
+          asset: translator.translate(ctx.languageCode, eduAsset.asset),
+        };
+      });
+
+      return {
+        ...translatedEdu,
+        assets: translatedAssets,
+        featuredAsset: translator.translate(
+          ctx.languageCode,
+          translatedEdu.featuredAsset,
+        ),
+      };
+    }
+  }
+
+  public async find(ctx: RequestContext, options: EducationListInputSchema) {
+    const qb = await listQueryBuilder.build(Education, options, {
+      ctx,
+      alias: "edu",
+      relations: {
+        assets: {
+          asset: true,
+        },
+        featuredAsset: true,
+      },
+    });
+
+    if (options?.filter?.school) {
+      const school = options.filter.school.contains;
+      if (school) {
+        qb.andWhere("edu.__translations.school LIKE :school", {
+          school: `%${typeof school === "string" ? school.trim() : school}%`,
+        });
+      }
+    }
+
+    if (options?.filter?.location) {
+      const location = options.filter.location.contains;
+      if (location) {
+        qb.andWhere("edu.__translations.location LIKE :location", {
+          location: `%${typeof location === "string" ? location.trim() : location}%`,
+        });
+      }
+    }
+
+    if (options?.filter?.degree) {
+      const degree = options.filter.degree.contains;
+      if (degree) {
+        qb.andWhere("edu.__translations.organization LIKE :degree", {
+          degree: `%${typeof degree === "string" ? degree.trim() : degree}%`,
+        });
+      }
+    }
+
+    if (options?.filter?.isPresent) {
+      const isPresent = options.filter.isPresent.equals;
+      if (isPresent !== undefined) {
+        qb.andWhere("edu.isPresent = :isPresent", {
+          isPresent,
+        });
+      }
+    }
+
+    if (options?.filter?.startDate) {
+      const startDate = options.filter.startDate.equals;
+      if (startDate) {
+        qb.andWhere("edu.startDate = :startDate", {
+          startDate: convertDate(startDate),
+        });
+      }
+    }
+
+    if (options?.filter?.endDate) {
+      const endDate = options.filter.endDate.equals;
+      if (endDate) {
+        qb.andWhere("edu.endDate = :endDate", {
+          endDate: convertDate(endDate),
+        });
+      }
+    }
+
+    return await qb.getManyAndCount().then((result) => {
+      return {
+        items: result[0].flatMap((edu) => {
+          const translatedEdu = translator.translate(ctx.languageCode, edu);
+          const translatedAssets = translatedEdu.assets.map((eduAsset) => {
+            return {
+              ...eduAsset,
+              asset: translator.translate(ctx.languageCode, eduAsset.asset),
+            };
+          });
+
+          return {
+            ...translatedEdu,
+            assets: translatedAssets,
+            featuredAsset: translator.translate(
+              ctx.languageCode,
+              translatedEdu.featuredAsset,
+            ),
+          };
+        }),
+        itemsCount: result[1],
+      };
+    });
+  }
+
+  public async create(ctx: RequestContext, input: CreateEducationInputSchema) {
+    await slugValidator.validateSlug(ctx, input, EducationTranslation);
+    const edu = await translatableSaver.create({
+      ctx,
+      input,
+      entityType: Education,
+      translationEntityType: EducationTranslation,
+      beforeSave: async (edu) => {
+        await assetService.updateEntityFeaturedAsset(ctx, edu, input);
+      },
+    });
+    await assetService.updateEntityAssets(ctx, edu, input);
+
+    return await this.findOne(ctx, { id: edu.id });
+  }
+
+  public async update(ctx: RequestContext, input: UpdateEducationInputSchema) {
+    const repo = await ormService.getRepository(ctx, Education);
+    const edu = await repo.findOne({
+      where: {
+        id: input.id,
+      },
+      relations: {
+        assets: {
+          asset: true,
+        },
+        featuredAsset: true,
+      },
+    });
+    if (!edu) {
+      throw new EntityNotFoundError("Education item not found");
+    }
+
+    await slugValidator.validateSlug(ctx, input, EducationTranslation);
+
+    const updatedEdu = await translatableSaver.update({
+      ctx,
+      input,
+      entityType: Education,
+      translationEntityType: EducationTranslation,
+      beforeSave: async (edu) => {
+        await assetService.updateEntityFeaturedAsset(ctx, edu, input);
+        await assetService.updateEntityAssets(ctx, edu, input);
+      },
+    });
+
+    return await this.findOne(ctx, { id: updatedEdu.id });
+  }
+
+  async delete(
+    ctx: RequestContext,
+    input: DeleteEducationsInputSchema,
+  ): Promise<DeletionResponse[]> {
+    const repo = await ormService.getRepository(ctx, Education);
+    const eduItems = await Promise.all(
+      input.ids.map(async (id) => {
+        const edu = await repo.findOne({
+          where: {
+            id,
+          },
+        });
+        if (!edu) {
+          throw new EntityNotFoundError("Education item not found");
+        }
+        return edu;
+      }),
+    );
+
+    return await Promise.all(
+      eduItems.map(async (skill) => {
+        await repo.remove(skill);
+        return {
+          result: "DELETED",
+          message: "",
+        };
+      }),
+    );
+  }
+}
+
+export const educationService = new EducationService();
+
+function convertDate(input: Date | string | number): string | number {
+  if (input instanceof Date) {
+    return DateUtils.mixedDateToUtcDatetimeString(input);
+  }
+  return input;
+}

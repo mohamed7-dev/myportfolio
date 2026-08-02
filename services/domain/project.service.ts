@@ -157,7 +157,7 @@ class ProjectService {
     // 3. create entity assets
     await assetService.updateEntityAssets(ctx, project, input);
 
-    return project;
+    return await this.findOne(ctx, { id: project.id });
   }
 
   public async update(ctx: RequestContext, input: UpdateProjectInputSchema) {

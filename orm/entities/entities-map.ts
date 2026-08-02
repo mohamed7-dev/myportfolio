@@ -1,12 +1,17 @@
 import { Achievement } from "./achievement/achievement.entity";
 import { AchievementAsset } from "./achievement/achievement-asset.entity";
+import { AchievementTranslation } from "./achievement/achievement-translation.entity";
 import { Asset } from "./asset/asset.entity";
 import { AssetTranslation } from "./asset/asset-translation.entity";
 import { Career } from "./career/career.entity";
+import { CareerTranslation } from "./career/career.translation";
 import { CareerAsset } from "./career/career-asset.entity";
 import { ContactMethod } from "./contact-method/contact-method.entity";
+import { ContactMethodAsset } from "./contact-method/contact-method-asset.entity";
+import { ContactMethodTranslation } from "./contact-method/contact-method-translation.entity";
 import { Education } from "./education/education.entity";
 import { EducationAsset } from "./education/education-asset.entity";
+import { EducationTranslation } from "./education/education-translation.entity";
 import { Profile } from "./profile/profile.entity";
 import { ProfileAsset } from "./profile/profile-asset.entity";
 import { ProfileTranslation } from "./profile/profile-translation.entity";
@@ -31,11 +36,16 @@ export const entitiesMap = {
   Asset,
   AssetTranslation,
   ContactMethod,
+  ContactMethodAsset,
+  ContactMethodTranslation,
   Achievement,
   AchievementAsset,
+  AchievementTranslation,
   Career,
   CareerAsset,
+  CareerTranslation,
   Education,
   EducationAsset,
+  EducationTranslation,
   Tag,
 };

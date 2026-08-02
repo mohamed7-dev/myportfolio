@@ -7,9 +7,11 @@ import { toast } from "sonner";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type CreateSkillInputSchema,
+  type CreateSkillOutputSchema,
   createSkillInputSchema,
   type Skill,
   type UpdateSkillInputSchema,
+  type UpdateSkillOutputSchema,
   updateSkillInputSchema,
 } from "@/lib/dto/skill";
 import { Form } from "@/lib/helpers/form";
@@ -54,7 +56,7 @@ export function SkillForm({
         body: JSON.stringify(input),
       });
 
-      const data = (await res.json()) as Skill;
+      const data = (await res.json()) as CreateSkillOutputSchema;
       return data;
     },
     onSuccess: () => {
@@ -76,7 +78,7 @@ export function SkillForm({
         body: JSON.stringify(input),
       });
 
-      const data = (await res.json()) as Skill;
+      const data = (await res.json()) as UpdateSkillOutputSchema;
       return data;
     },
     onSuccess: () => {

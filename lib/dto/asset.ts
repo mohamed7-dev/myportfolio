@@ -1,18 +1,16 @@
 import { z } from "@/lib/helpers/zod";
-import { deletionResponseSchema } from "./common";
+import {
+  baseSchema,
+  baseTranslationEntity,
+  baseTranslationEntityInput,
+  deletionResponseSchema,
+  inputIdsSchema,
+} from "./common";
 import { languageCodeSchema } from "./language-code";
 import {
   createPaginatedListOutputSchema,
   paginatedListInputSchema,
 } from "./paginated-list";
-
-const assetTranslationSchema = z.object({
-  languageCode: languageCodeSchema,
-  id: z.string(),
-  name: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
 
 export enum AssetType {
   IMAGE = "IMAGE",
@@ -22,10 +20,11 @@ export enum AssetType {
 
 const assetTypeSchema = z.nativeEnum(AssetType);
 
-export const asset = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+const assetTranslationSchema = baseTranslationEntity.extend({
+  name: z.string(),
+});
+
+export const asset = baseSchema.extend({
   name: z.string(),
   languageCode: languageCodeSchema,
   mimetype: z.string(),
@@ -37,16 +36,15 @@ export const asset = z.object({
   previewFileKey: z.string(),
   sourceIdentifier: z.string(),
   previewIdentifier: z.string(),
-  tags: z.array(z.any()).optional(), // TODO: change to tag schema
+  tags: z.array(z.any()).nullish(), // TODO: change to tag schema
   translations: z.array(assetTranslationSchema),
 });
 
 export type Asset = z.infer<typeof asset>;
 
 // ################## Create ####################
-const assetTranslationInputSchema = z.object({
+const assetTranslationInputSchema = baseTranslationEntityInput.extend({
   name: z.string(),
-  languageCode: languageCodeSchema,
 });
 
 export const createAssetInputSchema = z.object({
@@ -97,12 +95,16 @@ export type AssetListInputSchema = z.infer<typeof assetListInputSchema>;
 
 // ################## Delete ####################
 
-export const deleteAssetsInputSchema = z.object({
-  ids: z.array(z.string()),
-});
+export const deleteAssetsInputSchema = inputIdsSchema;
 
 export type DeleteAssetsInputSchema = z.infer<typeof deleteAssetsInputSchema>;
 
 export const deleteAssetsOutputSchema = z.array(deletionResponseSchema);
 
 export type DeleteAssetsOutputSchema = z.infer<typeof deleteAssetsOutputSchema>;
+
+//############################ Entity Asset ##########################
+export const entityAssetSchema = baseSchema.extend({
+  position: z.number(),
+  asset: asset,
+});

@@ -1,6 +1,12 @@
 import { z } from "@/lib/helpers/zod";
-import { asset } from "./asset";
-import { languageCodeSchema } from "./language-code";
+import { asset, entityAssetSchema } from "./asset";
+import {
+  baseSchema,
+  baseTranslationEntity,
+  baseTranslationEntityInput,
+  deletionResponseSchema,
+  inputIdsSchema,
+} from "./common";
 import {
   createPaginatedListOutputSchema,
   paginatedListInputSchema,
@@ -15,29 +21,18 @@ export enum SkillCategory {
 
 const skillCategorySchema = z.nativeEnum(SkillCategory);
 
-const skillTranslationSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  languageCode: languageCodeSchema,
+const skillTranslationSchema = baseTranslationEntity.extend({
   name: z.string().nonempty(),
   slug: z.string().optional(),
 });
 
-const skillAssetSchema = z.object({
-  position: z.number(),
-  asset: asset,
-  id: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+const skillAssetSchema = entityAssetSchema.extend({
+  skillId: z.string(),
 });
 
 export type SkillAsset = z.infer<typeof skillAssetSchema>;
 
-export const skill = z.object({
-  id: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+export const skill = baseSchema.extend({
   name: z.string(),
   slug: z.string(),
   category: skillCategorySchema,
@@ -48,8 +43,7 @@ export const skill = z.object({
 
 export type Skill = z.infer<typeof skill>;
 
-const skillTranslationInputSchema = z.object({
-  languageCode: languageCodeSchema,
+const skillTranslationInputSchema = baseTranslationEntityInput.extend({
   name: z.string().nonempty(),
   slug: z.string().optional(),
 });
@@ -64,6 +58,10 @@ export const createSkillInputSchema = z.object({
 
 export type CreateSkillInputSchema = z.infer<typeof createSkillInputSchema>;
 
+export const createSkillOutputSchema = skill;
+
+export type CreateSkillOutputSchema = z.infer<typeof createSkillOutputSchema>;
+
 //############################ Update #############################
 export const updateSkillInputSchema = z.object({
   id: z.string(),
@@ -75,13 +73,9 @@ export const updateSkillInputSchema = z.object({
 
 export type UpdateSkillInputSchema = z.infer<typeof updateSkillInputSchema>;
 
-//####################### Delete #######################
+export const updateSkillOutputSchema = skill;
 
-export const deleteSkillsInputSchema = z.object({
-  ids: z.array(z.string()),
-});
-
-export type DeleteSkillsInputSchema = z.infer<typeof deleteSkillsInputSchema>;
+export type UpdateSkillOutputSchema = z.infer<typeof updateSkillOutputSchema>;
 
 //###################### List #######################
 export const skillListInputSchema = paginatedListInputSchema.extend({
@@ -97,3 +91,13 @@ export type SkillListInputSchema = z.infer<typeof skillListInputSchema>;
 export const skillListOutputSchema = createPaginatedListOutputSchema(skill);
 
 export type SkillListOutputSchema = z.infer<typeof skillListOutputSchema>;
+
+// ################## Delete ####################
+
+export const deleteSkillsInputSchema = inputIdsSchema;
+
+export type DeleteSkillsInputSchema = z.infer<typeof deleteSkillsInputSchema>;
+
+export const deleteSkillsOutputSchema = z.array(deletionResponseSchema);
+
+export type DeleteSkillsOutputSchema = z.infer<typeof deleteSkillsOutputSchema>;

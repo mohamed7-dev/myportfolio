@@ -1,22 +1,21 @@
 import {
   Column,
   Entity,
+  Index,
   JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
 } from "typeorm";
+import type { AchievementType } from "@/lib/dto/achievement";
 import type { DeepPartial } from "@/lib/types/shared-types";
+import type { LocaleString, TranslationEntity } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
+import { Asset } from "../asset/asset.entity";
 import { Career } from "../career/career.entity";
 import { Project } from "../project/project.entity";
 import type { AchievementAsset } from "./achievement-asset.entity";
-
-export enum AchievementType {
-  CERTIFICATE = "CERTIFICATE",
-  COURSE = "COURSE",
-  INTERNSHIP = "INTERNSHIP",
-}
+import type { AchievementTranslation } from "./achievement-translation.entity";
 
 @Entity()
 export class Achievement extends AppEntity {
@@ -25,13 +24,13 @@ export class Achievement extends AppEntity {
     this.initialize(input);
   }
 
-  @Column()
-  title: string;
+  name: LocaleString;
 
-  @Column()
-  organization: string;
+  slug: LocaleString;
 
-  @Column()
+  organization: LocaleString;
+
+  @Column({ type: "varchar" })
   type: AchievementType;
 
   @Column({ type: "date" })
@@ -41,10 +40,25 @@ export class Achievement extends AppEntity {
   credentialUrl: string;
 
   @OneToMany(
+    "AchievementTranslation",
+    (translations: AchievementTranslation) => translations.base,
+    { eager: true },
+  )
+  translations: TranslationEntity<AchievementTranslation>[];
+
+  @OneToMany(
     "AchievementAsset",
     (achievementAsset: AchievementAsset) => achievementAsset.achievement,
   )
   assets: AchievementAsset[];
+
+  @Index()
+  @ManyToOne(
+    () => Asset,
+    (asset) => asset.featuredInAchievements,
+    { onDelete: "SET NULL" },
+  )
+  featuredAsset: Asset;
 
   @ManyToOne(
     () => Career,

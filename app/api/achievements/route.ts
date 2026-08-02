@@ -1,0 +1,66 @@
+import { NextResponse } from "next/server";
+import { createRouter } from "@/api/common/create-router";
+import {
+  createAchievementInputSchema,
+  createAchievementOutputSchema,
+  deleteAchievementsInputSchema,
+  deleteAchievementsOutputSchema,
+  updateAchievementInputSchema,
+  updateAchievementOutputSchema,
+} from "@/lib/dto/achievement";
+import { validateInput } from "@/lib/helpers/validate-input";
+import { validateOutput } from "@/lib/helpers/validate-output";
+import { achievementService } from "@/services/domain/achievement.service";
+
+export const { POST, PATCH, DELETE } = createRouter({
+  POST: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
+
+      const parsedData = validateInput(body, createAchievementInputSchema);
+      const result = await achievementService.create(ctx, parsedData);
+
+      const parsedResult = validateOutput(
+        result,
+        createAchievementOutputSchema,
+      );
+
+      return NextResponse.json(parsedResult);
+    },
+  },
+  PATCH: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
+
+      const parsedData = validateInput(body, updateAchievementInputSchema);
+
+      const result = await achievementService.update(ctx, parsedData);
+
+      const parsedResult = validateOutput(
+        result,
+        updateAchievementOutputSchema,
+      );
+
+      return NextResponse.json(parsedResult);
+    },
+  },
+  DELETE: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const body = await req.json();
+
+      const parsedData = validateInput(body, deleteAchievementsInputSchema);
+
+      const result = await achievementService.delete(ctx, parsedData);
+
+      const parsedResult = validateOutput(
+        result,
+        deleteAchievementsOutputSchema,
+      );
+
+      return NextResponse.json(parsedResult);
+    },
+  },
+});

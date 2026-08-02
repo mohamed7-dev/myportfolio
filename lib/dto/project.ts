@@ -1,13 +1,20 @@
 import { z } from "@/lib/helpers/zod";
-import { asset } from "./asset";
+import { asset, entityAssetSchema } from "./asset";
+import {
+  baseSchema,
+  baseTranslationEntity,
+  baseTranslationEntityInput,
+  deletionResponseSchema,
+  inputIdSchema,
+  inputIdsSchema,
+} from "./common";
 import { languageCodeSchema } from "./language-code";
 import {
   createPaginatedListOutputSchema,
   paginatedSoftDeletableListInputSchema,
 } from "./paginated-list";
 
-const projectTranslationInputSchema = z.object({
-  languageCode: languageCodeSchema,
+const projectTranslationInputSchema = baseTranslationEntityInput.extend({
   name: z.string().nonempty(),
   description: z.string().nonempty(),
   slug: z.string().optional(),
@@ -19,11 +26,7 @@ const projectTranslationInputSchema = z.object({
   techStack: z.string().nonempty(),
 });
 
-const projectTranslationSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  languageCode: languageCodeSchema,
+const projectTranslationSchema = baseTranslationEntity.extend({
   name: z.string().nonempty(),
   description: z.string().nonempty(),
   slug: z.string().optional(),
@@ -35,20 +38,13 @@ const projectTranslationSchema = z.object({
   techStack: z.string().nonempty(),
 });
 
-const projectAssetSchema = z.object({
-  position: z.number(),
-  asset: asset,
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+const projectAssetSchema = entityAssetSchema.extend({
+  projectId: z.string(),
 });
 
 export type ProjectAsset = z.infer<typeof projectAssetSchema>;
 
-export const project = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+export const project = baseSchema.extend({
   liveDemoUrl: z.string().url(),
   repoUrl: z.string().url(),
   enabled: z.boolean(),
@@ -83,6 +79,12 @@ export const createProjectInputSchema = z.object({
 
 export type CreateProjectInputSchema = z.infer<typeof createProjectInputSchema>;
 
+export const createProjectOutputSchema = project;
+
+export type CreateProjectOutputSchema = z.infer<
+  typeof createProjectOutputSchema
+>;
+
 //####################### Update #######################
 
 export const updateProjectInputSchema = z.object({
@@ -97,14 +99,34 @@ export const updateProjectInputSchema = z.object({
 
 export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;
 
+export const updateProjectOutputSchema = project;
+
+export type UpdateProjectOutputSchema = z.infer<
+  typeof updateProjectOutputSchema
+>;
+
 //####################### Delete #######################
 
-export const softDeleteProjectsInputSchema = z.object({
-  ids: z.array(z.string()),
-});
+export const softDeleteProjectsInputSchema = inputIdsSchema;
 
 export type SoftDeleteProjectsInputSchema = z.infer<
   typeof softDeleteProjectsInputSchema
+>;
+
+export const softDeleteProjectsOutputSchema = z.array(deletionResponseSchema);
+
+export type SoftDeleteProjectsOutputSchema = z.infer<
+  typeof softDeleteProjectsOutputSchema
+>;
+
+export const deleteProjectInputSchema = inputIdSchema;
+
+export type DeleteProjectInputSchema = z.infer<typeof deleteProjectInputSchema>;
+
+export const deleteProjectOutputSchema = deletionResponseSchema;
+
+export type DeleteProjectOutputSchema = z.infer<
+  typeof deleteProjectOutputSchema
 >;
 
 //###################### List #######################
