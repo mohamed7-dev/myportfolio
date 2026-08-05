@@ -73,7 +73,7 @@ class AssetService {
     if (options?.filter?.name) {
       const name = options.filter.name.contains;
       if (name) {
-        qb.andWhere("asset.__translations.name LIKE :name", {
+        qb.andWhere("asset__translations.name LIKE :name", {
           name: `%${typeof name === "string" ? name.trim() : name}%`,
         });
       }

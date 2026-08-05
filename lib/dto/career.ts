@@ -86,6 +86,7 @@ export const createCareerInputSchema = z.object({
   isPresent: z.boolean(),
   type: careerTypeSchema,
   mode: careerModeSchema,
+  achievementIds: z.array(z.string()).optional(),
 });
 
 export type CreateCareerInputSchema = z.infer<typeof createCareerInputSchema>;
@@ -109,6 +110,7 @@ export const updateCareerInputSchema = z.object({
   isPresent: z.boolean().optional(),
   type: careerTypeSchema.optional(),
   mode: careerModeSchema.optional(),
+  achievementIds: z.array(z.string()).optional(),
 });
 
 export type UpdateCareerInputSchema = z.infer<typeof updateCareerInputSchema>;

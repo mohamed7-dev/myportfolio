@@ -75,7 +75,7 @@ class ProjectService {
     if (input?.filter?.name) {
       const name = input.filter.name.contains;
       if (name) {
-        qb.andWhere("project.__translations.name LIKE :name", {
+        qb.andWhere("project__translations.name LIKE :name", {
           name: `%${typeof name === "string" ? name.trim() : name}%`,
         });
       }

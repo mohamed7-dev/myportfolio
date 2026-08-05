@@ -7,7 +7,6 @@ export function useRouterUtils() {
 
   const updateSearchParams = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
-
     for (const [key, value] of Object.entries(updates)) {
       if (value === null) {
         params.delete(key);

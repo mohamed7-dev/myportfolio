@@ -79,7 +79,7 @@ class ContactMethodService {
     if (options?.filter?.name) {
       const name = options.filter.name.contains;
       if (name) {
-        qb.andWhere("cm.__translations.name LIKE :name", {
+        qb.andWhere("cm__translations.name LIKE :name", {
           name: `%${typeof name === "string" ? name.trim() : name}%`,
         });
       }

@@ -79,7 +79,7 @@ class AchievementService {
     if (options?.filter?.name) {
       const name = options.filter.name.contains;
       if (name) {
-        qb.andWhere("achievement.__translations.name LIKE :name", {
+        qb.andWhere("achievement__translations.name LIKE :name", {
           name: `%${typeof name === "string" ? name.trim() : name}%`,
         });
       }

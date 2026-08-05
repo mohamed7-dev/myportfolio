@@ -59,7 +59,6 @@ export default async function ContactMethodListPage({
           <ContactMethodDataTable
             contactMethods={contactMethods?.items}
             totalItemsCount={contactMethods.itemsCount}
-            pageSize={Number(pageSize)}
           />
         </PageBlock>
       </PageLayout>

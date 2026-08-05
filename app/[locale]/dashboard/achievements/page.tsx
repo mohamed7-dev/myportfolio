@@ -59,7 +59,6 @@ export default async function AchievementListPage({
           <AchievementsDataTable
             achievements={achievements?.items}
             totalItemsCount={achievements.itemsCount}
-            pageSize={Number(pageSize)}
           />
         </PageBlock>
       </PageLayout>

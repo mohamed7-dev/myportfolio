@@ -71,7 +71,7 @@ class CareerService {
     if (options?.filter?.name) {
       const name = options.filter.name.contains;
       if (name) {
-        qb.andWhere("career.__translations.name LIKE :name", {
+        qb.andWhere("career__translations.name LIKE :name", {
           name: `%${typeof name === "string" ? name.trim() : name}%`,
         });
       }
@@ -80,7 +80,7 @@ class CareerService {
     if (options?.filter?.location) {
       const location = options.filter.location.contains;
       if (location) {
-        qb.andWhere("career.__translations.location LIKE :location", {
+        qb.andWhere("career__translations.location LIKE :location", {
           location: `%${typeof location === "string" ? location.trim() : location}%`,
         });
       }
@@ -89,7 +89,7 @@ class CareerService {
     if (options?.filter?.organization) {
       const organization = options.filter.organization.contains;
       if (organization) {
-        qb.andWhere("career.__translations.organization LIKE :organization", {
+        qb.andWhere("career__translations.organization LIKE :organization", {
           organization: `%${typeof organization === "string" ? organization.trim() : organization}%`,
         });
       }

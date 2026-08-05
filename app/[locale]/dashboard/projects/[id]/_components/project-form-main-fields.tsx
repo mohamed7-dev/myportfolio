@@ -1,13 +1,16 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useFormContext } from "react-hook-form";
+import { SlugInput } from "@/components/data-input/slug-input";
 import { DynamicLoader } from "@/components/shared/dynamic-loader";
 import { FormField } from "@/components/shared/form-field";
 import { TranslatableFormField } from "@/components/shared/translatable-form-field";
 import { FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import type { CreateProjectInputSchema } from "@/lib/dto/project";
-import { normalizeString } from "@/lib/utils/normalize-string";
+import type {
+  CreateProjectInputSchema,
+  UpdateProjectInputSchema,
+} from "@/lib/dto/project";
 
 const RichTextInput = dynamic(
   () =>
@@ -18,7 +21,9 @@ const RichTextInput = dynamic(
 );
 
 export function ProjectFormMainFields() {
-  const form = useFormContext<CreateProjectInputSchema>();
+  const form = useFormContext<
+    CreateProjectInputSchema | UpdateProjectInputSchema
+  >();
   return (
     <FieldGroup>
       <FieldGroup className="flex-row">
@@ -34,12 +39,12 @@ export function ProjectFormMainFields() {
           label={"Project Slug"}
           disabled={true}
           render={({ field }) => (
-            <Input
-              {...(field as any)}
-              value={normalizeString(
-                form?.getValues?.("translations.0.name"),
-                "-",
-              )}
+            <SlugInput
+              {...field}
+              entityName="Project"
+              fieldName="slug"
+              watchFieldName="name"
+              entityId={form.getValues("id")}
             />
           )}
         />

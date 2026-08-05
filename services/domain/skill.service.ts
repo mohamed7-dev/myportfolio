@@ -75,7 +75,7 @@ export class SkillService {
     if (options?.filter?.name) {
       const name = options.filter.name.contains;
       if (name) {
-        qb.andWhere("skill.__translations.name LIKE :name", {
+        qb.andWhere("skill__translations.name LIKE :name", {
           name: `%${typeof name === "string" ? name.trim() : name}%`,
         });
       }

@@ -1,12 +1,15 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useFormContext } from "react-hook-form";
+import { SlugInput } from "@/components/data-input/slug-input";
 import { DynamicLoader } from "@/components/shared/dynamic-loader";
 import { TranslatableFormField } from "@/components/shared/translatable-form-field";
 import { FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import type { CreateCareerInputSchema } from "@/lib/dto/career";
-import { normalizeString } from "@/lib/utils/normalize-string";
+import type {
+  CreateCareerInputSchema,
+  UpdateCareerInputSchema,
+} from "@/lib/dto/career";
 
 const RichTextInput = dynamic(
   () =>
@@ -17,7 +20,9 @@ const RichTextInput = dynamic(
 );
 
 export function CareerFormMainFields() {
-  const form = useFormContext<CreateCareerInputSchema>();
+  const form = useFormContext<
+    CreateCareerInputSchema | UpdateCareerInputSchema
+  >();
   return (
     <FieldGroup>
       <FieldGroup className="flex-row">
@@ -25,28 +30,22 @@ export function CareerFormMainFields() {
           control={form.control}
           name={"name"}
           label={"Career Name"}
-          render={({ field }) => (
-            <Input
-              {...(field as any)}
-              onChange={(e) => {
-                field.onChange(e);
-                form.setValue(
-                  "translations.0.slug",
-                  normalizeString(
-                    form?.getValues?.("translations.0.name"),
-                    "-",
-                  ),
-                );
-              }}
-            />
-          )}
+          render={({ field }) => <Input {...(field as any)} />}
         />
         <TranslatableFormField
           control={form.control}
           name={"slug"}
           label={"Career Slug"}
           disabled={true}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <SlugInput
+              {...field}
+              entityName="Career"
+              fieldName="slug"
+              watchFieldName="name"
+              entityId={form.getValues("id")}
+            />
+          )}
         />
       </FieldGroup>
 

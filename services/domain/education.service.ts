@@ -72,7 +72,7 @@ class EducationService {
     if (options?.filter?.school) {
       const school = options.filter.school.contains;
       if (school) {
-        qb.andWhere("edu.__translations.school LIKE :school", {
+        qb.andWhere("edu__translations.school LIKE :school", {
           school: `%${typeof school === "string" ? school.trim() : school}%`,
         });
       }
@@ -81,7 +81,7 @@ class EducationService {
     if (options?.filter?.location) {
       const location = options.filter.location.contains;
       if (location) {
-        qb.andWhere("edu.__translations.location LIKE :location", {
+        qb.andWhere("edu__translations.location LIKE :location", {
           location: `%${typeof location === "string" ? location.trim() : location}%`,
         });
       }
@@ -90,7 +90,7 @@ class EducationService {
     if (options?.filter?.degree) {
       const degree = options.filter.degree.contains;
       if (degree) {
-        qb.andWhere("edu.__translations.organization LIKE :degree", {
+        qb.andWhere("edu__translations.organization LIKE :degree", {
           degree: `%${typeof degree === "string" ? degree.trim() : degree}%`,
         });
       }

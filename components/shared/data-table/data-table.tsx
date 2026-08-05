@@ -4,6 +4,7 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   type Row,
+  type Table as TanstackTable,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -14,9 +15,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  type EntityListBulkAction,
+  EntityListDataTableBulkActionBar,
+} from "./bulk-actions-bar";
 import { PaginationBar } from "./pagination-bar";
 
-interface DataTableProps<TData, TValue> {
+export type DataTableActionBarItemContext<TData> = {
+  table: TanstackTable<TData>;
+};
+
+export type DataTableActionBarItemComponent<TData> = React.FunctionComponent<
+  DataTableActionBarItemContext<TData>
+>;
+
+export interface DataTableActionBarItem<TData> {
+  component: DataTableActionBarItemComponent<TData>;
+  id: string;
+  order?: number;
+}
+
+interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onClick(row: Row<TData>, event: React.MouseEvent): void;
@@ -26,15 +45,12 @@ interface DataTableProps<TData, TValue> {
   pageSize: number;
   onPageSizeChange: (newPageSize: number) => void;
   resetPage: () => void;
-  actionBarItems?: [
-    {
-      component: React.FunctionComponent;
-      id: string;
-    },
-  ];
+  actionBarItems?: Array<DataTableActionBarItem<TData>>;
+  bulkActions?: EntityListBulkAction<TData[]>[];
+  refetch: () => void;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: string }, TValue>({
   columns,
   data,
   onClick,
@@ -45,6 +61,8 @@ export function DataTable<TData, TValue>({
   onPageSizeChange,
   resetPage,
   actionBarItems,
+  bulkActions,
+  refetch,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -52,14 +70,29 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  const isSelected = table.getSelectedRowModel().flatRows.length > 0;
+
+  const allActionBarItems = [...(actionBarItems ?? [])];
+  allActionBarItems.sort((a, b) => (a.order ?? 10_000) - (b.order ?? 10_000));
+
   return (
     <div className="flex flex-col gap-4">
       <div className="overflow-hidden space-y-2">
+        {isSelected && (
+          <EntityListDataTableBulkActionBar
+            bulkActions={bulkActions}
+            selection={table
+              .getSelectedRowModel()
+              .flatRows.map((row) => row.original)}
+            refetch={refetch}
+          />
+        )}
         <div className="w-full flex items-center justify-between">
           <div />
           <div className="">
-            {actionBarItems?.map((item) => (
-              <item.component key={item.id} />
+            {allActionBarItems?.map((item) => (
+              <item.component key={item.id} table={table} />
             ))}
           </div>
         </div>

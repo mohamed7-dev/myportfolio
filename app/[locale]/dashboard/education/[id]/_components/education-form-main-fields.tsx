@@ -1,13 +1,19 @@
 "use client";
 import { useFormContext } from "react-hook-form";
+import { SlugInput } from "@/components/data-input/slug-input";
 import { FormField } from "@/components/shared/form-field";
 import { TranslatableFormField } from "@/components/shared/translatable-form-field";
 import { FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import type { CreateEducationInputSchema } from "@/lib/dto/education";
+import type {
+  CreateEducationInputSchema,
+  UpdateEducationInputSchema,
+} from "@/lib/dto/education";
 
 export function EducationFormMainFields() {
-  const form = useFormContext<CreateEducationInputSchema>();
+  const form = useFormContext<
+    CreateEducationInputSchema | UpdateEducationInputSchema
+  >();
   return (
     <FieldGroup>
       <FieldGroup className="flex-row">
@@ -21,7 +27,15 @@ export function EducationFormMainFields() {
           control={form.control}
           name={"slug"}
           label={"Slug"}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <SlugInput
+              {...field}
+              entityName="Education"
+              fieldName="slug"
+              watchFieldName="name"
+              entityId={form.getValues("id")}
+            />
+          )}
         />
       </FieldGroup>
       <FieldGroup className="lg:flex-row">

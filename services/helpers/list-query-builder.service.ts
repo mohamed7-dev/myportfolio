@@ -143,7 +143,9 @@ class ListQueryBuilder {
         "",
         "",
       );
-      qb.leftJoinAndSelect(`${alias}.translations`, translationsAlias);
+      if (!this.isRelationAlreadyJoined(qb, translationsAlias)) {
+        qb.leftJoinAndSelect(`${alias}.translations`, translationsAlias);
+      }
       qb.andWhere(
         new Brackets((qb1) => {
           qb1.where(`${translationsAlias}.languageCode = :languageCode`, {
@@ -196,6 +198,15 @@ class ListQueryBuilder {
         }),
       );
     }
+  }
+
+  private isRelationAlreadyJoined<Entity extends AppEntity>(
+    qb: SelectQueryBuilder<Entity>,
+    alias: string,
+  ): boolean {
+    return qb.expressionMap.joinAttributes.some(
+      (ja) => ja.alias.name === alias,
+    );
   }
 }
 

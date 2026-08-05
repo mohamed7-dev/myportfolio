@@ -60,21 +60,22 @@ export default async function ProjectsPage({
   const projects = validateOutput(result, projectListOutputSchema);
 
   return (
-    <Page pageId="projects">
-      <PageTitle pageTitleBlockName="projects-page-title">Projects</PageTitle>
-      <PageActionBar pageActionBarBlockName="projects-page-action-bar">
-        <PageActionBarItem actionBarItemBlockName="create-project-action-bar-item">
+    <Page pageId="project-list-page">
+      <PageTitle pageTitleBlockName="project-list-page-title">
+        Projects
+      </PageTitle>
+      <PageActionBar pageActionBarBlockName="project-list-page-action-bar">
+        <PageActionBarItem actionBarItemBlockName="new-project-action-bar-item">
           <Button>
             <Link href={"/dashboard/projects/new"}>Add New Project</Link>
           </Button>
         </PageActionBarItem>
       </PageActionBar>
       <PageLayout>
-        <PageBlock column="full" id="project-list">
+        <PageBlock column="full" id="project-list-data-table">
           <ProjectsDataTable
             projects={projects?.items}
             totalItemsCount={projects.itemsCount}
-            pageSize={Number(pageSize)}
           />
         </PageBlock>
       </PageLayout>

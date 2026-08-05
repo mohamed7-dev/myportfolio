@@ -75,6 +75,9 @@ export const createProjectInputSchema = z.object({
   assetIds: z.array(z.string()).nonempty(),
   featuredAssetId: z.string().optional(),
   translations: z.array(projectTranslationInputSchema).nonempty(),
+  careerId: z.string().optional(),
+  educationItemId: z.string().optional(),
+  achievementIds: z.array(z.string()).optional(),
 });
 
 export type CreateProjectInputSchema = z.infer<typeof createProjectInputSchema>;
@@ -95,6 +98,9 @@ export const updateProjectInputSchema = z.object({
   assetIds: z.array(z.string()).nonempty(),
   featuredAssetId: z.string().optional(),
   translations: z.array(projectTranslationInputSchema).nonempty(),
+  careerId: z.string().optional(),
+  educationItemId: z.string().optional(),
+  achievementIds: z.array(z.string()).optional(),
 });
 
 export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;

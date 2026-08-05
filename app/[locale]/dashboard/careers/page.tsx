@@ -76,7 +76,6 @@ export default async function CareersListPage({
           <CareerDataTable
             careers={careers?.items}
             totalItemsCount={careers.itemsCount}
-            pageSize={Number(pageSize)}
           />
         </PageBlock>
       </PageLayout>

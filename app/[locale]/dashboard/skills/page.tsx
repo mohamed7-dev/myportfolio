@@ -60,7 +60,6 @@ export default async function SkillsListPage({
           <SkillsDataTable
             skills={skills?.items}
             totalItemsCount={skills.itemsCount}
-            pageSize={Number(pageSize)}
           />
         </PageBlock>
       </PageLayout>

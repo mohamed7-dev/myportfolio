@@ -76,7 +76,6 @@ export default async function EducationListPage({
           <EducationDataTable
             education={education?.items}
             totalItemsCount={education.itemsCount}
-            pageSize={Number(pageSize)}
           />
         </PageBlock>
       </PageLayout>

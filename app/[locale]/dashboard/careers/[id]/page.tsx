@@ -9,10 +9,13 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
+import { achievementListOutputSchema } from "@/lib/dto/achievement";
 import { type Career, findOneCareerOutputSchema } from "@/lib/dto/career";
 import { validateOutput } from "@/lib/helpers/validate-output";
+import { achievementService } from "@/services/domain/achievement.service";
 import { careerService } from "@/services/domain/career.service";
 import { CareerForm } from "./_components/career-form";
+import { CareerFormAchievementsField } from "./_components/career-form-achievements-field";
 import { CareerFormAssetField } from "./_components/career-form-asset-field";
 import CareerFormDateFields from "./_components/career-form-date-fields";
 import { CareerFormMainFields } from "./_components/career-form-main-fields";
@@ -42,6 +45,16 @@ export default async function CareerPage({
     notFound();
   }
 
+  const findAchievements = wrapService({
+    authenticatedOnly: true,
+    handler: achievementService.find,
+  });
+  const achievementsResult = await findAchievements({});
+  const achievements = validateOutput(
+    achievementsResult,
+    achievementListOutputSchema,
+  );
+
   return (
     <CareerForm initialValues={career}>
       <Page pageId="career">
@@ -68,6 +81,9 @@ export default async function CareerPage({
           </PageBlock>
           <PageBlock column="side" id="career-dates">
             <CareerFormDateFields />
+          </PageBlock>
+          <PageBlock column="side" id="career-achievements">
+            <CareerFormAchievementsField achievements={achievements.items} />
           </PageBlock>
         </PageLayout>
       </Page>

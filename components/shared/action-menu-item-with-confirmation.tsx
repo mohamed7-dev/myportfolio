@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react";
 import React from "react";
 import {
   AlertDialog,
@@ -10,17 +9,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 
 export interface ActionMenuItemWithConfirmationProps {
-  label: React.ReactNode;
-  icon?: LucideIcon;
+  content: React.ReactNode;
   confirm?: React.ReactNode;
   disabled?: boolean;
   keepMenuOpen?: boolean;
   onExecute(): void;
-  className?: string;
 }
 
 export function ActionMenuItemWithConfirmation(
@@ -61,18 +57,12 @@ export function ActionMenuItemWithConfirmation(
 interface MenuItemProps
   extends Pick<
     ActionMenuItemWithConfirmationProps,
-    "icon" | "label" | "disabled" | "className" | "keepMenuOpen"
+    "content" | "disabled" | "keepMenuOpen"
   > {
   onSelect: () => void;
 }
 
-function ActionMenuItem({
-  label,
-  icon: Icon,
-  className,
-  disabled,
-  onSelect,
-}: MenuItemProps) {
+function ActionMenuItem({ content, disabled, onSelect }: MenuItemProps) {
   return (
     <DropdownMenuItem
       disabled={disabled}
@@ -82,9 +72,7 @@ function ActionMenuItem({
         onSelect();
       }}
     >
-      {Icon && <Icon className={cn("mr-2 h-4 w-4", className)} />}
-
-      <span className={cn("text-sm", className)}>{label}</span>
+      {content}
     </DropdownMenuItem>
   );
 }

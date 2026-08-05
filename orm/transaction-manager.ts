@@ -46,12 +46,12 @@ export class TransactionManager {
         options.work,
       );
       if (queryRunner.isTransactionActive) {
-        queryRunner.commitTransaction();
+        await queryRunner.commitTransaction();
       }
       return result;
     } catch (error) {
       if (queryRunner.isTransactionActive) {
-        queryRunner.rollbackTransaction();
+        await queryRunner.rollbackTransaction();
       }
       throw error;
     } finally {
@@ -141,8 +141,8 @@ export class TransactionManager {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       const result = await attemptStartTransaction();
       if (result) return;
-      // insert an increasing delay before retrying
-      new Promise((resolve) => setTimeout(() => resolve, attempts * 20));
+
+      await new Promise((resolve) => setTimeout(resolve, attempts * 20));
       attempts++;
     }
     throw lastError;

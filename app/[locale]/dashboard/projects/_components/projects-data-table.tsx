@@ -1,110 +1,47 @@
 "use client";
-import { useMutation } from "@tanstack/react-query";
 import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { EditIcon, TrashIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { toast } from "sonner";
-import { AssetDisplay } from "@/components/shared/assets/asset-display";
-import { DataTable } from "@/components/shared/data-table/data-table";
-import { RowActions } from "@/components/shared/data-table/row-actions";
+import { ActionMenuItemWithConfirmation } from "@/components/shared/action-menu-item-with-confirmation";
+import { EntityListDataTable } from "@/components/shared/data-table/entity-list-data-table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { useRouterUtils } from "@/hooks/use-router-utils";
 import type { DeletionResponse } from "@/lib/dto/common";
 import type { Project, SoftDeleteProjectsInputSchema } from "@/lib/dto/project";
-import { DeleteRowAction } from "./delete-row-action";
-
-export const columns: ColumnDef<Project>[] = [];
 
 export function ProjectsDataTable({
   projects,
   totalItemsCount,
-  pageSize = 24,
 }: {
   projects: Project[];
   totalItemsCount: number;
-  pageSize?: number;
 }) {
   const router = useRouter();
-  const { updateSearchParams, searchParams } = useRouterUtils();
-  const [page, setPage] = React.useState(1);
   const columnHelper = createColumnHelper<Project>();
+  const { updateSearchParams, searchParams } = useRouterUtils();
 
-  // Delete Project
-  const { mutate: deleteProjects, isPending } = useMutation({
-    mutationFn: async (
-      input: SoftDeleteProjectsInputSchema & { softDelete: boolean },
-    ) => {
-      const res = await fetch(
-        input.softDelete ? "/api/projects" : `/api/projects/${input.ids[0]}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-          body: input.softDelete ? JSON.stringify(input) : undefined,
-        },
-      );
+  const deleteProjects = async (
+    input: SoftDeleteProjectsInputSchema & { softDelete: boolean },
+  ) => {
+    const res = await fetch(
+      input.softDelete ? "/api/projects" : `/api/projects/${input.ids[0]}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+        body: input.softDelete ? JSON.stringify(input) : undefined,
+      },
+    );
 
-      const data = (await res.json()) as DeletionResponse[] | DeletionResponse;
-      return data;
-    },
-    onSuccess: (_, variables) => {
-      toast.success(
-        `Project${variables.ids.length !== 1 ? "s" : ""} were deleted successfully`,
-      );
-      router.refresh();
-    },
-    onError: (_, variables) => {
-      toast.error(
-        `Project${variables.ids.length !== 1 ? "s" : ""} weren't deleted successfully`,
-      );
-    },
-  });
+    const data = (await res.json()) as DeletionResponse[];
+    return data;
+  };
 
   const columns = React.useMemo(() => {
     return [
-      {
-        id: "select",
-        header: ({ table }) => (
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) =>
-              table.toggleAllPageRowsSelected(!!value)
-            }
-            aria-label="Select all"
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-          />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-      },
-      columnHelper.accessor("featuredAsset.sourceIdentifier", {
-        header: "Featured Asset",
-        cell: (info) => {
-          return (
-            <AssetDisplay
-              asset={info.row.original.featuredAsset}
-              image={{
-                width: 150,
-                height: 150,
-                className: "rounded-base object-cover",
-              }}
-            />
-          );
-        },
-      }),
       {
         accessorKey: "name",
         header: "Name",
@@ -165,94 +102,45 @@ export function ProjectsDataTable({
           );
         },
       }),
-      {
-        id: "actions",
-        cell: ({ row }) => {
-          return (
-            <RowActions
-              actions={[
-                {
-                  component: () => (
-                    <DeleteRowAction
-                      label="Soft Delete Project"
-                      confirm={`Are you sure you want to soft delete project?`}
-                      icon={TrashIcon}
-                      disabled={
-                        (isPending && !!row.original.deletedAt) ||
-                        !!row.original.deletedAt
-                      }
-                      onExecute={() =>
-                        deleteProjects({
-                          ids: [row.original.id],
-                          softDelete: true,
-                        })
-                      }
-                    />
-                  ),
-                },
-                {
-                  component: () => (
-                    <DeleteRowAction
-                      label="Delete Project"
-                      confirm={"Are you sure you want to delete project?"}
-                      icon={TrashIcon}
-                      disabled={isPending && !row.original.deletedAt}
-                      onExecute={() =>
-                        deleteProjects({
-                          ids: [row.original.id],
-                          softDelete: false,
-                        })
-                      }
-                    />
-                  ),
-                },
-                {
-                  component: () => (
-                    <DropdownMenuItem
-                      onClick={() =>
-                        router.push(`/dashboard/projects/${row.original.id}`)
-                      }
-                    >
-                      <EditIcon />
-                      View/Edit Project Details
-                    </DropdownMenuItem>
-                  ),
-                },
-              ]}
-            />
-          );
-        },
-      },
     ] as ColumnDef<Project>[];
-  }, [columnHelper.accessor, router.push, deleteProjects, isPending]);
-
-  // Pagination
-  const totalItems = totalItemsCount || 0;
-  const totalPagesCount = Math.ceil(totalItems / pageSize);
-  const goToPage = (newPage: number) => {
-    if (newPage < 1 || newPage > totalPagesCount) return;
-    setPage(newPage);
-  };
+  }, [columnHelper.accessor]);
 
   return (
-    <DataTable
-      columns={columns}
+    <EntityListDataTable
       data={projects}
-      onClick={(row) => {
-        // select
-      }}
-      goToPage={goToPage}
-      page={page}
-      totalPagesCount={totalPagesCount}
-      pageSize={pageSize}
-      onPageSizeChange={(pageSize) => {
-        updateSearchParams({
-          pageSize: `${pageSize}`,
-        });
-      }}
-      resetPage={() => setPage(0)}
+      columns={columns}
+      totalItemsCount={totalItemsCount}
+      entityName="project"
+      deleteMutationFn={(input) =>
+        deleteProjects({ ...input, softDelete: false })
+      }
+      refetch={() => router.refresh()}
+      rowActions={[
+        {
+          order: 300,
+          component: ({ row }) => (
+            <ActionMenuItemWithConfirmation
+              content={
+                <React.Fragment>
+                  <TrashIcon />
+                  <span className="capitalize">soft delete project</span>
+                </React.Fragment>
+              }
+              confirm={`Are you sure you want to soft delete project?`}
+              disabled={!!row.original.deletedAt || !!row.original.deletedAt}
+              onExecute={() =>
+                deleteProjects({
+                  ids: [row.original.id],
+                  softDelete: true,
+                })
+              }
+            />
+          ),
+        },
+      ]}
       actionBarItems={[
         {
+          order: 100,
           component: () => (
             <Field orientation={"horizontal"}>
               <Checkbox

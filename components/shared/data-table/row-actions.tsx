@@ -1,3 +1,4 @@
+import type { Row } from "@tanstack/react-table";
 import { MoreHorizontalIcon } from "lucide-react";
 import type React from "react";
 import { Button } from "@/components/ui/button";
@@ -9,18 +10,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export type AssetBulkActionComponent = React.FunctionComponent;
-
-export type RowAction = {
-  order?: number;
-  component: AssetBulkActionComponent;
+export type DataTableRowActionContext<TData> = {
+  row: Row<TData>;
 };
 
-interface RowActionsProps {
-  actions?: RowAction[];
+export type DataTableRowActionComponent<TData> = React.FunctionComponent<
+  DataTableRowActionContext<TData>
+>;
+
+export type RowAction<TData> = {
+  order?: number;
+  component: DataTableRowActionComponent<TData>;
+};
+
+interface RowActionsProps<TData> {
+  actions?: RowAction<TData>[];
+  row: Row<TData>;
 }
 
-export function RowActions({ actions }: RowActionsProps) {
+export function RowActions<TData>({ actions, row }: RowActionsProps<TData>) {
   const allActions = [...(actions ?? [])];
   allActions.sort((a, b) => (a.order ?? 10_000) - (b.order ?? 10_000));
   return (
@@ -34,13 +42,8 @@ export function RowActions({ actions }: RowActionsProps) {
       <DropdownMenuContent align="end" className="w-[18rem]">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         {allActions.length > 0 ? (
-          allActions.map((action, index) => (
-            <action.component
-              key={`row-action-${
-                // biome-ignore lint/suspicious/noArrayIndexKey: no other key available
-                index
-              }`}
-            />
+          allActions.map((action) => (
+            <action.component key={`row-action-${action.order}`} row={row} />
           ))
         ) : (
           <DropdownMenuItem className="text-foreground/70" disabled>
