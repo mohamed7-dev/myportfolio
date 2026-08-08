@@ -14,3 +14,8 @@ export const logoutInputSchema = z.object({
   token: z.string(),
 });
 export type LogoutInputSchema = z.infer<typeof logoutInputSchema>;
+
+export const logoutOutputSchema = z.object({
+  success: z.boolean(),
+});
+export type LogoutOutputSchema = z.infer<typeof logoutOutputSchema>;

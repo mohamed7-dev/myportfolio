@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "seed": "tsx ./orm/seed.ts",
-    "dev": "next dev",
+    "seed": "ts-node --project ./orm/tsconfig.seed.json ./orm/seed.ts",
+    "dev": "pnpm seed && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "biome check",

@@ -3,7 +3,11 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { toast } from "sonner";
 import z from "zod";
+import type { ClientSafeProfile } from "@/lib/dto/profile";
+import type { AppError } from "@/lib/errors/app-error";
+import { setUserInfoToLS } from "@/lib/helpers/auth-storage";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -46,15 +50,15 @@ export function LoginForm() {
       credentials: "include",
     })
       .then(async (result) => {
-        const data = (await result.json()) as { username: string };
+        const data = (await result.json()) as ClientSafeProfile;
         if (data.username) {
-          // show sonner
+          setUserInfoToLS(data);
+          toast.success("Authenticated successfully");
           router.replace("/dashboard");
         }
       })
       .catch((e) => {
-        // show sonner
-        console.log(e);
+        toast.error(`Failure: ${(e as AppError).message}`);
       })
       .finally(() => {
         setIsVerifying(false);

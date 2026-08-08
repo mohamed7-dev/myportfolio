@@ -28,9 +28,11 @@ export default async function AboutPage() {
   if (result) {
     profile = validateOutput(result, clientSafeSchema);
   }
+
   if (!profile) {
     throw new InternalServerError("Missing default profile");
   }
+
   return (
     <AboutForm initialValues={profile}>
       <Page pageId="about-me">

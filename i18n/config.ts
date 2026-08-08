@@ -1,5 +1,5 @@
 export type I18nConfig = {
-  locales: Array<{ key: "en" | "ar"; displayName: string }>;
+  locales: Array<{ key: "en" | "ar" }>;
   defaultLocale: "en" | "ar";
 };
 
@@ -7,11 +7,9 @@ export const i18nConfig: I18nConfig = {
   locales: [
     {
       key: "en",
-      displayName: "English",
     },
     {
       key: "ar",
-      displayName: "Arabic",
     },
   ],
   defaultLocale: "en",

@@ -26,7 +26,6 @@ export function SkillFormMainFields() {
           control={form.control}
           name={"slug"}
           label={"Skill Slug"}
-          disabled={true}
           render={({ field }) => (
             <SlugInput
               {...field}

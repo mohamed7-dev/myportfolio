@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   Index,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -18,6 +19,7 @@ import { AppEntity } from "../app-entity";
 import { Asset } from "../asset/asset.entity";
 import { Career } from "../career/career.entity";
 import { Education } from "../education/education.entity";
+import { Skill } from "../skill/skill.entity";
 import type { ProjectAsset } from "./project-asset.entity";
 import type { ProjectTranslation } from "./project-translation.entity";
 
@@ -58,12 +60,25 @@ export class Project extends AppEntity implements Translatable, SoftDeletable {
   @Column({ default: true })
   enabled: boolean;
 
+  @Column()
+  finished: boolean;
+
+  @Column({ default: false })
+  featured: boolean;
+
   @OneToMany(
     "ProjectTranslation",
     (translations: ProjectTranslation) => translations.base,
     { eager: true },
   )
   translations: TranslationEntity<ProjectTranslation>[];
+
+  @ManyToMany(
+    () => Skill,
+    (skill) => skill.projects,
+  )
+  @JoinTable()
+  skills: Skill[];
 
   @OneToMany(
     "ProjectAsset",
@@ -84,18 +99,19 @@ export class Project extends AppEntity implements Translatable, SoftDeletable {
     (career) => career.projects,
     { nullable: true },
   )
-  career?: Career | null;
+  career: Career | null;
 
   @ManyToOne(
     () => Education,
     (edu) => edu.projects,
     { nullable: true },
   )
-  education?: Education | null;
+  education: Education | null;
 
   @ManyToMany(
     () => Achievement,
     (achievement) => achievement.projects,
   )
+  @JoinTable()
   achievements: Achievement[];
 }

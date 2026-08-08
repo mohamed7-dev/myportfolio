@@ -17,7 +17,11 @@ import { listQueryBuilder } from "../helpers/list-query-builder.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { translator } from "../helpers/translator.service";
+import { achievementService } from "./achievement.service";
 import { assetService } from "./asset.service";
+import { careerService } from "./career.service";
+import { educationService } from "./education.service";
+import { skillService } from "./skill.service";
 
 class ProjectService {
   public async findOne(ctx: RequestContext, input: InputIdSchema) {
@@ -81,13 +85,18 @@ class ProjectService {
       }
     }
 
-    if (input?.filter?.enabled) {
+    if (input?.filter?.enabled !== undefined) {
       const enabled = input.filter.enabled.equals;
-      if (enabled !== undefined) {
-        qb.andWhere("project.enabled = :enabled", {
-          enabled: enabled,
-        });
-      }
+      qb.andWhere("project.enabled = :enabled", {
+        enabled: enabled,
+      });
+    }
+
+    if (input?.filter?.featured !== undefined) {
+      const featured = input.filter.featured.equals;
+      qb.andWhere("project.featured = :featured", {
+        featured: featured,
+      });
     }
 
     if (input?.filter?.liveDemoUrl) {
@@ -152,6 +161,13 @@ class ProjectService {
       translationEntityType: ProjectTranslation,
       beforeSave: async (p) => {
         await assetService.updateEntityFeaturedAsset(ctx, p, input);
+        await careerService.updateEntityCareer(ctx, p, input);
+        await achievementService.updateEntityAchievements(ctx, p, input);
+        await skillService.updateEntitySkills(ctx, p, input);
+        await educationService.updateEntityEducation(ctx, p, {
+          ...input,
+          educationId: input.educationItemId,
+        });
       },
     });
     // 3. create entity assets
@@ -187,6 +203,13 @@ class ProjectService {
       beforeSave: async (p) => {
         await assetService.updateEntityFeaturedAsset(ctx, p, input);
         await assetService.updateEntityAssets(ctx, p, input);
+        await careerService.updateEntityCareer(ctx, p, input);
+        await achievementService.updateEntityAchievements(ctx, p, input);
+        await skillService.updateEntitySkills(ctx, p, input);
+        await educationService.updateEntityEducation(ctx, p, {
+          ...input,
+          educationId: input.educationItemId,
+        });
       },
     });
 

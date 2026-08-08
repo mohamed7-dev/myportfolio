@@ -12,12 +12,21 @@ import type {
   UpdateEducationInputSchema,
 } from "@/lib/dto/education";
 import { EntityNotFoundError } from "@/lib/errors/errors";
+import type { AppEntity } from "@/orm/entities/app-entity";
 import { Education } from "@/orm/entities/education/education.entity";
 import { EducationTranslation } from "@/orm/entities/education/education-translation.entity";
 import { ormService } from "@/orm/orm.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { assetService } from "./asset.service";
+
+interface EntityWithEducation extends AppEntity {
+  education: Education | null;
+}
+
+export interface EntityEducationInput {
+  educationId?: string | null;
+}
 
 class EducationService {
   public async findOne(
@@ -225,6 +234,24 @@ class EducationService {
         };
       }),
     );
+  }
+
+  public async updateEntityEducation<Entity extends EntityWithEducation>(
+    ctx: RequestContext,
+    entity: Entity,
+    input: EntityEducationInput,
+  ): Promise<Entity> {
+    const { educationId } = input;
+    if (educationId === null || educationId === undefined) {
+      entity.education = null;
+      return entity;
+    }
+
+    const education = await this.findOne(ctx, { id: educationId });
+    if (education) {
+      entity.education = education as any;
+    }
+    return entity;
   }
 }
 

@@ -15,7 +15,6 @@ import {
   updateSkillInputSchema,
 } from "@/lib/dto/skill";
 import { Form } from "@/lib/helpers/form";
-import { normalizeString } from "@/lib/utils/normalize-string";
 
 export function SkillForm({
   children,
@@ -30,6 +29,7 @@ export function SkillForm({
 
   const form = useForm<CreateSkillInputSchema>({
     defaultValues: {
+      isFeatured: false,
       assetIds: [],
       translations: [],
     },
@@ -39,6 +39,7 @@ export function SkillForm({
   const updateForm = useForm<UpdateSkillInputSchema>({
     defaultValues: {
       id: initialValues?.id ?? "",
+      isFeatured: initialValues?.isFeatured ?? false,
       assetIds: initialValues?.assets?.map((asset) => asset.asset.id) ?? [],
       featuredAssetId: initialValues?.featuredAsset?.id ?? "",
       category: initialValues?.category ?? undefined,
@@ -95,21 +96,12 @@ export function SkillForm({
     if (creatingNewEntity) {
       createSkill({
         ...values,
-        category: (values as CreateSkillInputSchema).category,
-        translations: values.translations.map((t) => ({
-          ...t,
-          slug: normalizeString(form.getValues("translations.0.name"), "-"),
-        })) as any,
-      });
+      } as CreateSkillInputSchema);
     } else {
       updateSkill({
         ...values,
         id: params.id as string,
-        translations: values.translations.map((t) => ({
-          ...t,
-          slug: normalizeString(form.getValues("translations.0.name"), "-"),
-        })) as any,
-      });
+      } as UpdateSkillInputSchema);
     }
   };
 

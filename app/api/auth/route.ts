@@ -7,7 +7,7 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { authService } from "@/services/domain/auth.service";
 
-export const { POST } = createRouter({
+export const { POST, PUT } = createRouter({
   POST: {
     authenticatedOnly: false,
     handler: async (req, _, ctx) => {
@@ -33,7 +33,6 @@ export const { POST } = createRouter({
         (await cookies()).delete("session");
         res.success = true;
       }
-
       return NextResponse.json(res);
     },
   },

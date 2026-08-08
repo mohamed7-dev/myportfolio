@@ -32,7 +32,7 @@ export function EducationFormMainFields() {
               {...field}
               entityName="Education"
               fieldName="slug"
-              watchFieldName="name"
+              watchFieldName="school"
               entityId={form.getValues("id")}
             />
           )}

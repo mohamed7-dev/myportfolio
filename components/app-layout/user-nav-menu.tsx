@@ -3,6 +3,7 @@ import { LogOutIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { Suspense } from "react";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +19,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import type { LogoutOutputSchema } from "@/lib/dto/auth";
+import type { ClientSafeProfile } from "@/lib/dto/profile";
+import type { AppError } from "@/lib/errors/app-error";
+import {
+  getUserInfoFromLS,
+  removeUserInfoFromLS,
+} from "@/lib/helpers/auth-storage";
 import { AccentSwitcher } from "./accent-switcher";
 import { LanguageSwitcher } from "./language-switcher";
 
@@ -25,30 +33,34 @@ export function UserNavMenu() {
   const router = useRouter();
   const { isMobile, state } = useSidebar();
   const isSidebarExpanded = state === "expanded";
-
-  // TODO: read user data from the server
-  const user = {
-    firstName: "mohamed",
-    lastName: "shaban",
-  };
+  const [userInfo, setUserInfo] = React.useState<
+    ClientSafeProfile | undefined
+  >();
 
   const handleLogout = async () => {
-    await fetch("/api/auth", { method: "put", credentials: "include" }).then(
-      async (res) => {
-        const data = await res.json();
-        console.log(data);
+    await fetch("/api/auth", { method: "put", credentials: "include" })
+      .then(async (res) => {
+        const data = (await res.json()) as LogoutOutputSchema;
         if (data.success) {
+          removeUserInfoFromLS();
+          toast.success("Logged out successfully");
           router.refresh();
           router.replace("/login");
         } else {
-          // show sonner
+          toast.error("Something went wrong while trying to logout");
         }
-      },
-    );
+      })
+      .catch((e) => {
+        toast.error(`Failure: ${(e as AppError).message}`);
+      });
   };
 
   const avatar = React.useMemo(() => {
-    return (user.firstName?.charAt(0) ?? "") + (user.lastName?.charAt(0) ?? "");
+    return userInfo?.displayName?.charAt(0) ?? "";
+  }, [userInfo]);
+
+  React.useEffect(() => {
+    setUserInfo(getUserInfoFromLS());
   }, []);
 
   return (
@@ -66,7 +78,7 @@ export function UserNavMenu() {
               {isSidebarExpanded && (
                 <div className="flex flex-col text-sm leading-wide">
                   <span className="truncate font-base text-foreground">
-                    {user.firstName} {user.lastName}
+                    {userInfo?.displayName ?? ""}
                   </span>
                 </div>
               )}
@@ -85,7 +97,7 @@ export function UserNavMenu() {
                   </div>
                   <div className="flex flex-col text-sm leading-tight">
                     <span className="truncate font-base text-foreground">
-                      {user.firstName} {user.lastName}
+                      {userInfo?.displayName ?? ""}
                     </span>
                   </div>
                 </div>

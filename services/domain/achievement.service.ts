@@ -3,6 +3,7 @@ import type { RequestContext } from "@/api/request-context/request-context";
 import { listQueryBuilder } from "../helpers/list-query-builder.service";
 import { translator } from "../helpers/translator.service";
 import "server-only";
+import { In } from "typeorm";
 import type {
   AchievementListInputSchema,
   CreateAchievementInputSchema,
@@ -14,9 +15,18 @@ import type { DeletionResponse } from "@/lib/dto/common";
 import { EntityNotFoundError } from "@/lib/errors/errors";
 import { Achievement } from "@/orm/entities/achievement/achievement.entity";
 import { AchievementTranslation } from "@/orm/entities/achievement/achievement-translation.entity";
+import type { AppEntity } from "@/orm/entities/app-entity";
 import { ormService } from "@/orm/orm.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { assetService } from "./asset.service";
+
+export interface EntityWithAchievement extends AppEntity {
+  achievements: Achievement[];
+}
+
+export interface EntityAchievementInput {
+  achievementIds?: string[] | null;
+}
 
 class AchievementService {
   public async findOne(
@@ -198,6 +208,27 @@ class AchievementService {
         };
       }),
     );
+  }
+
+  public async updateEntityAchievements<Entity extends EntityWithAchievement>(
+    ctx: RequestContext,
+    entity: Entity,
+    input: EntityAchievementInput,
+  ) {
+    const { achievementIds } = input;
+    const repo = await ormService.getRepository(ctx, Achievement);
+    if (achievementIds?.length) {
+      const achievements = await repo.find({
+        where: {
+          id: In(achievementIds),
+        },
+      });
+      entity.achievements = achievements;
+    } else {
+      entity.achievements = [];
+    }
+
+    return entity;
   }
 }
 

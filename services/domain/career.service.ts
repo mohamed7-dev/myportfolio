@@ -13,11 +13,21 @@ import { translator } from "../helpers/translator.service";
 import "server-only";
 import type { DeletionResponse } from "@/lib/dto/common";
 import { EntityNotFoundError } from "@/lib/errors/errors";
+import type { AppEntity } from "@/orm/entities/app-entity";
 import { CareerTranslation } from "@/orm/entities/career/career.translation";
 import { ormService } from "@/orm/orm.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
+import { achievementService } from "./achievement.service";
 import { assetService } from "./asset.service";
+
+interface EntityWithCareer extends AppEntity {
+  career: Career | null;
+}
+
+export interface EntityCareerInput {
+  careerId?: string | null;
+}
 
 class CareerService {
   public async findOne(ctx: RequestContext, input: FindOneCareerInputSchema) {
@@ -162,8 +172,9 @@ class CareerService {
       input,
       entityType: Career,
       translationEntityType: CareerTranslation,
-      beforeSave: async (skill) => {
-        await assetService.updateEntityFeaturedAsset(ctx, skill, input);
+      beforeSave: async (career) => {
+        await assetService.updateEntityFeaturedAsset(ctx, career, input);
+        await achievementService.updateEntityAchievements(ctx, career, input);
       },
     });
     await assetService.updateEntityAssets(ctx, career, input);
@@ -195,9 +206,10 @@ class CareerService {
       input,
       entityType: Career,
       translationEntityType: CareerTranslation,
-      beforeSave: async (p) => {
-        await assetService.updateEntityFeaturedAsset(ctx, p, input);
-        await assetService.updateEntityAssets(ctx, p, input);
+      beforeSave: async (career) => {
+        await assetService.updateEntityFeaturedAsset(ctx, career, input);
+        await assetService.updateEntityAssets(ctx, career, input);
+        await achievementService.updateEntityAchievements(ctx, career, input);
       },
     });
 
@@ -232,6 +244,24 @@ class CareerService {
         };
       }),
     );
+  }
+
+  public async updateEntityCareer<Entity extends EntityWithCareer>(
+    ctx: RequestContext,
+    entity: Entity,
+    input: EntityCareerInput,
+  ): Promise<Entity> {
+    const { careerId } = input;
+    if (careerId === null || careerId === undefined) {
+      entity.career = null;
+      return entity;
+    }
+
+    const career = await this.findOne(ctx, { id: careerId });
+    if (career) {
+      entity.career = career as any;
+    }
+    return entity;
   }
 }
 

@@ -1,6 +1,4 @@
-import "server-only";
-
 export const ADMIN_CREDENTIALS = {
-  username: "mo_dev_profile",
-  password: "Youcanguessit@100",
+  username: process.env.ADMIN_USERNAME ?? "superadmin",
+  password: process.env.ADMIN_PASSWORD ?? "Youcanguessit@100",
 };

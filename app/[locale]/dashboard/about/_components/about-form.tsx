@@ -21,6 +21,10 @@ export function AboutForm({
   const form = useForm<UpdateProfileInputSchema>({
     defaultValues: {
       id: initialValues.id,
+      handle: initialValues.handle ?? "",
+      projectsShipped: initialValues.projectsShipped ?? 0,
+      openSourceContributions: initialValues.openSourceContributions ?? 0,
+      yearsOfExperience: initialValues.yearsOfExperience ?? 0,
       assetIds: initialValues?.assets?.map((asset) => asset.asset.id) ?? [],
       featuredAssetId: initialValues?.featuredAsset?.id ?? "",
       translations: initialValues?.translations ?? [],

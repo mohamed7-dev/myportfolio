@@ -21,6 +21,30 @@ export class Profile extends AppEntity implements Translatable {
 
   displayName: LocaleString;
 
+  intro: LocaleString;
+
+  subHeading: LocaleString;
+
+  subtitle: LocaleString;
+
+  jobTitle: LocaleString;
+
+  location: LocaleString;
+
+  currentFocus: LocaleString;
+
+  @Column({ type: "int", default: 0 })
+  projectsShipped: number;
+
+  @Column({ type: "int", default: 0 })
+  openSourceContributions: number;
+
+  @Column({ type: "int", default: 0 })
+  yearsOfExperience: number;
+
+  @Column()
+  handle: string;
+
   @Column()
   username: string;
 

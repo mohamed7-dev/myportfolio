@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import "reflect-metadata";
-import { cookies } from "next/headers";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { QueryClientProvider } from "@/components/providers/query-client-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { getAccentColor } from "@/lib/helpers/accent-cookie";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +32,7 @@ export default async function RootLayout({
 }>) {
   const { locale } = await params;
 
-  const cookieStore = await cookies();
-
-  const accent = cookieStore.get("accent")?.value ?? "";
+  const accent = await getAccentColor();
 
   return (
     <html

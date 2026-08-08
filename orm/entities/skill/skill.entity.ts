@@ -1,4 +1,11 @@
-import { Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
 import type { SkillCategory } from "@/lib/dto/skill";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type {
@@ -8,6 +15,7 @@ import type {
 } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
 import { Asset } from "../asset/asset.entity";
+import { Project } from "../project/project.entity";
 import type { SkillAsset } from "./skill-asset.entity";
 import type { SkillTranslation } from "./skill-translation.entity";
 
@@ -21,6 +29,9 @@ export class Skill extends AppEntity implements Translatable {
   name: LocaleString;
 
   slug: LocaleString;
+
+  @Column({ default: false })
+  isFeatured: boolean;
 
   @Column({ type: "varchar" })
   category: SkillCategory;
@@ -42,4 +53,10 @@ export class Skill extends AppEntity implements Translatable {
     { eager: true },
   )
   translations: TranslationEntity<SkillTranslation>[];
+
+  @ManyToMany(
+    () => Project,
+    (project) => project.skills,
+  )
+  projects: Project[];
 }

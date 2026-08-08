@@ -17,15 +17,19 @@ export function ProjectFormAchievementsField({
     <Field>
       <RelationField
         data={achievements.map((c) => ({ ...c, label: c.name }))}
-        selectedIds={[form.getValues("achievementIds")]}
+        selectedIds={form.getValues("achievementIds") ?? []}
         entityName="achievement"
         open={open}
         onOpenChange={setOpen}
         onSelectChange={(value) => {
-          form.setValue("achievementIds", value ?? undefined, {
-            shouldDirty: true,
-            shouldValidate: true,
-          });
+          form.setValue(
+            "achievementIds",
+            Array.isArray(value) ? value : [value],
+            {
+              shouldDirty: true,
+              shouldValidate: true,
+            },
+          );
           setOpen(false);
         }}
       />

@@ -15,6 +15,7 @@ import { skillService } from "@/services/domain/skill.service";
 import { SkillForm } from "./_components/skill-form";
 import { SkillFormAssetField } from "./_components/skill-form-asset-field";
 import { SkillFormCategoryField } from "./_components/skill-form-category-field";
+import { SkillFormFeaturedField } from "./_components/skill-form-featured-field";
 import { SkillFormMainFields } from "./_components/skill-form-main-fields";
 import { SubmitButton } from "./_components/submit-button";
 
@@ -60,6 +61,9 @@ export default async function SkillPage({
               skillAssets={skill?.assets ?? []}
               featuredAsset={skill?.featuredAsset ?? undefined}
             />
+          </PageBlock>
+          <PageBlock column="side" id="skill-featured">
+            <SkillFormFeaturedField />
           </PageBlock>
           <PageBlock column="side" id="skill-category">
             <SkillFormCategoryField />

@@ -1,4 +1,4 @@
-import { AppError } from "./i18n-error";
+import { AppError } from "./app-error";
 
 /**
  * @description

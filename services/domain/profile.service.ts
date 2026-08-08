@@ -54,6 +54,48 @@ class ProfileService {
       ),
     };
   }
+
+  public async getSuperAdmin(
+    ctx: RequestContext,
+    relations?: FindOptionsRelations<Profile>,
+  ) {
+    const repo = await ormService.getRepository(ctx, Profile);
+    const profile = await repo.findOne({
+      where: {
+        username: ADMIN_CREDENTIALS.username,
+      },
+      relations: relations ?? {
+        assets: {
+          asset: true,
+        },
+        featuredAsset: true,
+      },
+    });
+
+    if (!profile) {
+      throw new EntityNotFoundError("Profile not found");
+    }
+
+    const translatedProfile = translator.translate(ctx.languageCode, profile);
+    const translatedAssets = translatedProfile.assets.flatMap(
+      (profileAsset) => {
+        return {
+          ...profileAsset,
+          asset: translator.translate(ctx.languageCode, profileAsset.asset),
+        };
+      },
+    );
+
+    return {
+      ...translatedProfile,
+      assets: translatedAssets,
+      featuredAsset: translator.translate(
+        ctx.languageCode,
+        translatedProfile.featuredAsset,
+      ),
+    };
+  }
+
   public async initAdminProfile() {
     const repo = await ormService.getRepository(Profile);
     const foundAdmin = await repo.findOne({
@@ -71,6 +113,7 @@ class ProfileService {
       const newAdmin = new Profile({
         username: ADMIN_CREDENTIALS.username,
         password: hashedPassword,
+        handle: "?",
       });
       await repo.save(newAdmin);
 
@@ -78,6 +121,12 @@ class ProfileService {
       const translation = new ProfileTranslation({
         displayName: "?",
         summary: "?",
+        intro: "?",
+        subHeading: "?",
+        subtitle: "?",
+        jobTitle: "?",
+        location: "?",
+        currentFocus: "?",
         languageCode: currentLanguageCode,
         base: newAdmin,
       });

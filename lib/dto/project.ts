@@ -1,5 +1,7 @@
 import { z } from "@/lib/helpers/zod";
+import { achievement } from "./achievement";
 import { asset, entityAssetSchema } from "./asset";
+import { career } from "./career";
 import {
   baseSchema,
   baseTranslationEntity,
@@ -8,11 +10,13 @@ import {
   inputIdSchema,
   inputIdsSchema,
 } from "./common";
+import { education } from "./education";
 import { languageCodeSchema } from "./language-code";
 import {
   createPaginatedListOutputSchema,
   paginatedSoftDeletableListInputSchema,
 } from "./paginated-list";
+import { skill } from "./skill";
 
 const projectTranslationInputSchema = baseTranslationEntityInput.extend({
   name: z.string().nonempty(),
@@ -48,6 +52,8 @@ export const project = baseSchema.extend({
   liveDemoUrl: z.string().url(),
   repoUrl: z.string().url(),
   enabled: z.boolean(),
+  finished: z.boolean(),
+  featured: z.boolean(),
   languageCode: languageCodeSchema,
   name: z.string(),
   slug: z.string(),
@@ -62,6 +68,10 @@ export const project = baseSchema.extend({
   assets: z.array(projectAssetSchema),
   featuredAsset: asset,
   deletedAt: z.coerce.date().nullable(),
+  career: career.nullish(),
+  education: education.nullish(),
+  achievements: z.array(achievement).nullish(),
+  skills: z.array(skill).optional(), // TODO: remove the optional
 });
 
 export type Project = z.infer<typeof project>;
@@ -69,15 +79,18 @@ export type Project = z.infer<typeof project>;
 //####################### Create #######################
 
 export const createProjectInputSchema = z.object({
-  enabled: z.boolean(),
+  enabled: z.boolean().optional(),
+  finished: z.boolean(),
+  featured: z.boolean().optional(),
   liveDemoUrl: z.string().url(),
-  repoUrl: z.string().url().nonempty(),
-  assetIds: z.array(z.string()).nonempty(),
+  repoUrl: z.string().url(),
+  assetIds: z.array(z.string()),
   featuredAssetId: z.string().optional(),
-  translations: z.array(projectTranslationInputSchema).nonempty(),
+  translations: z.array(projectTranslationInputSchema),
   careerId: z.string().optional(),
   educationItemId: z.string().optional(),
   achievementIds: z.array(z.string()).optional(),
+  skillIds: z.array(z.string()).optional(), // TODO: remove optional
 });
 
 export type CreateProjectInputSchema = z.infer<typeof createProjectInputSchema>;
@@ -92,15 +105,24 @@ export type CreateProjectOutputSchema = z.infer<
 
 export const updateProjectInputSchema = z.object({
   id: z.string(),
-  enabled: z.boolean(),
-  liveDemoUrl: z.string().url(),
-  repoUrl: z.string().url().nonempty(),
-  assetIds: z.array(z.string()).nonempty(),
+  enabled: z.boolean().optional(),
+  finished: z.boolean().optional(),
+  featured: z.boolean().optional(),
+  liveDemoUrl: z.string().url().optional(),
+  repoUrl: z.string().url().optional(),
+  assetIds: z.array(z.string()),
   featuredAssetId: z.string().optional(),
-  translations: z.array(projectTranslationInputSchema).nonempty(),
+  translations: z
+    .array(
+      projectTranslationInputSchema
+        .partial()
+        .extend({ languageCode: languageCodeSchema }),
+    )
+    .optional(),
   careerId: z.string().optional(),
   educationItemId: z.string().optional(),
-  achievementIds: z.array(z.string()).optional(),
+  achievementIds: z.array(z.string()),
+  skillIds: z.array(z.string()),
 });
 
 export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;
@@ -142,6 +164,7 @@ export const projectListInputSchema =
       .object({
         name: z.object({ contains: z.string() }).optional(),
         enabled: z.object({ equals: z.boolean() }).optional(),
+        featured: z.object({ equals: z.boolean() }).optional(),
         liveDemoUrl: z.object({ contains: z.string() }).optional(),
         repoUrl: z.object({ contains: z.string() }).optional(),
       })

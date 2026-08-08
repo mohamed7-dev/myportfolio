@@ -37,7 +37,6 @@ export function ProjectFormMainFields() {
           control={form.control}
           name={"slug"}
           label={"Project Slug"}
-          disabled={true}
           render={({ field }) => (
             <SlugInput
               {...field}

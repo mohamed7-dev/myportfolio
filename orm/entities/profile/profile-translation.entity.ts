@@ -18,8 +18,26 @@ export class ProfileTranslation
   @Column("varchar")
   languageCode: LanguageCode;
 
-  @Column()
+  @Column({ type: "text" })
   summary: string;
+
+  @Column()
+  intro: string;
+
+  @Column()
+  jobTitle: string;
+
+  @Column()
+  location: string;
+
+  @Column()
+  subHeading: string;
+
+  @Column()
+  subtitle: string;
+
+  @Column({ type: "text" })
+  currentFocus: string;
 
   @Column()
   displayName: string;

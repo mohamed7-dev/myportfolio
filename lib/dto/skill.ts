@@ -7,6 +7,7 @@ import {
   deletionResponseSchema,
   inputIdsSchema,
 } from "./common";
+import { languageCodeSchema } from "./language-code";
 import {
   createPaginatedListOutputSchema,
   paginatedListInputSchema,
@@ -35,6 +36,7 @@ export type SkillAsset = z.infer<typeof skillAssetSchema>;
 export const skill = baseSchema.extend({
   name: z.string(),
   slug: z.string(),
+  isFeatured: z.boolean(),
   category: skillCategorySchema,
   assets: z.array(skillAssetSchema),
   featuredAsset: asset.nullable(),
@@ -44,16 +46,17 @@ export const skill = baseSchema.extend({
 export type Skill = z.infer<typeof skill>;
 
 const skillTranslationInputSchema = baseTranslationEntityInput.extend({
-  name: z.string().nonempty(),
-  slug: z.string().optional(),
+  name: z.string(),
+  slug: z.string(),
 });
 
 //############################ Create #############################
 export const createSkillInputSchema = z.object({
   category: skillCategorySchema,
-  assetIds: z.array(z.string()).nonempty(),
-  translations: z.array(skillTranslationInputSchema).nonempty(),
+  assetIds: z.array(z.string()),
+  translations: z.array(skillTranslationInputSchema),
   featuredAssetId: z.string().optional(),
+  isFeatured: z.boolean().optional(),
 });
 
 export type CreateSkillInputSchema = z.infer<typeof createSkillInputSchema>;
@@ -66,9 +69,16 @@ export type CreateSkillOutputSchema = z.infer<typeof createSkillOutputSchema>;
 export const updateSkillInputSchema = z.object({
   id: z.string(),
   category: skillCategorySchema.optional(),
-  assetIds: z.array(z.string()).nonempty(),
+  assetIds: z.array(z.string()),
   featuredAssetId: z.string().optional(),
-  translations: z.array(skillTranslationInputSchema).nonempty(),
+  translations: z
+    .array(
+      skillTranslationInputSchema
+        .partial()
+        .extend({ languageCode: languageCodeSchema }),
+    )
+    .optional(),
+  isFeatured: z.boolean().optional(),
 });
 
 export type UpdateSkillInputSchema = z.infer<typeof updateSkillInputSchema>;
@@ -83,6 +93,7 @@ export const skillListInputSchema = paginatedListInputSchema.extend({
     .object({
       name: z.object({ contains: z.string() }).optional(),
       category: z.object({ equals: skillCategorySchema }).optional(),
+      isFeatured: z.object({ equals: z.boolean() }).optional(),
     })
     .optional(),
 });

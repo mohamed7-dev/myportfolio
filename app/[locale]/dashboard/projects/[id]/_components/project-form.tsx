@@ -15,7 +15,6 @@ import {
   updateProjectInputSchema,
 } from "@/lib/dto/project";
 import { Form } from "@/lib/helpers/form";
-import { normalizeString } from "@/lib/utils/normalize-string";
 
 export function ProjectForm({
   children,
@@ -34,6 +33,7 @@ export function ProjectForm({
       liveDemoUrl: "",
       repoUrl: "",
       enabled: true,
+      featured: false,
       translations: [],
     },
     resolver: zodResolver(createProjectInputSchema),
@@ -47,6 +47,7 @@ export function ProjectForm({
       liveDemoUrl: initialValues?.liveDemoUrl ?? "",
       repoUrl: initialValues?.repoUrl ?? "",
       enabled: initialValues?.enabled === false ? false : true,
+      featured: initialValues?.featured === false ? false : true,
       translations: initialValues?.translations ?? [],
     },
     resolver: zodResolver(updateProjectInputSchema),
@@ -100,22 +101,15 @@ export function ProjectForm({
     if (creatingNewEntity) {
       createProject({
         ...values,
-        translations: values.translations.map((t) => ({
-          ...t,
-          slug: normalizeString(form.getValues("translations.0.name"), "-"),
-        })) as any,
-      });
+      } as CreateProjectInputSchema);
     } else {
       updateProject({
         ...values,
         id: params.id as string,
-        translations: values.translations.map((t) => ({
-          ...t,
-          slug: normalizeString(form.getValues("translations.0.name"), "-"),
-        })) as any,
-      });
+      } as UpdateProjectInputSchema);
     }
   };
+  console.log(form.formState.errors);
 
   return (
     <Form {...((creatingNewEntity ? form : updateForm) as any)}>

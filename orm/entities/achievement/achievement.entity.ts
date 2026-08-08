@@ -71,6 +71,5 @@ export class Achievement extends AppEntity {
     () => Project,
     (project) => project.achievements,
   )
-  @JoinTable()
   projects?: Project[];
 }

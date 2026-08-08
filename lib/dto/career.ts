@@ -110,7 +110,7 @@ export const updateCareerInputSchema = z.object({
   isPresent: z.boolean().optional(),
   type: careerTypeSchema.optional(),
   mode: careerModeSchema.optional(),
-  achievementIds: z.array(z.string()).optional(),
+  achievementIds: z.array(z.string()),
 });
 
 export type UpdateCareerInputSchema = z.infer<typeof updateCareerInputSchema>;
