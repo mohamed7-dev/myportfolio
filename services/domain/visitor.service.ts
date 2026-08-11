@@ -2,6 +2,7 @@ import type { RequestContext } from "@/api/request-context/request-context";
 import {
   getFeaturedProjectsOutputSchema,
   getFeaturedSkillsOutputSchema,
+  getSkillsOutputSchema,
   getSuperAdminProfileOutputSchema,
 } from "@/lib/dto/visitor";
 import { validateOutput } from "@/lib/helpers/validate-output";
@@ -35,6 +36,12 @@ class VisitorService {
     });
 
     const result = validateOutput(projects, getFeaturedProjectsOutputSchema);
+    return result;
+  }
+  public async getSkills(ctx: RequestContext) {
+    const skills = await skillService.find(ctx, {});
+
+    const result = validateOutput(skills, getSkillsOutputSchema);
     return result;
   }
 }

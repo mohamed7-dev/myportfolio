@@ -1,11 +1,11 @@
-import { Column, Entity, Index, ManyToOne } from "typeorm";
+import { Column, Entity, Index, ManyToOne, type Relation } from "typeorm";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type { TranslationEntity } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
 import { Skill } from "./skill.entity";
 
-@Entity()
+@Entity("skill_translation")
 export class SkillTranslation
   extends AppEntity
   implements TranslationEntity<Skill>
@@ -31,5 +31,5 @@ export class SkillTranslation
     (base) => base.translations,
     { onDelete: "CASCADE" },
   )
-  base: Skill;
+  base: Relation<Skill>;
 }

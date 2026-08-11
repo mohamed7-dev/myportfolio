@@ -2,6 +2,7 @@
 "use client";
 
 import { EllipsisVerticalIcon } from "lucide-react";
+import { HeadManagerContext } from "next/dist/shared/lib/head-manager-context.shared-runtime";
 import React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -28,10 +29,10 @@ export function Page(props: PageProps) {
   );
 
   const pageHeader = (
-    <div className="flex items-center justify-between gap-2 bg-secondary-background px-3.5 py-4 rounded-base border-2 border-border shadow-default">
+    <header className="flex items-center justify-between gap-2 bg-secondary-background px-3.5 py-4 rounded-base border-2 border-border shadow-default">
       <div className="min-w-0 shrink">{pageTitle ?? ""}</div>
       <div className="shrink-0">{pageActionBar}</div>
-    </div>
+    </header>
   );
 
   return (
@@ -52,7 +53,7 @@ export function PageTitle({
   children: React.ReactNode;
   pageTitleBlockName: string;
 }) {
-  return <h1 className="text-2xl font-heading">{children}</h1>;
+  return <h1 className="text-2xl font-heading capitalize">{children}</h1>;
 }
 
 type InlineActionBarMenuItem = Omit<ActionBarMenuItem, "type" | "pageId">;

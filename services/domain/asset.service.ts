@@ -5,7 +5,6 @@ import mime from "mime-types";
 import { In } from "typeorm";
 import { camelCase } from "typeorm/util/StringUtils.js";
 import type { RequestContext } from "@/api/request-context/request-context";
-import { getCurrentLocale } from "@/i18n/server";
 import {
   type AssetListInputSchema,
   AssetType,
@@ -14,7 +13,6 @@ import {
   type UpdateAssetInputSchema,
 } from "@/lib/dto/asset";
 import type { DeletionResponse, InputIdSchema } from "@/lib/dto/common";
-import type { LanguageCode } from "@/lib/dto/language-code";
 import {
   EntityNotFoundError,
   InternalServerError,
@@ -59,7 +57,6 @@ export interface EntityAssetInput {
 
 class AssetService {
   public async find(ctx: RequestContext, options: AssetListInputSchema) {
-    const currentLanguageCode = await getCurrentLocale();
     const qb = await listQueryBuilder.build(Asset, options, {
       ctx,
       alias: "asset",
@@ -81,7 +78,7 @@ class AssetService {
     return await qb.getManyAndCount().then((result) => {
       return {
         items: result[0].flatMap((asset) =>
-          translator.translate(currentLanguageCode as LanguageCode, asset),
+          translator.translate(ctx.languageCode, asset),
         ),
         itemsCount: result[1],
       };

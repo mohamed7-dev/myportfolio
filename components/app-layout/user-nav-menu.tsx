@@ -110,9 +110,9 @@ export function UserNavMenu() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <AccentSwitcher />
+            <AccentSwitcher mode="dashboard" />
             <Suspense>
-              <LanguageSwitcher />
+              <LanguageSwitcher mode="dashboard" />
             </Suspense>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>

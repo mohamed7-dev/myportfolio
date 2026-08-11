@@ -1,10 +1,13 @@
 import type { NextRequest, NextResponse } from "next/server";
+import { appConfig } from "@/lib/config/app-config";
 import { authorize } from "@/lib/helpers/authorize";
 import { ormService } from "@/orm/orm.service";
 import { transactionManager } from "@/orm/transaction-manager";
 import { requestContextService } from "@/services/helpers/request-context.service";
-import type { RequestContext } from "../request-context/request-context";
+import { RequestContext } from "../request-context/request-context";
 import "server-only";
+import { getLocale } from "next-intl/server";
+import type { LanguageCode } from "@/lib/dto/language-code";
 
 type RouteHandler<TCtx = unknown> = (
   req: NextRequest,
@@ -26,7 +29,15 @@ async function executeWithRequestContext<TResult>({
   authenticatedOnly?: boolean;
   work(requestContext: RequestContext): Promise<TResult>;
 }) {
-  const requestContext = await requestContextService.create(req);
+  const requestContext = authenticatedOnly
+    ? await requestContextService.create(req, authenticatedOnly)
+    : new RequestContext({
+        languageCode:
+          ((await getLocale().catch(
+            () => appConfig.defaultLanguageCode,
+          )) as LanguageCode) || appConfig.defaultLanguageCode,
+        req,
+      });
 
   if (authenticatedOnly) {
     await authorize(requestContext);

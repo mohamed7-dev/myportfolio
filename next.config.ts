@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
   images: {
@@ -19,6 +20,10 @@ const nextConfig: NextConfig = {
       mssql: "./mock-empty.js",
     },
   },
+  experimental: {
+    rootParams: true,
+  },
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin();
+export default withNextIntl(nextConfig);

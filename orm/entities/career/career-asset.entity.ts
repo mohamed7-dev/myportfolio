@@ -1,9 +1,9 @@
-import { Column, Entity, Index, ManyToOne } from "typeorm";
+import { Column, Entity, Index, ManyToOne, type Relation } from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import { OrderableAsset } from "../asset/orderable-asset.entity";
 import { Career } from "./career.entity";
 
-@Entity()
+@Entity("career_asset")
 export class CareerAsset extends OrderableAsset {
   constructor(input?: DeepPartial<CareerAsset>) {
     super();
@@ -21,5 +21,5 @@ export class CareerAsset extends OrderableAsset {
       onDelete: "CASCADE",
     },
   )
-  career: Career;
+  career: Relation<Career>;
 }

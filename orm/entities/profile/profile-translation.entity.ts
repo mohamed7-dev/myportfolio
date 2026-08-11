@@ -1,11 +1,11 @@
-import { Column, Entity, Index, ManyToOne } from "typeorm";
+import { Column, Entity, Index, ManyToOne, type Relation } from "typeorm";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type { TranslationEntity } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
-import type { Profile } from "./profile.entity";
+import { Profile } from "./profile.entity";
 
-@Entity()
+@Entity("profile_translation")
 export class ProfileTranslation
   extends AppEntity
   implements TranslationEntity<Profile>
@@ -43,8 +43,12 @@ export class ProfileTranslation
   displayName: string;
 
   @Index()
-  @ManyToOne("Profile", (base: Profile) => base.translations, {
-    onDelete: "CASCADE",
-  })
-  base: Profile;
+  @ManyToOne(
+    () => Profile,
+    (base: Profile) => base.translations,
+    {
+      onDelete: "CASCADE",
+    },
+  )
+  base: Relation<Profile>;
 }

@@ -10,16 +10,10 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import {
-  useChangeLocale,
-  useCurrentLocale,
-  useI18n,
-  useScopedI18n,
-} from "@/i18n/client";
-import { type I18nConfig, i18nConfig } from "@/i18n/config";
-import { cn } from "@/lib/utils";
 import { AccentSwitcher } from "../accent-switcher";
+import { LanguageSwitcher } from "../language-switcher";
 import { usePublicLayout } from "./public-layout-provider";
 
 const navLinks = [
@@ -33,8 +27,7 @@ const navLinks = [
 
 export function Sidebar() {
   const ctx = usePublicLayout("Sidebar");
-  const navI18n = useScopedI18n("nav");
-  const i18n = useI18n();
+  const i18n = useTranslations("publicLayout");
 
   return (
     <header className="hidden lg:flex lg:w-1/5 lg:shrink-0 lg:flex-col lg:pt-4">
@@ -49,14 +42,17 @@ export function Sidebar() {
               className="group flex items-center gap-4 rounded-lg px-4 py-2.5 font-base transition-all duration-300 hover:scale-[1.03]"
             >
               <item.icon className="size-5 transition-all duration-300 group-hover:-rotate-12" />
-              <span className="capitalize">{navI18n(item.key)}</span>
+              <span className="capitalize">{i18n(`nav.${item.key}`)}</span>
             </Link>
           ))}
         </nav>
         <div className="my-5 border-t-2 border-border" />
-        <footer className="text-center text-sm font-base leading-6 text-foreground capitalize">
-          <p>© {new Date().getFullYear()}</p>
-          <p>{i18n("copyright", { name: ctx.profile.displayName })}</p>
+        <footer className="text-center text-sm font-base leading-6 text-foreground capitalize flex flex-col items-center gap-4">
+          <AccentSwitcher mode="public" />
+          <div>
+            <p>© {new Date().getFullYear()}</p>
+            <p>{i18n("copyright", { name: ctx.profile.displayName })}</p>
+          </div>
         </footer>
       </div>
     </header>
@@ -79,31 +75,8 @@ function Identity() {
         {ctx.profile.handle}
       </p>
       <div className="mt-6 flex flex-col items-center gap-4">
-        <LangSwitch />
-        <AccentSwitcher mode="public" />
+        <LanguageSwitcher mode="public" />
       </div>
-    </div>
-  );
-}
-
-function LangSwitch() {
-  const changeLocale = useChangeLocale({ preserveSearchParams: true });
-  const locale = useCurrentLocale();
-  const i18n = useScopedI18n("languages");
-  return (
-    <div className="flex items-center gap-2">
-      {i18nConfig.locales.map((item) => (
-        <Button
-          variant={locale === item.key ? "default" : "neutral"}
-          key={item.key}
-          onClick={() =>
-            changeLocale(item.key as I18nConfig["locales"][number]["key"])
-          }
-          className={cn("transition-all duration-200 capitalize")}
-        >
-          {i18n(item.key)}
-        </Button>
-      ))}
     </div>
   );
 }

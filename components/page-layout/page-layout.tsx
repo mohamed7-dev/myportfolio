@@ -7,9 +7,14 @@ import type { PageBlockProps } from "./page-block";
 type PageLayoutProps = {
   children: React.ReactNode;
   className?: string;
+  alternate?: boolean;
 };
 
-export function PageLayout({ children, className }: PageLayoutProps) {
+export function PageLayout({
+  children,
+  className,
+  alternate = false,
+}: PageLayoutProps) {
   const isMobile = useIsMobile();
 
   // Normalize and extract PageBlock children
@@ -43,24 +48,54 @@ export function PageLayout({ children, className }: PageLayoutProps) {
 
   const sideBlocks = blocks.filter((block) => block.props.column === "side");
 
+  // Pair main + side blocks into rows.
+  const rowCount = Math.max(mainBlocks.length, sideBlocks.length);
+
+  const rows = Array.from({ length: rowCount }, (_, index) => ({
+    main: mainBlocks[index],
+    side: sideBlocks[index],
+  }));
+
   return (
     <div className={className}>
       {isMobile ? (
-        // Mobile: stack everything vertically
+        // Mobile: preserve the original markup order.
         <div className="space-y-4">{blocks}</div>
       ) : (
-        // Desktop grid layout
-        <div className="grid grid-cols-4 gap-4">
-          {/* Full width section */}
+        <div className="space-y-4">
+          {/* Full width sections */}
           {fullWidthBlocks.length > 0 && (
-            <div className="col-span-4 space-y-4">{fullWidthBlocks}</div>
+            <div className="grid grid-cols-5 gap-4">
+              <div className="col-span-5 space-y-4">{fullWidthBlocks}</div>
+            </div>
           )}
 
-          {/* Main content */}
-          <div className="col-span-3 space-y-4">{mainBlocks}</div>
+          {/* Main + side rows */}
+          {rows.map((row, index) => {
+            const shouldSwap = alternate && index % 2 === 1;
 
-          {/* Sidebar */}
-          <div className="col-span-1 space-y-4">{sideBlocks}</div>
+            const main = row.main;
+            const side = row.side;
+
+            return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: no other key available
+              <div key={index} className="grid grid-cols-5 gap-4">
+                {shouldSwap ? (
+                  <>
+                    {side && <div className="col-span-2">{side}</div>}
+
+                    {main && <div className="col-span-3">{main}</div>}
+                  </>
+                ) : (
+                  <>
+                    {main && <div className="col-span-3">{main}</div>}
+
+                    {side && <div className="col-span-2">{side}</div>}
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

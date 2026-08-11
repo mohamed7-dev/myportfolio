@@ -1,11 +1,11 @@
-import { Column, Entity, Index, ManyToOne } from "typeorm";
+import { Column, Entity, Index, ManyToOne, type Relation } from "typeorm";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type { TranslationEntity } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
-import type { Asset } from "./asset.entity";
+import { Asset } from "./asset.entity";
 
-@Entity()
+@Entity("asset_translation")
 export class AssetTranslation
   extends AppEntity
   implements TranslationEntity<Asset>
@@ -22,8 +22,12 @@ export class AssetTranslation
   name: string;
 
   @Index()
-  @ManyToOne("Asset", (base: Asset) => base.translations, {
-    onDelete: "CASCADE",
-  })
-  base: Asset;
+  @ManyToOne(
+    () => Asset,
+    (base: Asset) => base.translations,
+    {
+      onDelete: "CASCADE",
+    },
+  )
+  base: Relation<Asset>;
 }

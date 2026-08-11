@@ -1,10 +1,10 @@
 "use client";
 import { useForm } from "@tanstack/react-form";
 import { Loader2Icon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 import z from "zod";
+import { useRouter } from "@/i18n/navigation";
 import type { ClientSafeProfile } from "@/lib/dto/profile";
 import type { AppError } from "@/lib/errors/app-error";
 import { setUserInfoToLS } from "@/lib/helpers/auth-storage";
@@ -54,7 +54,7 @@ export function LoginForm() {
         if (data.username) {
           setUserInfoToLS(data);
           toast.success("Authenticated successfully");
-          router.replace("/dashboard");
+          router.replace({ pathname: "/dashboard" });
         }
       })
       .catch((e) => {

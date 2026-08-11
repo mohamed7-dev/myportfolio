@@ -6,6 +6,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  type Relation,
 } from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type { SoftDeletable } from "@/lib/types/soft-deletable";
@@ -20,10 +21,10 @@ import { Asset } from "../asset/asset.entity";
 import { Career } from "../career/career.entity";
 import { Education } from "../education/education.entity";
 import { Skill } from "../skill/skill.entity";
-import type { ProjectAsset } from "./project-asset.entity";
-import type { ProjectTranslation } from "./project-translation.entity";
+import { ProjectAsset } from "./project-asset.entity";
+import { ProjectTranslation } from "./project-translation.entity";
 
-@Entity()
+@Entity("project")
 export class Project extends AppEntity implements Translatable, SoftDeletable {
   constructor(input?: DeepPartial<Project>) {
     super();
@@ -67,11 +68,11 @@ export class Project extends AppEntity implements Translatable, SoftDeletable {
   featured: boolean;
 
   @OneToMany(
-    "ProjectTranslation",
+    () => ProjectTranslation,
     (translations: ProjectTranslation) => translations.base,
     { eager: true },
   )
-  translations: TranslationEntity<ProjectTranslation>[];
+  translations: Relation<TranslationEntity<ProjectTranslation>[]>;
 
   @ManyToMany(
     () => Skill,
@@ -81,10 +82,10 @@ export class Project extends AppEntity implements Translatable, SoftDeletable {
   skills: Skill[];
 
   @OneToMany(
-    "ProjectAsset",
+    () => ProjectAsset,
     (projectAsset: ProjectAsset) => projectAsset.project,
   )
-  assets: ProjectAsset[];
+  assets: Relation<ProjectAsset[]>;
 
   @Index()
   @ManyToOne(
@@ -92,7 +93,7 @@ export class Project extends AppEntity implements Translatable, SoftDeletable {
     (asset) => asset.featuredInProjects,
     { onDelete: "SET NULL" },
   )
-  featuredAsset: Asset;
+  featuredAsset: Relation<Asset>;
 
   @ManyToOne(
     () => Career,
@@ -112,6 +113,6 @@ export class Project extends AppEntity implements Translatable, SoftDeletable {
     () => Achievement,
     (achievement) => achievement.projects,
   )
-  @JoinTable()
+  @JoinTable({ name: "project_achievements_achievement" })
   achievements: Achievement[];
 }

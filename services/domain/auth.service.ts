@@ -4,7 +4,7 @@ import type {
   AuthenticateAdminUserInputSchema,
   LogoutInputSchema,
 } from "@/lib/dto/auth";
-import { InternalServerError, UnAuthorizedError } from "@/lib/errors/errors";
+import { UnAuthorizedError } from "@/lib/errors/errors";
 import { Profile } from "@/orm/entities/profile/profile.entity";
 import { ormService } from "@/orm/orm.service";
 import "server-only";
@@ -96,9 +96,6 @@ class AuthService {
       },
     );
 
-    if (!profile) {
-      throw new InternalServerError("Missing default profile");
-    }
     return { token: sessionToken.value, profile };
   }
 

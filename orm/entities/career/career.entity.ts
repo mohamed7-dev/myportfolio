@@ -1,4 +1,11 @@
-import { Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+  type Relation,
+} from "typeorm";
 import type { CareerMode, CareerType } from "@/lib/dto/career";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type { LocaleString, TranslationEntity } from "@/lib/types/translatable";
@@ -6,10 +13,10 @@ import { Achievement } from "../achievement/achievement.entity";
 import { AppEntity } from "../app-entity";
 import { Asset } from "../asset/asset.entity";
 import { Project } from "../project/project.entity";
-import type { CareerTranslation } from "./career.translation";
-import type { CareerAsset } from "./career-asset.entity";
+import { CareerTranslation } from "./career.translation";
+import { CareerAsset } from "./career-asset.entity";
 
-@Entity()
+@Entity("career")
 export class Career extends AppEntity {
   constructor(input?: DeepPartial<Career>) {
     super();
@@ -45,8 +52,11 @@ export class Career extends AppEntity {
   @Column({ type: "varchar" })
   type: CareerType;
 
-  @OneToMany("CareerAsset", (careerAsset: CareerAsset) => careerAsset.career)
-  assets: CareerAsset[];
+  @OneToMany(
+    () => CareerAsset,
+    (careerAsset: CareerAsset) => careerAsset.career,
+  )
+  assets: Relation<CareerAsset[]>;
 
   @Index()
   @ManyToOne(
@@ -54,7 +64,7 @@ export class Career extends AppEntity {
     (asset) => asset.featuredInCareers,
     { onDelete: "SET NULL" },
   )
-  featuredAsset: Asset;
+  featuredAsset: Relation<Asset>;
 
   @OneToMany(
     () => Project,
@@ -69,9 +79,9 @@ export class Career extends AppEntity {
   achievements: Achievement[];
 
   @OneToMany(
-    "CareerTranslation",
+    () => CareerTranslation,
     (translations: CareerTranslation) => translations.base,
     { eager: true },
   )
-  translations: TranslationEntity<CareerTranslation>[];
+  translations: Relation<TranslationEntity<CareerTranslation>[]>;
 }

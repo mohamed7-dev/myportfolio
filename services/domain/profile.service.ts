@@ -2,7 +2,7 @@ import "server-only";
 import bcrypt from "bcryptjs";
 import type { FindOptionsRelations } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
-import { getCurrentLocale } from "@/i18n/server";
+import { appConfig } from "@/lib/config/app-config";
 import { ADMIN_CREDENTIALS } from "@/lib/config/server-config";
 import type { UpdateProfileInputSchema } from "@/lib/dto/profile";
 import { EntityNotFoundError } from "@/lib/errors/errors";
@@ -31,6 +31,7 @@ class ProfileService {
         featuredAsset: true,
       },
     });
+
     if (!profile) {
       throw new EntityNotFoundError("Profile not found");
     }
@@ -117,7 +118,6 @@ class ProfileService {
       });
       await repo.save(newAdmin);
 
-      const currentLanguageCode = await getCurrentLocale();
       const translation = new ProfileTranslation({
         displayName: "?",
         summary: "?",
@@ -127,7 +127,7 @@ class ProfileService {
         jobTitle: "?",
         location: "?",
         currentFocus: "?",
-        languageCode: currentLanguageCode,
+        languageCode: appConfig.defaultLanguageCode,
         base: newAdmin,
       });
       const transRepo = await ormService.getRepository(ProfileTranslation);

@@ -1,4 +1,5 @@
 "use client";
+import { useLocale } from "next-intl";
 import React from "react";
 import {
   Controller,
@@ -13,7 +14,6 @@ import {
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
-import { useCurrentLocale } from "@/i18n/client";
 import { applyFormControlProps } from "@/lib/helpers/form";
 import type { FormFieldProps } from "./form-field";
 
@@ -105,7 +105,7 @@ export function TranslatableFormField<
     renderFormControl = true,
     ...restProps
   } = props;
-  const languageCode = useCurrentLocale();
+  const languageCode = useLocale();
 
   const formContext = useFormContext();
   const values = formContext.watch();

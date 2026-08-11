@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import type { ZodSchema } from "@/lib/helpers/zod";
 import { InternalServerError } from "../errors/errors";
 
@@ -7,8 +6,9 @@ export function validateOutput<Output = any>(
   schema: ZodSchema<Output>,
 ): Output {
   const r = schema.safeParse(input);
-  if (!r.success)
-    NextResponse.json(new InternalServerError("Internal Server Error"));
+  if (!r.success) {
+    throw new InternalServerError("Internal Server Error");
+  }
 
   return r.data as Output;
 }

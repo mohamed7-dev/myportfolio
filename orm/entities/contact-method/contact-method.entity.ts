@@ -1,12 +1,19 @@
-import { Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+  type Relation,
+} from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type { LocaleString, TranslationEntity } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
 import { Asset } from "../asset/asset.entity";
-import type { ContactMethodAsset } from "./contact-method-asset.entity";
-import type { ContactMethodTranslation } from "./contact-method-translation.entity";
+import { ContactMethodAsset } from "./contact-method-asset.entity";
+import { ContactMethodTranslation } from "./contact-method-translation.entity";
 
-@Entity()
+@Entity("contact_method")
 export class ContactMethod extends AppEntity {
   constructor(input?: DeepPartial<ContactMethod>) {
     super();
@@ -22,10 +29,10 @@ export class ContactMethod extends AppEntity {
   copyableText: string;
 
   @OneToMany(
-    "ContactMethodAsset",
+    () => ContactMethodAsset,
     (cmAsset: ContactMethodAsset) => cmAsset.contactMethod,
   )
-  assets: ContactMethodAsset[];
+  assets: Relation<ContactMethodAsset[]>;
 
   @Index()
   @ManyToOne(
@@ -33,12 +40,12 @@ export class ContactMethod extends AppEntity {
     (asset) => asset.featuredInContactMethods,
     { onDelete: "SET NULL" },
   )
-  featuredAsset: Asset;
+  featuredAsset: Relation<Asset>;
 
   @OneToMany(
-    "ContactMethodTranslation",
+    () => ContactMethodTranslation,
     (translations: ContactMethodTranslation) => translations.base,
     { eager: true },
   )
-  translations: TranslationEntity<ContactMethodTranslation>[];
+  translations: Relation<TranslationEntity<ContactMethodTranslation>[]>;
 }

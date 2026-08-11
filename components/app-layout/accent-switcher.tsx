@@ -6,24 +6,28 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-import { setAccent } from "@/lib/actions/set-accent";
+import { setAccentColor } from "@/lib/helpers/accent-color-storage";
 import { themes } from "@/lib/theme";
-import { Button } from "../ui/button";
 
 export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
   const [accentClassName, setAccentClassName] = React.useState("");
 
-  const changeAccent = async (accent: string) => {
-    await setAccent(accent);
+  const onChange = (value: string) => {
+    setAccentClassName(value);
+    setAccentColor(value);
+    const allAccentClassNames = Object.values(themes).map(
+      (theme) => theme.className,
+    );
+    const documentElAccentClassName = allAccentClassNames.find((c) =>
+      document.documentElement.classList.contains(c),
+    );
+    if (documentElAccentClassName) {
+      document.documentElement.classList.remove(documentElAccentClassName);
+    }
+    if (value) {
+      document.documentElement.classList.add(value);
+    }
   };
-
-  React.useEffect(() => {
-    const getAccentFromCookieStore = async () => {
-      const accent = await window.cookieStore.get("accent");
-      setAccentClassName(accent?.value ?? "");
-    };
-    getAccentFromCookieStore();
-  }, []);
 
   if (mode === "dashboard") {
     return (
@@ -32,10 +36,7 @@ export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
         <DropdownMenuSubContent>
           <DropdownMenuRadioGroup
             value={accentClassName}
-            onValueChange={(value) => {
-              setAccentClassName(value);
-              changeAccent(value);
-            }}
+            onValueChange={(value) => onChange(value)}
           >
             {Object.values(themes).map((theme) => (
               <DropdownMenuRadioItem key={theme.name} value={theme.className}>
@@ -55,14 +56,10 @@ export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
   return (
     <div className="flex items-center gap-2">
       {Object.values(themes).map((theme) => (
-        <Button
+        <button
+          type="button"
           key={theme.name}
-          variant={accentClassName === theme.className ? "default" : "neutral"}
-          size={"sm"}
-          onClick={() => {
-            setAccentClassName(theme.className);
-            changeAccent(theme.className);
-          }}
+          onClick={() => onChange(theme.className)}
         >
           <span
             className="block size-6 rounded-full border-2 border-border relative"
@@ -71,7 +68,7 @@ export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
           <span className="sr-only">
             {theme.name} {theme.isDefault && "(Default)"}
           </span>
-        </Button>
+        </button>
       ))}
     </div>
   );

@@ -1,11 +1,11 @@
-import { Column, Entity, Index, ManyToOne } from "typeorm";
+import { Column, Entity, Index, ManyToOne, type Relation } from "typeorm";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type { TranslationEntity } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
 import { Achievement } from "./achievement.entity";
 
-@Entity()
+@Entity("achievement_translation")
 export class AchievementTranslation
   extends AppEntity
   implements TranslationEntity<Achievement>
@@ -34,5 +34,5 @@ export class AchievementTranslation
     (base) => base.translations,
     { onDelete: "CASCADE" },
   )
-  base: Achievement;
+  base: Relation<Achievement>;
 }

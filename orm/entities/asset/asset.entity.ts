@@ -1,4 +1,11 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  type Relation,
+} from "typeorm";
 import type { AssetType } from "@/lib/dto/asset";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type {
@@ -6,18 +13,18 @@ import type {
   Translatable,
   TranslationEntity,
 } from "@/lib/types/translatable";
-import type { Achievement } from "../achievement/achievement.entity";
+import { Achievement } from "../achievement/achievement.entity";
 import { AppEntity } from "../app-entity";
-import type { Career } from "../career/career.entity";
-import type { ContactMethod } from "../contact-method/contact-method.entity";
-import type { Education } from "../education/education.entity";
-import type { Profile } from "../profile/profile.entity";
-import type { Project } from "../project/project.entity";
-import type { Skill } from "../skill/skill.entity";
+import { Career } from "../career/career.entity";
+import { ContactMethod } from "../contact-method/contact-method.entity";
+import { Education } from "../education/education.entity";
+import { Profile } from "../profile/profile.entity";
+import { Project } from "../project/project.entity";
+import { Skill } from "../skill/skill.entity";
 import { Tag } from "../tag/tag.entity";
-import type { AssetTranslation } from "./asset-translation.entity";
+import { AssetTranslation } from "./asset-translation.entity";
 
-@Entity()
+@Entity("asset")
 export class Asset extends AppEntity implements Translatable {
   constructor(input?: DeepPartial<Asset>) {
     super();
@@ -58,34 +65,55 @@ export class Asset extends AppEntity implements Translatable {
   previewIdentifier: string;
 
   @OneToMany(
-    "AssetTranslation",
+    () => AssetTranslation,
     (translations: TranslationEntity<AssetTranslation>) => translations.base,
     { eager: true },
   )
-  translations: TranslationEntity<AssetTranslation>[];
+  translations: Relation<TranslationEntity<AssetTranslation>[]>;
 
   @ManyToMany(() => Tag)
-  @JoinTable()
+  @JoinTable({ name: "asset_tags_tag" })
   tags: Tag[];
 
-  @OneToMany("Project", (project: Project) => project.featuredAsset)
-  featuredInProjects?: Project[];
+  @OneToMany(
+    () => Project,
+    (project: Project) => project.featuredAsset,
+  )
+  featuredInProjects?: Relation<Project[]>;
 
-  @OneToMany("Profile", (profile: Profile) => profile.featuredAsset)
-  featuredInProfiles?: Profile[];
+  @OneToMany(
+    () => Profile,
+    (profile: Profile) => profile.featuredAsset,
+  )
+  featuredInProfiles?: Relation<Profile[]>;
 
-  @OneToMany("Skill", (skill: Skill) => skill.featuredAsset)
-  featuredInSkills?: Skill[];
+  @OneToMany(
+    () => Skill,
+    (skill: Skill) => skill.featuredAsset,
+  )
+  featuredInSkills?: Relation<Skill[]>;
 
-  @OneToMany("Career", (career: Career) => career.featuredAsset)
-  featuredInCareers?: Career[];
+  @OneToMany(
+    () => Career,
+    (career: Career) => career.featuredAsset,
+  )
+  featuredInCareers?: Relation<Career[]>;
 
-  @OneToMany("Education", (education: Education) => education.featuredAsset)
-  featuredInEducations?: Education[];
+  @OneToMany(
+    () => Education,
+    (education: Education) => education.featuredAsset,
+  )
+  featuredInEducations?: Relation<Education[]>;
 
-  @OneToMany("ContactMethod", (cm: ContactMethod) => cm.featuredAsset)
-  featuredInContactMethods?: ContactMethod[];
+  @OneToMany(
+    () => ContactMethod,
+    (cm: ContactMethod) => cm.featuredAsset,
+  )
+  featuredInContactMethods?: Relation<ContactMethod[]>;
 
-  @OneToMany("Achievement", (cm: Achievement) => cm.featuredAsset)
-  featuredInAchievements?: Achievement[];
+  @OneToMany(
+    () => Achievement,
+    (cm: Achievement) => cm.featuredAsset,
+  )
+  featuredInAchievements?: Relation<Achievement[]>;
 }

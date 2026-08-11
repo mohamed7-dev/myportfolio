@@ -1,9 +1,9 @@
-import { Column, Entity, Index, ManyToOne } from "typeorm";
+import { Column, Entity, Index, ManyToOne, type Relation } from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import { OrderableAsset } from "../asset/orderable-asset.entity";
 import { ContactMethod } from "./contact-method.entity";
 
-@Entity()
+@Entity("contact_method_asset")
 export class ContactMethodAsset extends OrderableAsset {
   constructor(input?: DeepPartial<ContactMethodAsset>) {
     super();
@@ -21,5 +21,5 @@ export class ContactMethodAsset extends OrderableAsset {
       onDelete: "CASCADE",
     },
   )
-  contactMethod: ContactMethod;
+  contactMethod: Relation<ContactMethod>;
 }

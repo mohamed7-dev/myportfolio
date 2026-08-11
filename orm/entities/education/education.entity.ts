@@ -1,13 +1,20 @@
-import { Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+  type Relation,
+} from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type { LocaleString, TranslationEntity } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
 import { Asset } from "../asset/asset.entity";
 import { Project } from "../project/project.entity";
-import type { EducationAsset } from "./education-asset.entity";
-import type { EducationTranslation } from "./education-translation.entity";
+import { EducationAsset } from "./education-asset.entity";
+import { EducationTranslation } from "./education-translation.entity";
 
-@Entity()
+@Entity("education")
 export class Education extends AppEntity {
   constructor(input?: DeepPartial<Education>) {
     super();
@@ -35,10 +42,10 @@ export class Education extends AppEntity {
   gpa: number;
 
   @OneToMany(
-    "EducationAsset",
+    () => EducationAsset,
     (educationAsset: EducationAsset) => educationAsset.education,
   )
-  assets: EducationAsset[];
+  assets: Relation<EducationAsset[]>;
 
   @Index()
   @ManyToOne(
@@ -46,14 +53,14 @@ export class Education extends AppEntity {
     (asset) => asset.featuredInEducations,
     { onDelete: "SET NULL" },
   )
-  featuredAsset: Asset;
+  featuredAsset: Relation<Asset>;
 
   @OneToMany(
-    "EducationTranslation",
+    () => EducationTranslation,
     (translations: EducationTranslation) => translations.base,
     { eager: true },
   )
-  translations: TranslationEntity<EducationTranslation>[];
+  translations: Relation<TranslationEntity<EducationTranslation>[]>;
 
   @OneToMany(
     () => Project,

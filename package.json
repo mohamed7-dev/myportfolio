@@ -4,8 +4,12 @@
   "private": true,
   "scripts": {
     "seed": "ts-node --project ./orm/tsconfig.seed.json ./orm/seed.ts",
-    "dev": "pnpm seed && next dev",
-    "build": "next build",
+    "dev": "NODE_ENV=development pnpm run seed && next dev",
+    "typeorm": "ts-node --project ./orm/tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./orm/data-source.ts",
+    "migration:generate": "NODE_ENV=production npm run typeorm -- migration:generate ./orm/migrations/Initial",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert",
+    "build": "NODE_ENV=production pnpm seed && next build",
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write"
@@ -34,7 +38,7 @@
     "lucide-react": "^1.22.0",
     "mime-types": "^3.0.2",
     "next": "16.2.9",
-    "next-international": "^1.3.1",
+    "next-intl": "^4.13.5",
     "next-themes": "^0.4.6",
     "pg": "^8.22.0",
     "radix-ui": "^1.6.0",
@@ -50,6 +54,7 @@
     "tailwind-merge": "^3.6.0",
     "tw-animate-css": "^1.4.0",
     "typeorm": "^1.0.0",
+    "typeorm-ts-node-commonjs": "^0.3.20",
     "uploadthing": "^7.7.4",
     "zod": "^3.25.0 || ^4.0.0"
   },
@@ -61,6 +66,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.23.0",
     "typescript": "^5"
   }

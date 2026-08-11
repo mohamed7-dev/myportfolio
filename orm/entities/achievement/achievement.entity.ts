@@ -2,10 +2,10 @@ import {
   Column,
   Entity,
   Index,
-  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
+  type Relation,
 } from "typeorm";
 import type { AchievementType } from "@/lib/dto/achievement";
 import type { DeepPartial } from "@/lib/types/shared-types";
@@ -14,10 +14,10 @@ import { AppEntity } from "../app-entity";
 import { Asset } from "../asset/asset.entity";
 import { Career } from "../career/career.entity";
 import { Project } from "../project/project.entity";
-import type { AchievementAsset } from "./achievement-asset.entity";
-import type { AchievementTranslation } from "./achievement-translation.entity";
+import { AchievementAsset } from "./achievement-asset.entity";
+import { AchievementTranslation } from "./achievement-translation.entity";
 
-@Entity()
+@Entity("achievement")
 export class Achievement extends AppEntity {
   constructor(input?: DeepPartial<Achievement>) {
     super();
@@ -40,17 +40,17 @@ export class Achievement extends AppEntity {
   credentialUrl: string;
 
   @OneToMany(
-    "AchievementTranslation",
+    () => AchievementTranslation,
     (translations: AchievementTranslation) => translations.base,
     { eager: true },
   )
-  translations: TranslationEntity<AchievementTranslation>[];
+  translations: Relation<TranslationEntity<AchievementTranslation>[]>;
 
   @OneToMany(
-    "AchievementAsset",
+    () => AchievementAsset,
     (achievementAsset: AchievementAsset) => achievementAsset.achievement,
   )
-  assets: AchievementAsset[];
+  assets: Relation<AchievementAsset[]>;
 
   @Index()
   @ManyToOne(
@@ -58,7 +58,7 @@ export class Achievement extends AppEntity {
     (asset) => asset.featuredInAchievements,
     { onDelete: "SET NULL" },
   )
-  featuredAsset: Asset;
+  featuredAsset: Relation<Asset>;
 
   @ManyToOne(
     () => Career,

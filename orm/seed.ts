@@ -1,40 +1,15 @@
 import "reflect-metadata";
 import bcrypt from "bcryptjs";
-import { config } from "dotenv";
-import path from "path";
-import { DataSource } from "typeorm";
-import { entitiesMap } from "./entities/entities-map";
+import dataSource from "./data-source";
 import { Profile } from "./entities/profile/profile.entity";
 import { ProfileTranslation } from "./entities/profile/profile-translation.entity";
-
-config({ path: path.join(__dirname, "../.env.local") });
-
-const connectionString = process.env.DATABASE_URL;
 
 const ADMIN = {
   username: process.env.ADMIN_USERNAME ?? "superadmin",
   password: process.env.ADMIN_PASSWORD ?? "Youcanguessit@100",
 };
 
-const ds = new DataSource({
-  type: "postgres",
-  url: connectionString,
-  host: connectionString ? undefined : process.env.DB_HOST,
-  port: connectionString
-    ? undefined
-    : process.env.DB_PORT
-      ? Number(process.env.DB_PORT)
-      : undefined,
-  username: connectionString ? undefined : process.env.DB_USER_NAME,
-  password: connectionString ? undefined : process.env.DB_PASSWORD,
-  database: connectionString ? undefined : process.env.DB_NAME,
-  schema: process.env.DB_SCHEMA,
-  entities: Object.values(entitiesMap),
-  synchronize: true,
-  logging: false,
-  ssl:
-    process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : undefined,
-});
+const ds = dataSource;
 
 async function ensureAdmin() {
   await ds.initialize();
@@ -63,27 +38,30 @@ async function ensureAdmin() {
       password: hashedPassword,
       handle: "?",
     });
-    await translationRepo.save({
-      displayName: "?",
-      summary: "?",
-      intro: "?",
-      subHeading: "?",
-      subtitle: "?",
-      jobTitle: "?",
-      location: "?",
-      currentFocus: "?",
-      languageCode: "en",
-      base: existingProfile,
-    });
+    await profileRepo.save(existingProfile);
+
+    await translationRepo.save(
+      new ProfileTranslation({
+        displayName: "?",
+        summary: "?",
+        intro: "?",
+        subHeading: "?",
+        subtitle: "?",
+        jobTitle: "?",
+        location: "?",
+        currentFocus: "?",
+        languageCode: "en",
+        base: existingProfile,
+      }),
+    );
   } else {
     existingProfile.username = ADMIN.username;
     existingProfile.password = hashedPassword;
     if (!existingProfile.handle) {
       existingProfile.handle = "?";
     }
+    await profileRepo.save(existingProfile);
   }
-
-  await profileRepo.save(existingProfile);
 
   await ds.destroy();
 }

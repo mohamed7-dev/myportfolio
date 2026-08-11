@@ -1,7 +1,7 @@
-import { Column, Index, ManyToOne } from "typeorm";
+import { Column, Index, ManyToOne, type Relation } from "typeorm";
 import type { DeepPartial, Orderable } from "@/lib/types/shared-types";
 import { AppEntity } from "../app-entity";
-import type { Asset } from "./asset.entity";
+import { Asset } from "./asset.entity";
 
 export abstract class OrderableAsset extends AppEntity implements Orderable {
   protected constructor(input?: DeepPartial<OrderableAsset>) {
@@ -10,8 +10,8 @@ export abstract class OrderableAsset extends AppEntity implements Orderable {
   }
 
   @Index()
-  @ManyToOne("Asset", { eager: true, onDelete: "CASCADE" })
-  asset: Asset;
+  @ManyToOne(() => Asset, { eager: true, onDelete: "CASCADE" })
+  asset: Relation<Asset>;
 
   @Column()
   position: number;

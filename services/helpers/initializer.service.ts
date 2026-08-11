@@ -1,5 +1,5 @@
-import { profileService } from "../domain/profile.service";
 import "server-only";
+import { profileService } from "../domain/profile.service";
 
 class InitializerService {
   public async init() {

@@ -5,9 +5,9 @@ import { FeaturedWork } from "./_components/featured-work";
 import { HomePageHeader } from "./_components/header";
 import { Skills } from "./_components/skills";
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
-    <section className="p-4 pt-0 sm:p-8 sm:pt-0 lg:pe-20 lg:ps-10 space-y-6">
+    <section className="space-y-6">
       <HomePageHeader>
         <React.Suspense fallback={<DynamicLoader />}>
           <Skills />

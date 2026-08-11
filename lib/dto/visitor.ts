@@ -21,6 +21,7 @@ export const getSuperAdminProfileOutputSchema = clientSafeSchema
     jobTitle: true,
     location: true,
     currentFocus: true,
+    assets: true,
   })
   .extend({
     avatar: clientSafeSchema.shape.featuredAsset,
@@ -58,3 +59,14 @@ export const getFeaturedProjectsOutputSchema =
 export type GetFeaturedProjectsOutputSchema = z.infer<
   typeof getFeaturedProjectsOutputSchema
 >;
+
+// ################### Skills ############################
+const publicSkill = skill.omit({
+  assets: true,
+  translations: true,
+});
+
+export const getSkillsOutputSchema =
+  createPaginatedListOutputSchema(publicSkill);
+
+export type GetSkillsOutputSchema = z.infer<typeof getSkillsOutputSchema>;

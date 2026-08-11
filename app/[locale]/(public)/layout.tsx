@@ -1,14 +1,16 @@
-import type React from "react";
 import { wrapService } from "@/api/common/create-router";
 import { PublicLayout as PublicLayoutImpl } from "@/components/app-layout/public-layout/public-layout";
 import { PublicLayoutProvider } from "@/components/app-layout/public-layout/public-layout-provider";
+import { routing } from "@/i18n/routing";
 import { visitorService } from "@/services/domain/visitor.service";
+
+export function generateStaticParams() {
+  return routing.locales.map((l) => ({ locale: l }));
+}
 
 export default async function PublicLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: LayoutProps<"/[locale]">) {
   const getSuperAdminProfile = wrapService({
     authenticatedOnly: false,
     handler: visitorService.getSuperAdminProfileInfo,

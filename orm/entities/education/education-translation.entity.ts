@@ -1,11 +1,11 @@
-import { Column, Entity, Index, ManyToOne } from "typeorm";
+import { Column, Entity, Index, ManyToOne, type Relation } from "typeorm";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type { TranslationEntity } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
 import { Education } from "./education.entity";
 
-@Entity()
+@Entity("education_translation")
 export class EducationTranslation
   extends AppEntity
   implements TranslationEntity<Education>
@@ -37,5 +37,5 @@ export class EducationTranslation
     (base) => base.translations,
     { onDelete: "CASCADE" },
   )
-  base: Education;
+  base: Relation<Education>;
 }

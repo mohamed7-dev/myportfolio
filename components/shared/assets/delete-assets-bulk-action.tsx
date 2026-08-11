@@ -49,9 +49,13 @@ export function DeleteAssetsBulkAction({
           ids: selection.map((s) => s.id),
         })
       }
-      label="Delete"
+      content={
+        <>
+          <TrashIcon />
+          Delete
+        </>
+      }
       confirm={`Are you sure you want to delete ${selectionLength} assets?`}
-      icon={TrashIcon}
       keepMenuOpen={false}
     />
   );

@@ -2,16 +2,17 @@ import "server-only";
 import "reflect-metadata";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
+import type {
   DataSource,
-  type DataSourceOptions,
-  type EntityManager,
-  type EntityTarget,
-  type ObjectLiteral,
-  type Repository,
+  DataSourceOptions,
+  EntityManager,
+  EntityTarget,
+  ObjectLiteral,
+  Repository,
 } from "typeorm";
 import { RequestContext } from "@/api/request-context/request-context";
 import { TRANSACTION_MANAGER_KEY } from "@/lib/constants";
+import dataSource from "./data-source";
 import { entitiesMap } from "./entities/entities-map";
 
 class OrmService {
@@ -56,8 +57,8 @@ class OrmService {
   }
 
   private async createConnection() {
-    const options = this.getConnectionOptions();
-    const connection = new DataSource(options);
+    // const options = this.getConnectionOptions();
+    const connection = dataSource;
 
     await connection.initialize();
     return connection;
@@ -76,32 +77,32 @@ class OrmService {
     return this.dataSource;
   }
 
-  private getConnectionOptions(): DataSourceOptions {
-    const connectionString = process.env.DATABASE_URL;
-
-    return {
-      type: "postgres",
-      url: connectionString,
-      host: connectionString ? undefined : process.env.DB_HOST,
-      port: connectionString
-        ? undefined
-        : process.env.DB_PORT
-          ? Number(process.env.DB_PORT)
-          : undefined,
-      username: connectionString ? undefined : process.env.DB_USER_NAME,
-      password: connectionString ? undefined : process.env.DB_PASSWORD,
-      database: connectionString ? undefined : process.env.DB_NAME,
-      schema: process.env.DB_SCHEMA,
-      entities: Object.values(entitiesMap),
-      migrations: [this.migrationPath],
-      synchronize: true,
-      logging: false,
-      ssl:
-        process.env.DB_SSL === "true"
-          ? { rejectUnauthorized: false }
-          : undefined,
-    };
-  }
+  // private getConnectionOptions(): DataSourceOptions {
+  //   const connectionString = process.env.DATABASE_URL;
+  //   console.log(process.env.NODE_ENV !== "production");
+  //   return {
+  //     type: "postgres",
+  //     url: connectionString,
+  //     host: connectionString ? undefined : process.env.DB_HOST,
+  //     port: connectionString
+  //       ? undefined
+  //       : process.env.DB_PORT
+  //         ? Number(process.env.DB_PORT)
+  //         : undefined,
+  //     username: connectionString ? undefined : process.env.DB_USER_NAME,
+  //     password: connectionString ? undefined : process.env.DB_PASSWORD,
+  //     database: connectionString ? undefined : process.env.DB_NAME,
+  //     schema: process.env.DB_SCHEMA,
+  //     entities: Object.values(entitiesMap),
+  //     migrations: [this.migrationPath],
+  //     synchronize: process.env.NODE_ENV !== "production",
+  //     logging: false,
+  //     ssl:
+  //       process.env.DB_SSL === "true"
+  //         ? { rejectUnauthorized: false }
+  //         : undefined,
+  //   };
+  // }
 
   async disconnectDb() {
     if (this.dataSource?.isInitialized) {

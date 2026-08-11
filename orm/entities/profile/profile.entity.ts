@@ -1,4 +1,11 @@
-import { Column, Entity, Index, ManyToOne, OneToMany } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+  type Relation,
+} from "typeorm";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type {
   LocaleString,
@@ -7,10 +14,10 @@ import type {
 } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
 import { Asset } from "../asset/asset.entity";
-import type { ProfileAsset } from "./profile-asset.entity";
-import type { ProfileTranslation } from "./profile-translation.entity";
+import { ProfileAsset } from "./profile-asset.entity";
+import { ProfileTranslation } from "./profile-translation.entity";
 
-@Entity()
+@Entity("profile")
 export class Profile extends AppEntity implements Translatable {
   constructor(input?: DeepPartial<Profile>) {
     super();
@@ -55,10 +62,10 @@ export class Profile extends AppEntity implements Translatable {
   token?: string;
 
   @OneToMany(
-    "ProfileAsset",
+    () => ProfileAsset,
     (profileAsset: ProfileAsset) => profileAsset.profile,
   )
-  assets: ProfileAsset[];
+  assets: Relation<ProfileAsset[]>;
 
   @Index()
   @ManyToOne(
@@ -66,12 +73,12 @@ export class Profile extends AppEntity implements Translatable {
     (asset) => asset.featuredInProfiles,
     { onDelete: "SET NULL" },
   )
-  featuredAsset: Asset;
+  featuredAsset: Relation<Asset>;
 
   @OneToMany(
-    "ProfileTranslation",
+    () => ProfileTranslation,
     (translations: TranslationEntity<ProfileTranslation>) => translations.base,
     { eager: true },
   )
-  translations: TranslationEntity<ProfileTranslation>[];
+  translations: Relation<TranslationEntity<ProfileTranslation>[]>;
 }

@@ -5,6 +5,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  type Relation,
 } from "typeorm";
 import type { SkillCategory } from "@/lib/dto/skill";
 import type { DeepPartial } from "@/lib/types/shared-types";
@@ -16,10 +17,10 @@ import type {
 import { AppEntity } from "../app-entity";
 import { Asset } from "../asset/asset.entity";
 import { Project } from "../project/project.entity";
-import type { SkillAsset } from "./skill-asset.entity";
-import type { SkillTranslation } from "./skill-translation.entity";
+import { SkillAsset } from "./skill-asset.entity";
+import { SkillTranslation } from "./skill-translation.entity";
 
-@Entity()
+@Entity("skill")
 export class Skill extends AppEntity implements Translatable {
   constructor(input?: DeepPartial<Skill>) {
     super();
@@ -36,8 +37,11 @@ export class Skill extends AppEntity implements Translatable {
   @Column({ type: "varchar" })
   category: SkillCategory;
 
-  @OneToMany("SkillAsset", (skillAsset: SkillAsset) => skillAsset.skill)
-  assets: SkillAsset[];
+  @OneToMany(
+    () => SkillAsset,
+    (skillAsset: SkillAsset) => skillAsset.skill,
+  )
+  assets: Relation<SkillAsset[]>;
 
   @Index()
   @ManyToOne(
@@ -45,14 +49,14 @@ export class Skill extends AppEntity implements Translatable {
     (asset) => asset.featuredInSkills,
     { onDelete: "SET NULL" },
   )
-  featuredAsset: Asset;
+  featuredAsset: Relation<Asset>;
 
   @OneToMany(
-    "SkillTranslation",
+    () => SkillTranslation,
     (translation: SkillTranslation) => translation.base,
     { eager: true },
   )
-  translations: TranslationEntity<SkillTranslation>[];
+  translations: Relation<TranslationEntity<SkillTranslation>[]>;
 
   @ManyToMany(
     () => Project,

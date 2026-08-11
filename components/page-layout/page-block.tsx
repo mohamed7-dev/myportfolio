@@ -70,8 +70,16 @@ export function PageBlock(props: PageBlockProps) {
         >
           {title || description ? (
             <CardHeader>
-              {title && <CardTitle>{title}</CardTitle>}
-              {description && <CardDescription>{description}</CardDescription>}
+              {title && (
+                <CardTitle>
+                  <h2>{title}</h2>
+                </CardTitle>
+              )}
+              {description && (
+                <CardDescription>
+                  <p>{description}</p>
+                </CardDescription>
+              )}
             </CardHeader>
           ) : null}
           <CardContent>{children}</CardContent>

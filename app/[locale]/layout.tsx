@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "../globals.css";
+import "./globals.css";
 import "reflect-metadata";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
+import { getMessages } from "next-intl/server";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { QueryClientProvider } from "@/components/providers/query-client-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { getAccentColor } from "@/lib/helpers/accent-cookie";
+import { routing } from "@/i18n/routing";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,23 +29,43 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
   params,
-}: Readonly<{
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}>) {
+}: LayoutProps<"/[locale]">) {
   const { locale } = await params;
 
-  const accent = await getAccentColor();
+  if (!hasLocale(routing.locales, locale)) {
+    return notFound();
+  }
+
+  const messages = await getMessages();
 
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased ${accent}`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: to avoid FOUC
+          dangerouslySetInnerHTML={{
+            __html: `
+              (() => {
+                if (typeof window !== 'undefined'){
+                  const accentColor = localStorage.getItem("accent-color");
+  
+                  if (accentColor) {
+                    document.documentElement.classList.add(accentColor);
+                  }
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <Toaster />
         <QueryClientProvider>
-          <I18nProvider locale={locale}>
+          <I18nProvider locale={locale} messages={messages}>
             <TooltipProvider>{children}</TooltipProvider>
           </I18nProvider>
         </QueryClientProvider>

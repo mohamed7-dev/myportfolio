@@ -1,0 +1,48 @@
+{
+  "languages": {
+    "en": "english",
+    "ar": "arabic"
+  },
+  "home": {
+    "location": "Based in {location}",
+    "cv": "Download CV",
+    "cards": {
+      "stats": {
+        "title": "Quick Stats",
+        "experience": "Experience",
+        "projectsShipped": "Projects shipped",
+        "openSourceContributions": "Open source Contributions",
+        "years": "yrs"
+      },
+      "currentFocus": {
+        "title": "Current focus"
+      },
+      "projects": {
+        "title": "Featured Work",
+        "description": "A selection of real apps built to solve real problems."
+      },
+      "career": {
+        "title": "Career",
+        "description": "My professional journey and work experience."
+      }
+    }
+  },
+  "about": {
+    "title": "about me",
+    "summaryBlockTitle": "The Architect Mindset"
+  },
+  "projects": {
+    "title": "engineering showcase"
+  },
+  "publicLayout": {
+    "copyright": "{name} All rights reserved.",
+    "nav": {
+      "home": "home",
+      "about": "about",
+      "career": "career",
+      "projects": "projects",
+      "achievements": "achievements",
+      "contact": "contact"
+    }
+  }
+}

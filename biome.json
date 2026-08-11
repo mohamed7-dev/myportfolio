@@ -24,7 +24,8 @@
       },
       "complexity": {
         "noUselessConstructor": "off",
-        "noUselessTernary": "off"
+        "noUselessTernary": "off",
+        "noStaticOnlyClass": "off"
       },
       "correctness": {
         "noChildrenProp": "off"
