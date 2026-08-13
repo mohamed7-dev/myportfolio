@@ -1,50 +1,77 @@
 "use client";
-import { BriefcaseIcon, FolderIcon } from "lucide-react";
+import {
+  BriefcaseIcon,
+  FolderIcon,
+  TargetIcon,
+  TrendingUpIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import type React from "react";
 import { usePublicLayout } from "@/components/app-layout/public-layout/public-layout-provider";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardWrapper } from "@/components/shared/card-wrapper";
+import { IconTile } from "../../../../components/shared/icon-tile";
 import { BentoLink } from "./bento-link";
-import { IconTile } from "./icon-tile";
 
 export function Cards({ children }: { children: React.ReactNode }) {
   const ctx = usePublicLayout("Cards");
   const i18n = useTranslations("home.cards");
   return (
-    <div className="grid grid-cols-1 gap-2.5 md:grid-cols-4 ">
-      <Card className="md:col-span-2">
-        <CardHeader>
-          <CardTitle>{i18n("stats.title")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="flex flex-col gap-2 capitalize">
-            <li className="flex items-center justify-between pb-2 border-b border-border">
-              <strong>{i18n("stats.experience")}: </strong>
-              <strong className="text-primary text-base font-base">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-4 ">
+      <CardWrapper
+        cardTitle={
+          <span className="group flex items-center gap-2">
+            <IconTile>
+              <TrendingUpIcon />
+            </IconTile>
+            {i18n("stats.title")}
+          </span>
+        }
+        className="md:col-span-2"
+      >
+        <ul className="flex flex-col gap-2 capitalize">
+          <li className="flex items-center justify-between pb-2 border-b border-border">
+            <p className="w-full text-sm font-base flex items-center justify-between">
+              <span>{i18n("stats.experience")}:</span>
+              <strong className="text-sm font-base">
                 {ctx.profile.yearsOfExperience} {i18n("stats.years")}
               </strong>
-            </li>
-            <li className="flex items-center justify-between pb-2 border-b border-border">
-              <strong>{i18n("stats.projectsShipped")}: </strong>
-              <strong className="text-primary text-base font-base">
+            </p>
+          </li>
+          <li className="flex items-center justify-between pb-2 border-b border-border">
+            <p className="w-full text-sm font-base flex items-center justify-between">
+              <span>{i18n("stats.projectsShipped")}: </span>
+              <strong className="text-sm font-base">
                 {ctx.profile.projectsShipped}
               </strong>
-            </li>
-            <li className="flex items-center justify-between pb-2 border-b border-border">
-              <strong>{i18n("stats.openSourceContributions")}: </strong>
-              <strong className="text-primary text-base font-base">
+            </p>
+          </li>
+          <li className="flex items-center justify-between">
+            <p className="w-full text-sm font-base flex items-center justify-between">
+              <span>{i18n("stats.openSourceContributions")}: </span>
+              <strong className="text-sm font-base">
                 {ctx.profile.openSourceContributions}
               </strong>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
-      <Card className="md:col-span-2">
-        <CardHeader>
-          <CardTitle>{i18n("currentFocus.title")}</CardTitle>
-        </CardHeader>
-        <CardContent>{ctx.profile.currentFocus}</CardContent>
-      </Card>
+            </p>
+          </li>
+        </ul>
+      </CardWrapper>
+      <CardWrapper
+        className="md:col-span-2"
+        cardTitle={
+          <span className="group flex items-center gap-2">
+            <IconTile>
+              <TargetIcon />
+            </IconTile>
+            {i18n("currentFocus.title")}
+          </span>
+        }
+      >
+        <div
+          dangerouslySetInnerHTML={{ __html: ctx.profile.currentFocus }}
+          className="space-y-2"
+        />
+      </CardWrapper>
+
       <ProjectsCard>{children}</ProjectsCard>
       <CareerCard />
     </div>
@@ -56,21 +83,19 @@ function ProjectsCard({ children }: { children: React.ReactNode }) {
 
   return (
     <BentoLink href="/projects" className="md:col-span-2">
-      <div className="relative min-h-77 p-6">
-        <div className="relative z-10 max-w-42.5">
+      <div className="min-h-77 flex">
+        <div className="max-w-42.5 self-center">
           <IconTile>
             <FolderIcon className="size-6" />
           </IconTile>
-          <h2 className="mt-4 whitespace-pre-line text-lg font-heading leading-none tracking-wider uppercase">
+          <h3 className="mt-4 whitespace-pre-line leading-none tracking-wider uppercase font-heading text-sm md:text-lg text-foreground">
             {i18n("title").replace(" ", "\n")}
-          </h2>
+          </h3>
           <p className="mt-2 text-xs font-base leading-4 text-foreground">
             {i18n("description")}
           </p>
         </div>
-        <div className="absolute right-5 top-4 flex w-42.5 flex-col gap-5 sm:right-5">
-          {children}
-        </div>
+        <div className="flex w-42.5 flex-col gap-5 sm:right-5">{children}</div>
       </div>
     </BentoLink>
   );
@@ -81,12 +106,14 @@ function CareerCard() {
 
   return (
     <BentoLink href="/career" className="md:col-span-2">
-      <div className="flex min-h-[308px] flex-col items-center p-6 text-center">
+      <div className="flex min-h-77 flex-col items-center p-6 text-center">
         <IconTile>
           <BriefcaseIcon className="size-6" />
         </IconTile>
-        <h2 className="mt-4 text-base font-base">{i18n("title")}</h2>
-        <p className="mt-2 max-w-[170px] text-xs leading-4 text-foreground">
+        <h3 className="mt-4 whitespace-pre-line leading-none tracking-wider uppercase font-heading text-sm md:text-lg text-foreground">
+          {i18n("title")}
+        </h3>
+        <p className="mt-2 max-w-42.5 text-xs leading-4 text-foreground">
           {i18n("description")}
         </p>
         <div className="mt-auto flex w-full items-center justify-center gap-5 overflow-hidden pb-4">

@@ -6,6 +6,8 @@
   "home": {
     "location": "Based in {location}",
     "cv": "Download CV",
+    "connect": "Connect",
+    "welcome": "welcome",
     "cards": {
       "stats": {
         "title": "Quick Stats",
@@ -29,10 +31,74 @@
   },
   "about": {
     "title": "about me",
-    "summaryBlockTitle": "The Architect Mindset"
+    "summary": {
+      "title": "The Architect Mindset"
+    },
+    "skills": {
+      "title": "The technical arsenal"
+    },
+    "mediaGallery": {
+      "title": "Media Gallery"
+    }
   },
   "projects": {
     "title": "engineering showcase"
+  },
+  "project": {
+    "backToProjects": "Back To Projects",
+    "source": "source",
+    "liveDemo": "live demo",
+    "relations": {
+      "title": "Project Relations",
+      "techStack": "Tech Stack",
+      "career": "career",
+      "education": "education",
+      "achievements": "achievements"
+    },
+    "summary": { "title": "Overview" },
+    "features": { "title": "Features" },
+    "techStack": { "title": "Tech Stack" },
+    "challenges": { "title": "Technical Challenges" },
+    "technicalHighlights": { "title": "Technical Highlights" },
+    "contributions": { "title": "contributions" },
+    "execution": {
+      "title": "execution",
+      "production": "in production",
+      "development": "in development",
+      "status": "status"
+    }
+  },
+  "contact": {
+    "title": "Get in touch",
+    "description": "I'm always open to discussing technical architecture roles, innovative projects, or opportunities to collaborate. Reach out via your preferred channel.",
+    "contactMethods": {
+      "title": "Contact Methods",
+      "goTo": "Visit",
+      "primary": "primary",
+      "primaryDescription": "For serious inquiries and formal communications.",
+      "copiedToClipboard": "Contact method was successfully copied to the clipboard"
+    },
+    "directMessage": {
+      "title": "Direct message",
+      "form": {
+        "fullName": {
+          "label": "Full Name",
+          "description": "Enter your full name"
+        },
+        "email": {
+          "label": "Email Address",
+          "description": "Enter your email address"
+        },
+        "subject": {
+          "label": "Subject",
+          "description": "Example: Job Opportunity: Senior full-stack web developer"
+        },
+        "content": {
+          "label": "Content",
+          "description": "Tell me about your project.."
+        }
+      }
+    }
   },
   "publicLayout": {
     "copyright": "{name} All rights reserved.",

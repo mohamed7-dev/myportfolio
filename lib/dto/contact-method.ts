@@ -26,6 +26,8 @@ export type ContactMethodAsset = z.infer<typeof contactMethodAssetSchema>;
 export const contactMethod = baseSchema.extend({
   name: z.string().nonempty(),
   url: z.string(),
+  enabled: z.boolean(),
+  primary: z.boolean(),
   copyableText: z.string().nullish(),
   translations: z.array(contactMethodTranslationSchema),
   assets: z.array(contactMethodAssetSchema),
@@ -45,6 +47,8 @@ export const createContactMethodInputSchema = z.object({
   assetIds: z.array(z.string()),
   translations: z.array(contactMethodTranslationInputSchema),
   featuredAssetId: z.string(),
+  enabled: z.boolean().optional(),
+  primary: z.boolean().optional(),
 });
 
 export type CreateContactMethodInputSchema = z.infer<
@@ -62,6 +66,8 @@ export const updateContactMethodInputSchema = z.object({
   id: z.string(),
   url: z.string().optional(),
   copyableText: z.string().optional(),
+  enabled: z.boolean().optional(),
+  primary: z.boolean().optional(),
   translations: z
     .array(
       contactMethodTranslationInputSchema
@@ -72,7 +78,7 @@ export const updateContactMethodInputSchema = z.object({
         ),
     )
     .optional(),
-  assetIds: z.array(z.string()),
+  assetIds: z.array(z.string()).optional(),
   featuredAssetId: z.string().optional(),
 });
 
@@ -105,6 +111,7 @@ export const contactMethodListInputSchema = paginatedListInputSchema.extend({
   filter: z
     .object({
       name: z.object({ contains: z.string() }).optional(),
+      enabled: z.object({ equals: z.boolean() }).optional(),
     })
     .optional(),
 });

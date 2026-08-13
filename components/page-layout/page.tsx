@@ -2,7 +2,6 @@
 "use client";
 
 import { EllipsisVerticalIcon } from "lucide-react";
-import { HeadManagerContext } from "next/dist/shared/lib/head-manager-context.shared-runtime";
 import React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -23,15 +22,24 @@ export function Page(props: PageProps) {
   const { children, entity, pageId, ...restProps } = props;
   const childrenArray = React.Children.toArray(children);
   const pageTitle = childrenArray.find((child) => isPageTitleItem(child));
+  const pageDescription = childrenArray.find((child) =>
+    isPageDescriptionItem(child),
+  );
   const pageActionBar = childrenArray.find((child) => isPageActionBar(child));
   const pageContent = childrenArray.filter(
-    (child) => !isPageTitleItem(child) && !isPageActionBar(child),
+    (child) =>
+      !isPageTitleItem(child) &&
+      !isPageDescriptionItem(child) &&
+      !isPageActionBar(child),
   );
 
   const pageHeader = (
-    <header className="flex items-center justify-between gap-2 bg-secondary-background px-3.5 py-4 rounded-base border-2 border-border shadow-default">
-      <div className="min-w-0 shrink">{pageTitle ?? ""}</div>
-      <div className="shrink-0">{pageActionBar}</div>
+    <header className="flex flex-col gap-4 bg-secondary-background px-3.5 py-4 rounded-base border-2 border-border shadow-default">
+      <div className="min-w-0 flex items-center justify-between">
+        {pageTitle ?? ""}
+        {pageActionBar}
+      </div>
+      {pageDescription && <div className="shrink-0">{pageDescription}</div>}
     </header>
   );
 
@@ -51,16 +59,25 @@ export function PageTitle({
   children,
 }: {
   children: React.ReactNode;
-  pageTitleBlockName: string;
+  pageTitleBlockId: string;
 }) {
   return <h1 className="text-2xl font-heading capitalize">{children}</h1>;
+}
+
+export function PageDescription({
+  children,
+}: {
+  children: React.ReactNode;
+  pageDescriptionBlockId: string;
+}) {
+  return <p className="text-sm text-foreground/80 font-base">{children}</p>;
 }
 
 type InlineActionBarMenuItem = Omit<ActionBarMenuItem, "type" | "pageId">;
 interface PageActionBarProps {
   children: React.ReactNode;
   menuItems?: InlineActionBarMenuItem[];
-  pageActionBarBlockName: string;
+  pageActionBarBlockId: string;
 }
 export function PageActionBar({ children, menuItems }: PageActionBarProps) {
   const isMobile = useIsMobile();
@@ -116,7 +133,7 @@ export function PageActionBar({ children, menuItems }: PageActionBarProps) {
 
 export interface ActionBarItemProps {
   children: React.ReactNode;
-  actionBarItemBlockName: string;
+  actionBarItemBlockId: string;
 }
 
 export function PageActionBarItem({ children }: ActionBarItemProps) {
@@ -163,23 +180,31 @@ function PageActionBarDropdownMenu({
 function isPageActionBarItem(child: unknown): boolean {
   return (
     React.isValidElement(child) &&
-    "actionBarItemBlockName" in
-      (child as React.ReactElement<{ actionBarItemBlockName: string }>).props
+    "actionBarItemBlockId" in
+      (child as React.ReactElement<{ actionBarItemBlockId: string }>).props
   );
 }
 
 function isPageTitleItem(child: unknown) {
   return (
     React.isValidElement(child) &&
-    "pageTitleBlockName" in
-      (child as React.ReactElement<{ pageTitleBlockName: string }>).props
+    "pageTitleBlockId" in
+      (child as React.ReactElement<{ pageTitleBlockId: string }>).props
+  );
+}
+
+function isPageDescriptionItem(child: unknown) {
+  return (
+    React.isValidElement(child) &&
+    "pageDescriptionBlockId" in
+      (child as React.ReactElement<{ pageDescriptionBlockId: string }>).props
   );
 }
 
 function isPageActionBar(child: unknown) {
   return (
     React.isValidElement(child) &&
-    "pageActionBarBlockName" in
-      (child as React.ReactElement<{ pageActionBarBlockName: string }>).props
+    "pageActionBarBlockId" in
+      (child as React.ReactElement<{ pageActionBarBlockId: string }>).props
   );
 }

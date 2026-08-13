@@ -38,7 +38,7 @@ export default async function ProjectsPage({
   } = await searchParams;
   const find = wrapService({
     authenticatedOnly: true,
-    handler: projectService.find,
+    handler: projectService.find.bind(projectService),
   });
 
   const result = await find({
@@ -61,11 +61,9 @@ export default async function ProjectsPage({
 
   return (
     <Page pageId="project-list-page">
-      <PageTitle pageTitleBlockName="project-list-page-title">
-        Projects
-      </PageTitle>
-      <PageActionBar pageActionBarBlockName="project-list-page-action-bar">
-        <PageActionBarItem actionBarItemBlockName="new-project-action-bar-item">
+      <PageTitle pageTitleBlockId="project-list-page-title">Projects</PageTitle>
+      <PageActionBar pageActionBarBlockId="project-list-page-action-bar">
+        <PageActionBarItem actionBarItemBlockId="new-project-action-bar-item">
           <Button>
             <Link href={"/dashboard/projects/new"}>Add New Project</Link>
           </Button>

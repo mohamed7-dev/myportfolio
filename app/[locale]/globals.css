@@ -8,11 +8,11 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #c7ddff;
+  --background: #d0fbea;
   --foreground: #000000;
   --secondary-background: #ffffff;
   --overlay: #000000;
-  --primary: #5294ff;
+  --primary: #00d696;
   --primary-foreground: #000000;
   --border: #000000;
   --ring: #000000;
@@ -27,9 +27,9 @@
   --primary: #ff4d4f;
 }
 
-.emerald {
-  --background: #d0fbea;
-  --primary: #00d696;
+.blue {
+  --background: #c7ddff;
+  --primary: #5294ff;
 }
 
 @theme inline {

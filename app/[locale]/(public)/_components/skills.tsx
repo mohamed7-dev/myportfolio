@@ -1,4 +1,5 @@
 import { wrapService } from "@/api/common/create-router";
+import { Badge } from "@/components/ui/badge";
 import { visitorService } from "@/services/domain/visitor.service";
 
 export async function Skills() {
@@ -11,12 +12,9 @@ export async function Skills() {
   return (
     <div className="flex gap-2 mt-4 flex-wrap">
       {skills.items?.map((skill) => (
-        <span
-          key={skill.id}
-          className="px-3 py-1 bg-background text-foreground rounded-base text-sm font-base"
-        >
+        <Badge variant="neutral" key={skill.id}>
           {skill.name}
-        </span>
+        </Badge>
       ))}
     </div>
   );

@@ -18,7 +18,7 @@ export interface PageBlockProps {
   title?: React.ReactNode | string;
   description?: React.ReactNode | string;
   className?: string;
-  unStyled?: boolean;
+  srOnly?: boolean;
 }
 
 export function PageBlock(props: PageBlockProps) {
@@ -29,7 +29,7 @@ export function PageBlock(props: PageBlockProps) {
     column,
     className,
     children,
-    unStyled = false,
+    srOnly = false,
   } = props;
   const contextValue = React.useMemo(
     () => ({
@@ -43,48 +43,29 @@ export function PageBlock(props: PageBlockProps) {
 
   return (
     <PageBlockProvider {...contextValue}>
-      {unStyled && (
-        <div
-          className={cn(
-            "@container  w-full",
-            className,
-            "animate-in fade-in duration-300",
-          )}
-        >
-          {/* {title || description ? (
-						<div>
-							{title && <CardTitle>{title}</CardTitle>}
-							{description && <CardDescription>{description}</CardDescription>}
-						</div>
-					) : null} */}
-          {children}
-        </div>
-      )}
-      {!unStyled && (
-        <Card
-          className={cn(
-            "@container  w-full",
-            className,
-            "animate-in fade-in duration-300",
-          )}
-        >
-          {title || description ? (
-            <CardHeader>
-              {title && (
-                <CardTitle>
-                  <h2>{title}</h2>
-                </CardTitle>
-              )}
-              {description && (
-                <CardDescription>
-                  <p>{description}</p>
-                </CardDescription>
-              )}
-            </CardHeader>
-          ) : null}
-          <CardContent>{children}</CardContent>
-        </Card>
-      )}
+      <Card
+        className={cn(
+          "@container  w-full",
+          className,
+          "animate-in fade-in duration-300",
+        )}
+      >
+        {title || description ? (
+          <CardHeader className={cn(srOnly && "sr-only")}>
+            {title && (
+              <CardTitle className={cn(srOnly && "sr-only")}>
+                <h2>{title}</h2>
+              </CardTitle>
+            )}
+            {description && (
+              <CardDescription>
+                <p>{description}</p>
+              </CardDescription>
+            )}
+          </CardHeader>
+        ) : null}
+        <CardContent>{children}</CardContent>
+      </Card>
     </PageBlockProvider>
   );
 }

@@ -27,7 +27,7 @@ export default async function ContactMethodListPage({
 
   const find = wrapService({
     authenticatedOnly: true,
-    handler: contactMethodService.find,
+    handler: contactMethodService.find.bind(contactMethodService),
   });
 
   const result = await find({
@@ -41,12 +41,12 @@ export default async function ContactMethodListPage({
   const contactMethods = validateOutput(result, contactMethodListOutputSchema);
 
   return (
-    <Page pageId="contact-method-list-page">
-      <PageTitle pageTitleBlockName="contact-method-list-page-title">
+    <Page pageId="dashboard-contact-method-list">
+      <PageTitle pageTitleBlockId="dashboard-contact-method-list-title">
         Contact Methods
       </PageTitle>
-      <PageActionBar pageActionBarBlockName="contact-method-list-page-action-bar">
-        <PageActionBarItem actionBarItemBlockName="new-contact-method-action-bar-item">
+      <PageActionBar pageActionBarBlockId="dashboard-contact-method-list-action-bar">
+        <PageActionBarItem actionBarItemBlockId="new-edit-contact-method">
           <Button>
             <Link href={"/dashboard/contact-methods/new"}>
               Add New Contact Method

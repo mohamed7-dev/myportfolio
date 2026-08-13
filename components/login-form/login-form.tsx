@@ -4,6 +4,7 @@ import { Loader2Icon } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import z from "zod";
+import { useRouterUtils } from "@/hooks/use-router-utils";
 import { useRouter } from "@/i18n/navigation";
 import type { ClientSafeProfile } from "@/lib/dto/profile";
 import type { AppError } from "@/lib/errors/app-error";
@@ -28,6 +29,7 @@ type LoginSchema = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const router = useRouter();
+  const { getApiHandlerUrl } = useRouterUtils();
   const [isVerifying, setIsVerifying] = React.useState(false);
   const form = useForm({
     defaultValues: {
@@ -44,7 +46,7 @@ export function LoginForm() {
 
   const onFormSubmit = async (value: LoginSchema) => {
     setIsVerifying(true);
-    await fetch("/api/auth", {
+    await fetch(getApiHandlerUrl("auth"), {
       method: "post",
       body: JSON.stringify(value),
       credentials: "include",

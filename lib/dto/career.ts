@@ -61,7 +61,7 @@ export const career = baseSchema.extend({
   type: careerTypeSchema,
   translations: z.array(careerTranslationSchema),
   assets: z.array(careerAssetSchema),
-  featuredAsset: asset.nullish(),
+  featuredAsset: asset.nullish(), // TODO: remove this once all entities has featured asset
 });
 
 export type Career = z.infer<typeof career>;
@@ -80,7 +80,7 @@ const careerTranslationInputSchema = baseTranslationEntityInput.extend({
 export const createCareerInputSchema = z.object({
   assetIds: z.array(z.string()),
   translations: z.array(careerTranslationInputSchema),
-  featuredAssetId: z.string().optional(),
+  featuredAssetId: z.string(),
   startDate: z.coerce.date(),
   endDate: z.coerce.date().nullish(),
   isPresent: z.boolean(),
@@ -98,19 +98,23 @@ export type CreateCareerOutputSchema = z.infer<typeof createCareerOutputSchema>;
 //############################ Update #############################
 export const updateCareerInputSchema = z.object({
   id: z.string(),
-  translations: z.array(
-    careerTranslationInputSchema
-      .partial()
-      .extend(careerTranslationInputSchema.pick({ languageCode: true }).shape),
-  ),
-  assetIds: z.array(z.string()),
+  translations: z
+    .array(
+      careerTranslationInputSchema
+        .partial()
+        .extend(
+          careerTranslationInputSchema.pick({ languageCode: true }).shape,
+        ),
+    )
+    .optional(),
+  assetIds: z.array(z.string()).optional(),
   featuredAssetId: z.string().optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().nullish().optional(),
   isPresent: z.boolean().optional(),
   type: careerTypeSchema.optional(),
   mode: careerModeSchema.optional(),
-  achievementIds: z.array(z.string()),
+  achievementIds: z.array(z.string()).optional(),
 });
 
 export type UpdateCareerInputSchema = z.infer<typeof updateCareerInputSchema>;

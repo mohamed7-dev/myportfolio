@@ -9,9 +9,9 @@ import {
   UserRoundIcon,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { AccentSwitcher } from "../accent-switcher";
 import { LanguageSwitcher } from "../language-switcher";
 import { usePublicLayout } from "./public-layout-provider";

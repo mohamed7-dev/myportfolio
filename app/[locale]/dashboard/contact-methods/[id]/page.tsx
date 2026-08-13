@@ -18,6 +18,7 @@ import { contactMethodService } from "@/services/domain/contact-method.service";
 import { ContactMethodForm } from "./_components/contact-method-form";
 import { ContactMethodFormAssetField } from "./_components/contact-method-form-asset-field";
 import { ContactMethodFormMainFields } from "./_components/contact-method-form-main-fields";
+import { ContactMethodFormStatusField } from "./_components/contact-method-form-status-field";
 import { ContactMethodFormSubmitButton } from "./_components/contact-method-form-submit-button";
 
 export default async function ContactMethodPage({
@@ -33,7 +34,7 @@ export default async function ContactMethodPage({
   if (!creatingNewEntity) {
     const findOne = wrapService({
       authenticatedOnly: true,
-      handler: contactMethodService.findOne,
+      handler: contactMethodService.findOne.bind(contactMethodService),
     });
     const result = await findOne({ id });
     contactMethod = validateOutput(result, findOneContactMethodOutputSchema);
@@ -45,24 +46,27 @@ export default async function ContactMethodPage({
 
   return (
     <ContactMethodForm initialValues={contactMethod}>
-      <Page pageId="contact-method-detail-page">
-        <PageTitle pageTitleBlockName="contact-method-detail-page-title">
+      <Page pageId="dashboard-contact-method">
+        <PageTitle pageTitleBlockId="dashboard-contact-method-title">
           {creatingNewEntity ? "New Contact Method" : "Update Contact Method"}
         </PageTitle>
-        <PageActionBar pageActionBarBlockName="contact-method-detail-page-action-bar">
-          <PageActionBarItem actionBarItemBlockName="contact-method-detail-page-submit-button">
+        <PageActionBar pageActionBarBlockId="dashboard-contact-method-action-bar">
+          <PageActionBarItem actionBarItemBlockId="dashboard-contact-method-submit-button">
             <ContactMethodFormSubmitButton />
           </PageActionBarItem>
         </PageActionBar>
         <PageLayout>
-          <PageBlock column="main" id="contact-method-detail-main-fields">
+          <PageBlock column="main" id="main-fields">
             <ContactMethodFormMainFields />
           </PageBlock>
-          <PageBlock column="side" id="contact-method-detail-assets">
+          <PageBlock column="side" id="assets-field">
             <ContactMethodFormAssetField
               contactMethodAssets={contactMethod?.assets ?? []}
               featuredAsset={contactMethod?.featuredAsset ?? undefined}
             />
+          </PageBlock>
+          <PageBlock column="side" id="status-field">
+            <ContactMethodFormStatusField />
           </PageBlock>
         </PageLayout>
       </Page>

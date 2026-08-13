@@ -1,13 +1,13 @@
 export const themes = {
   lightBlue: {
     name: "light-blue",
-    className: "",
+    className: "blue",
     labelColor: "#5294ff",
     isDefault: false,
   },
   lightEmerald: {
     name: "light-emerald",
-    className: "emerald",
+    className: "",
     labelColor: "#00d696",
     isDefault: true,
   },

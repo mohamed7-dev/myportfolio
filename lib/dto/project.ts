@@ -110,7 +110,7 @@ export const updateProjectInputSchema = z.object({
   featured: z.boolean().optional(),
   liveDemoUrl: z.string().url().optional(),
   repoUrl: z.string().url().optional(),
-  assetIds: z.array(z.string()),
+  assetIds: z.array(z.string()).optional(),
   featuredAssetId: z.string().optional(),
   translations: z
     .array(
@@ -121,8 +121,8 @@ export const updateProjectInputSchema = z.object({
     .optional(),
   careerId: z.string().optional(),
   educationItemId: z.string().optional(),
-  achievementIds: z.array(z.string()),
-  skillIds: z.array(z.string()),
+  achievementIds: z.array(z.string()).optional(),
+  skillIds: z.array(z.string()).optional(),
 });
 
 export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;
@@ -163,6 +163,7 @@ export const projectListInputSchema =
     filter: z
       .object({
         name: z.object({ contains: z.string() }).optional(),
+        slug: z.object({ equals: z.string() }).optional(),
         enabled: z.object({ equals: z.boolean() }).optional(),
         featured: z.object({ equals: z.boolean() }).optional(),
         liveDemoUrl: z.object({ contains: z.string() }).optional(),
@@ -175,3 +176,51 @@ export type ProjectListInputSchema = z.infer<typeof projectListInputSchema>;
 export const projectListOutputSchema = createPaginatedListOutputSchema(project);
 
 export type ProjectListOutputSchema = z.infer<typeof projectListOutputSchema>;
+
+//###################### Find One #######################
+export const findOneProjectInputSchema = inputIdSchema;
+
+export type FindOneProjectInputSchema = z.infer<
+  typeof findOneProjectInputSchema
+>;
+
+export const findOneProjectOutputSchema = project.extend({
+  career: career
+    .pick({
+      id: true,
+      name: true,
+      slug: true,
+      featuredAsset: true,
+    })
+    .nullish(),
+  education: education
+    .pick({
+      id: true,
+      school: true,
+      slug: true,
+      featuredAsset: true,
+    })
+    .nullish(),
+  achievements: z
+    .array(
+      achievement.pick({
+        id: true,
+        name: true,
+        slug: true,
+        featuredAsset: true,
+      }),
+    )
+    .nullish(),
+  skills: z.array(
+    skill.pick({
+      id: true,
+      name: true,
+      slug: true,
+      featuredAsset: true,
+    }),
+  ),
+});
+
+export type FindOneProjectOutputSchema = z.infer<
+  typeof findOneProjectOutputSchema
+>;

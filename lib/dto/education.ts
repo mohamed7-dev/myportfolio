@@ -37,7 +37,7 @@ export const education = baseSchema.extend({
   gpa: z.number().nullish(),
   translations: z.array(educationTranslationSchema),
   assets: z.array(educationAssetSchema),
-  featuredAsset: asset.nullish(),
+  featuredAsset: asset.nullish(), // TODO: remove nullish once all entities have featured asset
 });
 
 export type Education = z.infer<typeof education>;
@@ -53,7 +53,7 @@ const educationTranslationInputSchema = baseTranslationEntityInput.extend({
 export const createEducationInputSchema = z.object({
   assetIds: z.array(z.string()),
   translations: z.array(educationTranslationInputSchema),
-  featuredAssetId: z.string().optional(),
+  featuredAssetId: z.string(),
   startDate: z.coerce.date(),
   endDate: z.coerce.date().nullish(),
   isPresent: z.boolean(),
@@ -73,14 +73,16 @@ export type CreateEducationOutputSchema = z.infer<
 //############################ Update #############################
 export const updateEducationInputSchema = z.object({
   id: z.string(),
-  translations: z.array(
-    educationTranslationInputSchema
-      .partial()
-      .extend(
-        educationTranslationInputSchema.pick({ languageCode: true }).shape,
-      ),
-  ),
-  assetIds: z.array(z.string()).nonempty(),
+  translations: z
+    .array(
+      educationTranslationInputSchema
+        .partial()
+        .extend(
+          educationTranslationInputSchema.pick({ languageCode: true }).shape,
+        ),
+    )
+    .optional(),
+  assetIds: z.array(z.string()).optional(),
   featuredAssetId: z.string().optional(),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().nullish().optional(),

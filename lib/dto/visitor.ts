@@ -1,4 +1,8 @@
-import type { z } from "@/lib/helpers/zod";
+import { z } from "@/lib/helpers/zod";
+import { achievement } from "./achievement";
+import { career } from "./career";
+import { contactMethod } from "./contact-method";
+import { education } from "./education";
 import { createPaginatedListOutputSchema } from "./paginated-list";
 import { clientSafeSchema } from "./profile";
 import { project } from "./project";
@@ -70,3 +74,115 @@ export const getSkillsOutputSchema =
   createPaginatedListOutputSchema(publicSkill);
 
 export type GetSkillsOutputSchema = z.infer<typeof getSkillsOutputSchema>;
+
+// ################### Projects ############################
+const publicProjectInList = project.pick({
+  id: true,
+  liveDemoUrl: true,
+  repoUrl: true,
+  finished: true,
+  featured: true,
+  languageCode: true,
+  name: true,
+  slug: true,
+  description: true,
+  featuredAsset: true,
+  career: true,
+  education: true,
+  // skills: true, // TODO: uncomment once all projects have the required skills
+});
+
+export const getPublicProjectsOutputSchema =
+  createPaginatedListOutputSchema(publicProjectInList);
+
+export type GetPublicProjectsOutputSchema = z.infer<
+  typeof getPublicProjectsOutputSchema
+>;
+
+// ################### Project ############################
+
+export const getPublicProjectInputSchema = z.object({ slug: z.string() });
+
+export type GetPublicProjectInputSchema = z.infer<
+  typeof getPublicProjectInputSchema
+>;
+
+const publicProject = project
+  .pick({
+    id: true,
+    liveDemoUrl: true,
+    repoUrl: true,
+    finished: true,
+    featured: true,
+    languageCode: true,
+    name: true,
+    slug: true,
+    description: true,
+    overview: true,
+    features: true,
+    technicalHighlights: true,
+    contributions: true,
+    challengesAndSolutions: true,
+    techStack: true,
+    featuredAsset: true,
+    assets: true,
+  })
+  .extend({
+    skills: z.array(
+      skill.pick({
+        id: true,
+        name: true,
+        featuredAsset: true,
+      }),
+    ),
+    career: career
+      .pick({
+        id: true,
+        slug: true,
+        name: true,
+        featuredAsset: true,
+      })
+      .nullish(),
+    education: education
+      .pick({
+        id: true,
+        slug: true,
+        school: true,
+        featuredAsset: true,
+      })
+      .nullish(),
+    achievements: z
+      .array(
+        achievement.pick({
+          id: true,
+          slug: true,
+          name: true,
+          featuredAsset: true,
+        }),
+      )
+      .nullish(),
+  });
+
+export const getPublicProjectOutputSchema = publicProject;
+
+export type GetPublicProjectOutputSchema = z.infer<
+  typeof getPublicProjectOutputSchema
+>;
+
+// ################### Contact Methods ############################
+const publicContactMethodInList = contactMethod.pick({
+  id: true,
+  name: true,
+  enabled: true,
+  primary: true,
+  featuredAsset: true,
+  copyableText: true,
+  url: true,
+});
+
+export const getPublicContactMethodsOutputSchema =
+  createPaginatedListOutputSchema(publicContactMethodInList);
+
+export type GetPublicContactMethodsOutputSchema = z.infer<
+  typeof getPublicContactMethodsOutputSchema
+>;

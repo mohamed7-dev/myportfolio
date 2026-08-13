@@ -3,6 +3,7 @@ import { EditIcon, LockIcon, RefreshCwIcon } from "lucide-react";
 import { useLocale } from "next-intl";
 import React from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+import { useRouterUtils } from "@/hooks/use-router-utils";
 import type {
   SlugForEntityInputSchema,
   SlugForEntityOutputSchema,
@@ -17,8 +18,9 @@ async function generateSlug(input: {
   fieldName: string;
   inputValue: string;
   entityId?: string;
+  url: string;
 }) {
-  const response = await fetch("/api/slug-for-entity", {
+  const response = await fetch(input.url, {
     method: "POST",
     credentials: "include",
     body: JSON.stringify({
@@ -99,6 +101,7 @@ export function SlugInput({
 }: SlugInputProps & { placeholder?: string }) {
   const form = useFormContext();
   const currentLanguageCode = useLocale();
+  const { getApiHandlerUrl } = useRouterUtils();
 
   const [manualReadonly, setManualReadonly] = React.useState(defaultReadonly);
   const [loading, setLoading] = React.useState(false);
@@ -141,6 +144,7 @@ export function SlugInput({
           fieldName,
           inputValue: debouncedValue,
           entityId,
+          url: getApiHandlerUrl("slug-for-entity"),
         });
 
         if (!cancelled && slug !== value) {
@@ -166,6 +170,7 @@ export function SlugInput({
     entityId,
     value,
     onChange,
+    getApiHandlerUrl,
   ]);
 
   async function regenerate() {
@@ -181,6 +186,7 @@ export function SlugInput({
         fieldName,
         inputValue: watchedValue,
         entityId,
+        url: getApiHandlerUrl("slug-for-entity"),
       });
 
       onChange?.(slug);

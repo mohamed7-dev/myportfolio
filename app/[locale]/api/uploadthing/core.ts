@@ -1,9 +1,7 @@
-import { getLocale } from "next-intl/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-import { RequestContext } from "@/api/request-context/request-context";
-import type { LanguageCode } from "@/lib/dto/language-code";
 import { authService } from "@/services/domain/auth.service";
+import { requestContextService } from "@/services/helpers/request-context.service";
 
 const f = createUploadthing();
 
@@ -23,11 +21,10 @@ export const ourFileRouter = {
     },
   })
     // Set permissions and file types for this FileRoute
-    .middleware(async () => {
+    .middleware(async (req) => {
       // This code RUNS ON YOUR SERVER before upload
-      const ctx = new RequestContext({
-        languageCode: (await getLocale()) as LanguageCode,
-      });
+      const ctx = await requestContextService.create(req.req, undefined, true);
+
       const session = await authService.getSession(ctx);
 
       // If you throw, the user will not be able to upload
@@ -54,12 +51,10 @@ export const ourFileRouter = {
     },
   })
     // Set permissions and file types for this FileRoute
-    .middleware(async () => {
+    .middleware(async (meta) => {
       // This code RUNS ON YOUR SERVER before upload
 
-      const ctx = new RequestContext({
-        languageCode: (await getLocale()) as LanguageCode,
-      });
+      const ctx = await requestContextService.create(meta.req, undefined, true);
       const session = await authService.getSession(ctx);
 
       // If you throw, the user will not be able to upload

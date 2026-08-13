@@ -10,7 +10,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         <Sidebar />
         <main
           id="main-content"
-          className="w-full flex-1 transition-all duration-300 lg:h-full lg:min-h-0 lg:w-4/5 lg:overflow-y-auto lg:pt-4 p-4 pt-0 sm:p-8 sm:pt-0 lg:pe-20 lg:ps-10"
+          className="w-full flex-1 transition-all duration-300 lg:h-full lg:min-h-0 lg:w-4/5 lg:overflow-y-auto lg:pt-4 p-4 pt-0 sm:p-8 sm:pt-0 lg:pe-10 lg:ps10"
         >
           {children}
         </main>

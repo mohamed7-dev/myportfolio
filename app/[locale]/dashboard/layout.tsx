@@ -7,7 +7,11 @@ export default async function DashboardLayout({
   params,
 }: LayoutProps<"/[locale]/dashboard">) {
   const { locale } = await params;
-  const requestContext = await requestContextService.create(undefined, true);
+  const requestContext = await requestContextService.create(
+    undefined,
+    undefined,
+    true,
+  );
 
   if (!requestContext.isAuthenticated) {
     redirect({ href: "/login", locale });

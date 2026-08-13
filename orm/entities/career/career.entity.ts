@@ -62,7 +62,7 @@ export class Career extends AppEntity {
   @ManyToOne(
     () => Asset,
     (asset) => asset.featuredInCareers,
-    { onDelete: "SET NULL" },
+    { onDelete: "RESTRICT" },
   )
   featuredAsset: Relation<Asset>;
 

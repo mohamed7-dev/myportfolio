@@ -9,7 +9,7 @@
     "migration:generate": "NODE_ENV=production npm run typeorm -- migration:generate ./orm/migrations/Initial",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
-    "build": "NODE_ENV=production pnpm seed && next build",
+    "build": "NODE_ENV=production pnpm migration:run && pnpm seed && next build",
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write"

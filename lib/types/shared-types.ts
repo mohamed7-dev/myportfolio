@@ -16,3 +16,5 @@ export interface Orderable {
 export interface ClassType<T> extends Function {
   new (...args: any[]): T;
 }
+
+export type NextCtx = { params: Promise<Record<string, unknown>> };

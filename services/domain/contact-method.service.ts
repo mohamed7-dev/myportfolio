@@ -17,11 +17,13 @@ import { ormService } from "@/orm/orm.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { assetService } from "./asset.service";
 import "server-only";
+import type { FindOptionsRelations } from "typeorm";
 
 class ContactMethodService {
   public async findOne(
     ctx: RequestContext,
     input: FindOneContactMethodInputSchema,
+    relations?: FindOptionsRelations<ContactMethod>,
   ) {
     const repo = await ormService.getRepository(ctx, ContactMethod);
     const contactMethod = await repo.findOne({
@@ -33,37 +35,19 @@ class ContactMethodService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
     if (contactMethod) {
-      const translatedContactMethod = translator.translate(
-        ctx.languageCode,
-        contactMethod,
-      );
-      const translatedAssets = translatedContactMethod.assets.flatMap(
-        (cmAsset) => {
-          return {
-            ...cmAsset,
-            asset: translator.translate(ctx.languageCode, cmAsset.asset),
-          };
-        },
-      );
-
-      return {
-        ...translatedContactMethod,
-        assets: translatedAssets,
-        featuredAsset: translator.translate(
-          ctx.languageCode,
-          translatedContactMethod.featuredAsset,
-        ),
-      };
+      return this.translateContactMethod(ctx, contactMethod);
     }
   }
 
   public async find(
     ctx: RequestContext,
     options: ContactMethodListInputSchema,
+    relations?: FindOptionsRelations<ContactMethod>,
   ) {
     const qb = await listQueryBuilder.build(ContactMethod, options, {
       ctx,
@@ -73,6 +57,7 @@ class ContactMethodService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
@@ -87,28 +72,8 @@ class ContactMethodService {
 
     return await qb.getManyAndCount().then((result) => {
       return {
-        items: result[0].flatMap((career) => {
-          const translatedContactMethod = translator.translate(
-            ctx.languageCode,
-            career,
-          );
-          const translatedAssets = translatedContactMethod.assets.map(
-            (cmAsset) => {
-              return {
-                ...cmAsset,
-                asset: translator.translate(ctx.languageCode, cmAsset.asset),
-              };
-            },
-          );
-
-          return {
-            ...translatedContactMethod,
-            assets: translatedAssets,
-            featuredAsset: translator.translate(
-              ctx.languageCode,
-              translatedContactMethod.featuredAsset,
-            ),
-          };
+        items: result[0].flatMap((contactMethod) => {
+          return this.translateContactMethod(ctx, contactMethod);
         }),
         itemsCount: result[1],
       };
@@ -125,6 +90,10 @@ class ContactMethodService {
       entityType: ContactMethod,
       translationEntityType: ContactMethodTranslation,
       beforeSave: async (cm) => {
+        if (input.primary && input.primary === true) {
+          const repo = await ormService.getRepository(ContactMethod);
+          await repo.update({ primary: true }, { primary: false });
+        }
         await assetService.updateEntityFeaturedAsset(ctx, cm, input);
       },
     });
@@ -195,6 +164,33 @@ class ContactMethodService {
         };
       }),
     );
+  }
+
+  private translateContactMethod(
+    ctx: RequestContext,
+    contactMethod: ContactMethod,
+  ) {
+    const translatedContactMethod = translator.translate(
+      ctx.languageCode,
+      contactMethod,
+    );
+    const translatedAssets = translatedContactMethod.assets.flatMap(
+      (cmAsset) => {
+        return {
+          ...cmAsset,
+          asset: translator.translate(ctx.languageCode, cmAsset.asset),
+        };
+      },
+    );
+
+    return {
+      ...translatedContactMethod,
+      assets: translatedAssets,
+      featuredAsset: translator.translate(
+        ctx.languageCode,
+        translatedContactMethod.featuredAsset,
+      ),
+    };
   }
 }
 

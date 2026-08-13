@@ -1,13 +1,11 @@
 import type { NextRequest, NextResponse } from "next/server";
-import { appConfig } from "@/lib/config/app-config";
 import { authorize } from "@/lib/helpers/authorize";
 import { ormService } from "@/orm/orm.service";
 import { transactionManager } from "@/orm/transaction-manager";
 import { requestContextService } from "@/services/helpers/request-context.service";
-import { RequestContext } from "../request-context/request-context";
+import type { RequestContext } from "../request-context/request-context";
 import "server-only";
-import { getLocale } from "next-intl/server";
-import type { LanguageCode } from "@/lib/dto/language-code";
+import type { NextCtx } from "@/lib/types/shared-types";
 
 type RouteHandler<TCtx = unknown> = (
   req: NextRequest,
@@ -20,24 +18,22 @@ type ServiceHandler<TArgs extends unknown[] = [], TResult = unknown> = (
   ...args: TArgs
 ) => Promise<TResult>;
 
-async function executeWithRequestContext<TResult>({
+async function executeWithRequestContext<TResult, TCtx extends NextCtx>({
   req,
   authenticatedOnly = true,
   work,
+  ctx,
 }: {
   req?: NextRequest;
   authenticatedOnly?: boolean;
   work(requestContext: RequestContext): Promise<TResult>;
+  ctx?: TCtx;
 }) {
-  const requestContext = authenticatedOnly
-    ? await requestContextService.create(req, authenticatedOnly)
-    : new RequestContext({
-        languageCode:
-          ((await getLocale().catch(
-            () => appConfig.defaultLanguageCode,
-          )) as LanguageCode) || appConfig.defaultLanguageCode,
-        req,
-      });
+  const requestContext = await requestContextService.create(
+    req,
+    ctx,
+    authenticatedOnly,
+  );
 
   if (authenticatedOnly) {
     await authorize(requestContext);
@@ -52,7 +48,7 @@ async function executeWithRequestContext<TResult>({
   });
 }
 
-function wrapRoute<TCtx>({
+function wrapRoute<TCtx extends NextCtx>({
   handler,
   authenticatedOnly = true,
 }: {
@@ -64,6 +60,7 @@ function wrapRoute<TCtx>({
       req,
       authenticatedOnly,
       work: (requestContext) => handler(req, ctx, requestContext),
+      ctx: ctx,
     });
   };
 }
@@ -95,7 +92,9 @@ interface RouterDefinition<TCtx> {
   PATCH?: RouteConfiguration<TCtx>;
   DELETE?: RouteConfiguration<TCtx>;
 }
-export function createRouter<TCtx>(routes: RouterDefinition<TCtx>) {
+export function createRouter<TCtx extends NextCtx>(
+  routes: RouterDefinition<TCtx>,
+) {
   return {
     GET: routes.GET && wrapRoute(routes.GET),
     POST: routes.POST && wrapRoute(routes.POST),

@@ -7,7 +7,11 @@ export default async function LoginPage({
 }: PageProps<"/[locale]/login">) {
   const { locale } = await params;
 
-  const requestContext = await requestContextService.create();
+  const requestContext = await requestContextService.create(
+    undefined,
+    undefined,
+    false,
+  );
 
   if (requestContext.isAuthenticated) {
     redirect({ href: "/dashboard", locale });

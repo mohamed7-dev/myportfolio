@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
+import { CardWrapper } from "@/components/shared/card-wrapper";
 
 export function BentoLink({
   href,
@@ -12,9 +12,7 @@ export function BentoLink({
 }) {
   return (
     <Link href={href} className={className}>
-      <Card className="group h-full overflow-hidden transition-all duration-300 shadow-default hover:shadow-none hover:translate-x-box-shadow-x hover:translate-y-box-shadow-y">
-        {children}
-      </Card>
+      <CardWrapper interactive={true}>{children}</CardWrapper>
     </Link>
   );
 }

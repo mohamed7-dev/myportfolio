@@ -44,7 +44,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
+      {/* <head>
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: to avoid FOUC
           dangerouslySetInnerHTML={{
@@ -61,7 +61,7 @@ export default async function RootLayout({
             `,
           }}
         />
-      </head>
+      </head> */}
       <body className="min-h-full flex flex-col">
         <Toaster />
         <QueryClientProvider>

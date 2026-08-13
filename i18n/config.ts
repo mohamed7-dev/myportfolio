@@ -1,6 +1,8 @@
+import type { LanguageCode } from "@/lib/dto/language-code";
+
 export type I18nConfig = {
-  locales: Array<{ key: "en" | "ar" }>;
-  defaultLocale: "en" | "ar";
+  locales: Array<{ key: LanguageCode }>;
+  defaultLocale: LanguageCode;
 };
 
 export const i18nConfig: I18nConfig = {

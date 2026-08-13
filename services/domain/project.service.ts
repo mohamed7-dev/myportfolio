@@ -1,5 +1,5 @@
 import "server-only";
-import { IsNull } from "typeorm";
+import { type FindOptionsRelations, IsNull } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
 import type { DeletionResponse, InputIdSchema } from "@/lib/dto/common";
 
@@ -10,8 +10,13 @@ import type {
   UpdateProjectInputSchema,
 } from "@/lib/dto/project";
 import { EntityNotFoundError } from "@/lib/errors/errors";
+import type { Translated } from "@/lib/types/translatable";
+import type { Achievement } from "@/orm/entities/achievement/achievement.entity";
+import type { Career } from "@/orm/entities/career/career.entity";
+import type { Education } from "@/orm/entities/education/education.entity";
 import { Project } from "@/orm/entities/project/project.entity";
 import { ProjectTranslation } from "@/orm/entities/project/project-translation.entity";
+import type { Skill } from "@/orm/entities/skill/skill.entity";
 import { ormService } from "@/orm/orm.service";
 import { listQueryBuilder } from "../helpers/list-query-builder.service";
 import { slugValidator } from "../helpers/slug-validator.service";
@@ -24,7 +29,11 @@ import { educationService } from "./education.service";
 import { skillService } from "./skill.service";
 
 class ProjectService {
-  public async findOne(ctx: RequestContext, input: InputIdSchema) {
+  public async findOne(
+    ctx: RequestContext,
+    input: InputIdSchema,
+    relations?: FindOptionsRelations<Project>,
+  ) {
     const repo = await ormService.getRepository(ctx, Project);
     const project = await repo.findOne({
       where: {
@@ -36,31 +45,20 @@ class ProjectService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
-    if (project) {
-      const translatedProject = translator.translate(ctx.languageCode, project);
-      const translatedAssets = translatedProject.assets.flatMap(
-        (projectAsset) => {
-          return {
-            ...projectAsset,
-            asset: translator.translate(ctx.languageCode, projectAsset.asset),
-          };
-        },
-      );
 
-      return {
-        ...translatedProject,
-        assets: translatedAssets,
-        featuredAsset: translator.translate(
-          ctx.languageCode,
-          translatedProject.featuredAsset,
-        ),
-      };
+    if (project) {
+      return this.translateProject(ctx, project);
     }
   }
 
-  public async find(ctx: RequestContext, input: ProjectListInputSchema) {
+  public async find(
+    ctx: RequestContext,
+    input: ProjectListInputSchema,
+    relations?: FindOptionsRelations<Project>,
+  ) {
     const qb = await listQueryBuilder.build(Project, input, {
       ctx,
       alias: "project",
@@ -69,6 +67,7 @@ class ProjectService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
@@ -81,6 +80,15 @@ class ProjectService {
       if (name) {
         qb.andWhere("project__translations.name LIKE :name", {
           name: `%${typeof name === "string" ? name.trim() : name}%`,
+        });
+      }
+    }
+
+    if (input?.filter?.slug) {
+      const slug = input.filter.slug.equals;
+      if (slug) {
+        qb.andWhere("project__translations.slug = :slug", {
+          slug: `${typeof slug === "string" ? slug.trim() : slug}`,
         });
       }
     }
@@ -120,30 +128,7 @@ class ProjectService {
     return await qb.getManyAndCount().then((result) => {
       return {
         items: result[0].flatMap((project) => {
-          const translatedProject = translator.translate(
-            ctx.languageCode,
-            project,
-          );
-          const translatedAssets = translatedProject.assets.map(
-            (projectAsset) => {
-              return {
-                ...projectAsset,
-                asset: translator.translate(
-                  ctx.languageCode,
-                  projectAsset.asset,
-                ),
-              };
-            },
-          );
-
-          return {
-            ...translatedProject,
-            assets: translatedAssets,
-            featuredAsset: translator.translate(
-              ctx.languageCode,
-              translatedProject.featuredAsset,
-            ),
-          };
+          return this.translateProject(ctx, project);
         }),
         itemsCount: result[1],
       };
@@ -266,6 +251,71 @@ class ProjectService {
     return {
       result: "DELETED",
       message: "",
+    };
+  }
+
+  private translateProject(ctx: RequestContext, project: Project) {
+    const translatedProject = translator.translate(ctx.languageCode, project);
+    const translatedAssets = translatedProject.assets.flatMap(
+      (projectAsset) => {
+        return {
+          ...projectAsset,
+          asset: translator.translate(ctx.languageCode, projectAsset.asset),
+        };
+      },
+    );
+
+    return {
+      ...translatedProject,
+      assets: translatedAssets,
+      featuredAsset: translator.translate(
+        ctx.languageCode,
+        translatedProject.featuredAsset,
+      ),
+      ...(project.skills?.length && {
+        skills: project.skills.map((skill) =>
+          translator.translate<any>(ctx.languageCode, {
+            ...skill,
+            featuredAsset: translator.translate(
+              ctx.languageCode,
+              skill.featuredAsset,
+            ),
+          }),
+        ) as Translated<Skill>[],
+      }),
+      ...(project.achievements?.length && {
+        achievements: project.achievements.map((achievement) =>
+          translator.translate<any>(ctx.languageCode, {
+            ...achievement,
+            featuredAsset: translator.translate(
+              ctx.languageCode,
+              achievement.featuredAsset,
+            ),
+          }),
+        ) as Translated<Achievement>[],
+      }),
+      ...(project.career && {
+        career: translator.translate<any>(ctx.languageCode, {
+          ...project.career,
+          ...(project.career?.featuredAsset && {
+            featuredAsset: translator.translate(
+              ctx.languageCode,
+              project.career?.featuredAsset,
+            ),
+          }),
+        }) as Translated<Career>,
+      }),
+      ...(project.education && {
+        education: translator.translate<any>(ctx.languageCode, {
+          ...project.education,
+          ...(project.education?.featuredAsset && {
+            featuredAsset: translator.translate(
+              ctx.languageCode,
+              project.education.featuredAsset,
+            ),
+          }),
+        }) as Translated<Education>,
+      }),
     };
   }
 }

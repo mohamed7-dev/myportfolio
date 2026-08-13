@@ -28,6 +28,12 @@ export class ContactMethod extends AppEntity {
   @Column({ nullable: true, type: "text" })
   copyableText: string;
 
+  @Column({ default: true })
+  enabled: boolean;
+
+  @Column({ default: false })
+  primary: boolean;
+
   @OneToMany(
     () => ContactMethodAsset,
     (cmAsset: ContactMethodAsset) => cmAsset.contactMethod,
@@ -38,7 +44,7 @@ export class ContactMethod extends AppEntity {
   @ManyToOne(
     () => Asset,
     (asset) => asset.featuredInContactMethods,
-    { onDelete: "SET NULL" },
+    { onDelete: "RESTRICT" },
   )
   featuredAsset: Relation<Asset>;
 

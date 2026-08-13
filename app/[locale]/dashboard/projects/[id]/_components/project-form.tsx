@@ -9,7 +9,7 @@ import {
   type CreateProjectInputSchema,
   type CreateProjectOutputSchema,
   createProjectInputSchema,
-  type Project,
+  type FindOneProjectOutputSchema,
   type UpdateProjectInputSchema,
   type UpdateProjectOutputSchema,
   updateProjectInputSchema,
@@ -21,7 +21,7 @@ export function ProjectForm({
   initialValues,
 }: {
   children: React.ReactNode;
-  initialValues?: Project;
+  initialValues?: FindOneProjectOutputSchema;
 }) {
   const params = useParams();
   const creatingNewEntity = params.id === NEW_ENTITY_PATH;
@@ -35,6 +35,8 @@ export function ProjectForm({
       enabled: true,
       featured: false,
       translations: [],
+      skillIds: [],
+      achievementIds: [],
     },
     resolver: zodResolver(createProjectInputSchema),
   });
@@ -42,13 +44,20 @@ export function ProjectForm({
   const updateForm = useForm<UpdateProjectInputSchema>({
     defaultValues: {
       id: initialValues?.id ?? "",
-      assetIds: initialValues?.assets?.map((asset) => asset.asset.id) ?? [],
+      assetIds:
+        initialValues?.assets?.map((asset) => asset.asset.id) ?? undefined,
       featuredAssetId: initialValues?.featuredAsset?.id ?? "",
       liveDemoUrl: initialValues?.liveDemoUrl ?? "",
       repoUrl: initialValues?.repoUrl ?? "",
       enabled: initialValues?.enabled === false ? false : true,
       featured: initialValues?.featured === false ? false : true,
-      translations: initialValues?.translations ?? [],
+      finished: initialValues?.finished === false ? false : true,
+      translations: initialValues?.translations ?? undefined,
+      achievementIds:
+        initialValues?.achievements?.map((a) => a.id) ?? undefined,
+      skillIds: initialValues?.skills?.map((s) => s.id) ?? undefined,
+      careerId: initialValues?.career?.id,
+      educationItemId: initialValues?.education?.id,
     },
     resolver: zodResolver(updateProjectInputSchema),
   });
@@ -109,7 +118,7 @@ export function ProjectForm({
       } as UpdateProjectInputSchema);
     }
   };
-  console.log(form.formState.errors);
+  console.log(updateForm.formState.errors);
 
   return (
     <Form {...((creatingNewEntity ? form : updateForm) as any)}>

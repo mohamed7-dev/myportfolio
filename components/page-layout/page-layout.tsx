@@ -7,14 +7,9 @@ import type { PageBlockProps } from "./page-block";
 type PageLayoutProps = {
   children: React.ReactNode;
   className?: string;
-  alternate?: boolean;
 };
 
-export function PageLayout({
-  children,
-  className,
-  alternate = false,
-}: PageLayoutProps) {
+export function PageLayout({ children, className }: PageLayoutProps) {
   const isMobile = useIsMobile();
 
   // Normalize and extract PageBlock children
@@ -48,54 +43,24 @@ export function PageLayout({
 
   const sideBlocks = blocks.filter((block) => block.props.column === "side");
 
-  // Pair main + side blocks into rows.
-  const rowCount = Math.max(mainBlocks.length, sideBlocks.length);
-
-  const rows = Array.from({ length: rowCount }, (_, index) => ({
-    main: mainBlocks[index],
-    side: sideBlocks[index],
-  }));
-
   return (
     <div className={className}>
       {isMobile ? (
-        // Mobile: preserve the original markup order.
+        // Mobile: stack everything vertically
         <div className="space-y-4">{blocks}</div>
       ) : (
-        <div className="space-y-4">
-          {/* Full width sections */}
+        // Desktop grid layout
+        <div className="grid grid-cols-5 gap-4">
+          {/* Full width section */}
           {fullWidthBlocks.length > 0 && (
-            <div className="grid grid-cols-5 gap-4">
-              <div className="col-span-5 space-y-4">{fullWidthBlocks}</div>
-            </div>
+            <div className="col-span-5 space-y-4">{fullWidthBlocks}</div>
           )}
 
-          {/* Main + side rows */}
-          {rows.map((row, index) => {
-            const shouldSwap = alternate && index % 2 === 1;
+          {/* Main content */}
+          <div className="col-span-3 space-y-4">{mainBlocks}</div>
 
-            const main = row.main;
-            const side = row.side;
-
-            return (
-              // biome-ignore lint/suspicious/noArrayIndexKey: no other key available
-              <div key={index} className="grid grid-cols-5 gap-4">
-                {shouldSwap ? (
-                  <>
-                    {side && <div className="col-span-2">{side}</div>}
-
-                    {main && <div className="col-span-3">{main}</div>}
-                  </>
-                ) : (
-                  <>
-                    {main && <div className="col-span-3">{main}</div>}
-
-                    {side && <div className="col-span-2">{side}</div>}
-                  </>
-                )}
-              </div>
-            );
-          })}
+          {/* Sidebar */}
+          <div className="col-span-2 space-y-4">{sideBlocks}</div>
         </div>
       )}
     </div>

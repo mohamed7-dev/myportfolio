@@ -1,6 +1,6 @@
-import Image from "next/image";
 import React from "react";
 import { wrapService } from "@/api/common/create-router";
+import { AppImage } from "@/components/shared/app-image";
 import { visitorService } from "@/services/domain/visitor.service";
 
 export async function FeaturedWork() {
@@ -13,13 +13,11 @@ export async function FeaturedWork() {
   return (
     <React.Fragment>
       {featuredProjects.items.map((p, index) => (
-        <Image
+        <AppImage
           key={p.id}
-          src={p.featuredAsset.previewIdentifier}
-          alt={p.name}
-          width={170}
-          height={96}
-          className="h-21.5 rounded-base border border-border object-cover shadow-2xl transition duration-500 group-hover:-translate-y-2"
+          asset={p.featuredAsset}
+          transform={{ preset: "thumb", mode: "resize" }}
+          className="rounded-base border-2 border-border object-cover transition duration-500 group-hover:-translate-y-2"
           style={{ transitionDelay: `${index * 35}ms` }}
         />
       ))}

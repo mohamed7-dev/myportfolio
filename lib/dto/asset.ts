@@ -108,3 +108,5 @@ export const entityAssetSchema = baseSchema.extend({
   position: z.number(),
   asset: asset,
 });
+
+export type EntityAsset = z.infer<typeof entityAssetSchema>;

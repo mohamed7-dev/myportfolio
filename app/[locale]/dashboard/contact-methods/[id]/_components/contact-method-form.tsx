@@ -34,6 +34,8 @@ export function ContactMethodForm({
       assetIds: [],
       featuredAssetId: undefined,
       translations: [],
+      enabled: true,
+      primary: false,
     },
     resolver: zodResolver(createContactMethodInputSchema),
   });
@@ -42,9 +44,11 @@ export function ContactMethodForm({
     defaultValues: {
       id: initialValues?.id ?? "",
       url: initialValues?.url ?? "",
+      enabled: initialValues?.enabled === false ? false : true,
+      primary: initialValues?.primary === false ? false : true,
       copyableText: initialValues?.copyableText ?? "",
       translations: initialValues?.translations ?? [],
-      assetIds: initialValues?.assets.map((asset) => asset.id) ?? [],
+      assetIds: initialValues?.assets.map((asset) => asset.id) ?? undefined,
       featuredAssetId: initialValues?.featuredAsset?.id ?? undefined,
     },
     resolver: zodResolver(updateContactMethodInputSchema),
