@@ -3,6 +3,7 @@ import {
   type GetPublicProjectInputSchema,
   getFeaturedProjectsOutputSchema,
   getFeaturedSkillsOutputSchema,
+  getPublicAchievementsOutputSchema,
   getPublicContactMethodsOutputSchema,
   getPublicProjectOutputSchema,
   getPublicProjectsOutputSchema,
@@ -12,11 +13,7 @@ import {
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { profileService } from "./profile.service";
 import "server-only";
-import type { Translated } from "@/lib/types/translatable";
-import type { Career } from "@/orm/entities/career/career.entity";
-import { Project } from "@/orm/entities/project/project.entity";
-import type { Skill } from "@/orm/entities/skill/skill.entity";
-import { translator } from "../helpers/translator.service";
+import { achievementService } from "./achievement.service";
 import { contactMethodService } from "./contact-method.service";
 import { projectService } from "./project.service";
 import { skillService } from "./skill.service";
@@ -116,6 +113,16 @@ class VisitorService {
     const result = validateOutput(
       contactMethods,
       getPublicContactMethodsOutputSchema,
+    );
+    return result;
+  }
+
+  public async getAchievements(ctx: RequestContext) {
+    const achievements = await achievementService.find(ctx, {});
+
+    const result = validateOutput(
+      achievements,
+      getPublicAchievementsOutputSchema,
     );
     return result;
   }

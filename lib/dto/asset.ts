@@ -1,4 +1,5 @@
 import { z } from "@/lib/helpers/zod";
+import { objectStorageResourceTypeSchema } from "./asset-upload";
 import {
   baseSchema,
   baseTranslationEntity,
@@ -12,14 +13,6 @@ import {
   paginatedListInputSchema,
 } from "./paginated-list";
 
-export enum AssetType {
-  IMAGE = "IMAGE",
-  VIDEO = "VIDEO",
-  BINARY = "BINARY",
-}
-
-const assetTypeSchema = z.nativeEnum(AssetType);
-
 const assetTranslationSchema = baseTranslationEntity.extend({
   name: z.string(),
 });
@@ -28,12 +21,10 @@ export const asset = baseSchema.extend({
   name: z.string(),
   languageCode: languageCodeSchema,
   mimetype: z.string(),
-  type: assetTypeSchema,
+  type: objectStorageResourceTypeSchema,
   width: z.number(),
   height: z.number(),
   fileSize: z.number(),
-  sourceFileKey: z.string(),
-  previewFileKey: z.string(),
   sourceIdentifier: z.string(),
   previewIdentifier: z.string(),
   tags: z.array(z.any()).nullish(), // TODO: change to tag schema
@@ -52,9 +43,9 @@ export const createAssetInputSchema = z.object({
   previewIdentifier: z.string(),
   sourceFilename: z.string(),
   sourceFileMimetype: z.string(),
-  sourceFileKey: z.string(),
-  previewFileKey: z.string(),
   sourceFileSize: z.number(),
+  height: z.number().optional(),
+  width: z.number().optional(),
   tags: z.array(z.string()).optional(),
   translations: z.array(assetTranslationInputSchema).optional(),
 });
@@ -87,7 +78,7 @@ export const assetListInputSchema = paginatedListInputSchema.extend({
   filter: z
     .object({
       name: z.object({ contains: z.string() }).optional(),
-      type: z.object({ equals: assetTypeSchema }).optional(),
+      type: z.object({ equals: objectStorageResourceTypeSchema }).optional(),
     })
     .optional(),
 });

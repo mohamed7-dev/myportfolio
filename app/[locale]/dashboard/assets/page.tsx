@@ -11,8 +11,8 @@ export default async function AssetsPage({
   const { pageSize } = await searchParams;
 
   return (
-    <Page pageId="assets">
-      <PageTitle pageTitleBlockName="assets-page-title">Asset</PageTitle>
+    <Page pageId="dashboard-assets">
+      <PageTitle pageTitleBlockId="dashboard-assets-title">Asset</PageTitle>
 
       <PageLayout>
         <PageBlock id="asset-gallery" column="full">

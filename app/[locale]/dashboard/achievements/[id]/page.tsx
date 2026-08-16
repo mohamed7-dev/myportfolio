@@ -35,7 +35,7 @@ export default async function AchievementPage({
   if (!creatingNewEntity) {
     const findOne = wrapService({
       authenticatedOnly: true,
-      handler: achievementService.findOne,
+      handler: achievementService.findOne.bind(achievementService),
     });
     const result = await findOne({ id });
     achievement = validateOutput(result, findOneAchievementOutputSchema);
@@ -47,12 +47,12 @@ export default async function AchievementPage({
 
   return (
     <AchievementForm initialValues={achievement}>
-      <Page pageId="achievement-detail-page">
-        <PageTitle pageTitleBlockName="achievement-detail-page-title">
+      <Page pageId="dashboard-achievement">
+        <PageTitle pageTitleBlockId="dashboard-achievement-title">
           {creatingNewEntity ? "New Achievement" : "Update Achievement"}
         </PageTitle>
-        <PageActionBar pageActionBarBlockName="achievement-detail-page-action-bar">
-          <PageActionBarItem actionBarItemBlockName="achievement-detail-page-submit-action">
+        <PageActionBar pageActionBarBlockId="dashboard-achievement-action-bar">
+          <PageActionBarItem actionBarItemBlockId="create-edit-achievement">
             <AchievementFormSubmitButton />
           </PageActionBarItem>
         </PageActionBar>

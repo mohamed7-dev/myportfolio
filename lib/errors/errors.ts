@@ -14,6 +14,12 @@ export class UserInputError extends AppError {
   }
 }
 
+export class ConflictError extends AppError {
+  constructor(message: string) {
+    super(message, 409, "CONFLICT_ERROR");
+  }
+}
+
 export class InternalServerError extends AppError {
   constructor(message: string) {
     super(message, 500, "INTERNAL_SERVER_ERROR");

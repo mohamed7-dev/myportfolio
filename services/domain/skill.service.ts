@@ -1,13 +1,14 @@
 import type {
   CreateSkillInputSchema,
   DeleteSkillsInputSchema,
+  FindOneSkillInputSchema,
   SkillListInputSchema,
   UpdateSkillInputSchema,
 } from "@/lib/dto/skill";
 import "server-only";
-import { In } from "typeorm";
+import { type FindOptionsRelations, In } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
-import type { DeletionResponse, InputIdSchema } from "@/lib/dto/common";
+import type { DeletionResponse } from "@/lib/dto/common";
 import { EntityNotFoundError } from "@/lib/errors/errors";
 import type { AppEntity } from "@/orm/entities/app-entity";
 import { Skill } from "@/orm/entities/skill/skill.entity";
@@ -28,7 +29,11 @@ export interface EntitySkillInput {
 }
 
 export class SkillService {
-  async findOne(ctx: RequestContext, input: InputIdSchema) {
+  async findOne(
+    ctx: RequestContext,
+    input: FindOneSkillInputSchema,
+    relations?: FindOptionsRelations<Skill>,
+  ) {
     const repo = await ormService.getRepository(ctx, Skill);
     const skill = await repo.findOne({
       where: {
@@ -39,30 +44,20 @@ export class SkillService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
     if (skill) {
-      const translatedSkill = translator.translate(ctx.languageCode, skill);
-      const translatedAssets = translatedSkill.assets.flatMap((skillAsset) => {
-        return {
-          ...skillAsset,
-          asset: translator.translate(ctx.languageCode, skillAsset.asset),
-        };
-      });
-
-      return {
-        ...translatedSkill,
-        assets: translatedAssets,
-        featuredAsset: translator.translate(
-          ctx.languageCode,
-          translatedSkill.featuredAsset,
-        ),
-      };
+      return this.translateSkill(ctx, skill);
     }
   }
 
-  async find(ctx: RequestContext, options: SkillListInputSchema) {
+  async find(
+    ctx: RequestContext,
+    options: SkillListInputSchema,
+    relations?: FindOptionsRelations<Skill>,
+  ) {
     const qb = await listQueryBuilder.build(Skill, options, {
       ctx,
       alias: "skill",
@@ -71,6 +66,7 @@ export class SkillService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
@@ -99,26 +95,8 @@ export class SkillService {
 
     return await qb.getManyAndCount().then((result) => {
       return {
-        items: result[0].flatMap((project) => {
-          const translatedSkill = translator.translate(
-            ctx.languageCode,
-            project,
-          );
-          const translatedAssets = translatedSkill.assets.map((skillAsset) => {
-            return {
-              ...skillAsset,
-              asset: translator.translate(ctx.languageCode, skillAsset.asset),
-            };
-          });
-
-          return {
-            ...translatedSkill,
-            assets: translatedAssets,
-            featuredAsset: translator.translate(
-              ctx.languageCode,
-              translatedSkill.featuredAsset,
-            ),
-          };
+        items: result[0].flatMap((skill) => {
+          return this.translateSkill(ctx, skill);
         }),
         itemsCount: result[1],
       };
@@ -223,6 +201,25 @@ export class SkillService {
     }
 
     return entity;
+  }
+
+  private translateSkill(ctx: RequestContext, skill: Skill) {
+    const translatedSkill = translator.translate(ctx.languageCode, skill);
+    const translatedAssets = translatedSkill.assets.flatMap((skillAsset) => {
+      return {
+        ...skillAsset,
+        asset: translator.translate(ctx.languageCode, skillAsset.asset),
+      };
+    });
+
+    return {
+      ...translatedSkill,
+      assets: translatedAssets,
+      featuredAsset: translator.translate(
+        ctx.languageCode,
+        translatedSkill.featuredAsset,
+      ),
+    };
   }
 }
 

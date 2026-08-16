@@ -71,7 +71,7 @@ export class Profile extends AppEntity implements Translatable {
   @ManyToOne(
     () => Asset,
     (asset) => asset.featuredInProfiles,
-    { onDelete: "SET NULL" },
+    { onDelete: "RESTRICT" },
   )
   featuredAsset: Relation<Asset>;
 

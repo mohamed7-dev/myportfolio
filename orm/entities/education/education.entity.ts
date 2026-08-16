@@ -51,7 +51,7 @@ export class Education extends AppEntity {
   @ManyToOne(
     () => Asset,
     (asset) => asset.featuredInEducations,
-    { onDelete: "SET NULL" },
+    { onDelete: "RESTRICT" },
   )
   featuredAsset: Relation<Asset>;
 

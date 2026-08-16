@@ -2,7 +2,7 @@ import "server-only";
 import type { NextRequest } from "next/server";
 import { getLocale } from "next-intl/server";
 import { RequestContext } from "@/api/request-context/request-context";
-import { appConfig } from "@/lib/config/app-config";
+import { serverConfig } from "@/lib/config/server-config";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import type { NextCtx } from "@/lib/types/shared-types";
 import { authService } from "../domain/auth.service";
@@ -16,8 +16,8 @@ class RequestContextService {
     const languageCode = ctx
       ? ((await ctx.params)?.locale as LanguageCode)
       : ((await getLocale().catch(
-          () => appConfig.defaultLanguageCode,
-        )) as LanguageCode) || appConfig.defaultLanguageCode;
+          () => serverConfig.defaultLanguageCode,
+        )) as LanguageCode) || serverConfig.defaultLanguageCode;
 
     if (!requireSession) {
       return new RequestContext({ languageCode, req });

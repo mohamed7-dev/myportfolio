@@ -1,4 +1,4 @@
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -6,8 +6,10 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-import { type I18nConfig, i18nConfig } from "@/i18n/config";
+import { useLocalFormatter } from "@/hooks/use-locale-formatter";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { sharedConfig } from "@/lib/config/shared-config";
+import type { LanguageCode } from "@/lib/dto/language-code";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 
@@ -15,13 +17,13 @@ export function LanguageSwitcher({ mode }: { mode: "public" | "dashboard" }) {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = useLocale();
-  const changeLocale = (newLocale: I18nConfig["locales"][number]["key"]) => {
+  const changeLocale = (newLocale: LanguageCode) => {
     if (newLocale !== currentLocale) {
       router.replace(pathname, { locale: newLocale });
       router.refresh();
     }
   };
-  const i18n = useTranslations("languages");
+  const { formatLanguageName } = useLocalFormatter();
   if (mode === "dashboard") {
     return (
       <DropdownMenuSub>
@@ -30,13 +32,15 @@ export function LanguageSwitcher({ mode }: { mode: "public" | "dashboard" }) {
           <DropdownMenuRadioGroup
             value={currentLocale}
             onValueChange={(value) => {
-              changeLocale(value as I18nConfig["locales"][number]["key"]);
+              changeLocale(value as LanguageCode);
             }}
           >
-            {i18nConfig.locales.map((locale) => (
+            {sharedConfig.i18n.locales.map((locale) => (
               <DropdownMenuRadioItem key={locale.key} value={locale.key}>
-                {i18n(locale.key)}{" "}
-                {locale.key === i18nConfig.defaultLocale ? "(Default)" : ""}
+                {formatLanguageName(locale.key)}
+                {locale.key === sharedConfig.i18n.defaultLocale
+                  ? "(Default)"
+                  : ""}
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
@@ -46,17 +50,16 @@ export function LanguageSwitcher({ mode }: { mode: "public" | "dashboard" }) {
   }
 
   return (
-    <div className="flex items-center gap-2">
-      {i18nConfig.locales.map((item) => (
+    <div className="flex items-center flex-wrap gap-2">
+      {sharedConfig.i18n.locales.map((item) => (
         <Button
           variant={currentLocale === item.key ? "default" : "neutral"}
+          size={"sm"}
           key={item.key}
-          onClick={() =>
-            changeLocale(item.key as I18nConfig["locales"][number]["key"])
-          }
+          onClick={() => changeLocale(item.key as LanguageCode)}
           className={cn("transition-all duration-200 capitalize")}
         >
-          {i18n(item.key)}
+          {formatLanguageName(item.key)}
         </Button>
       ))}
     </div>

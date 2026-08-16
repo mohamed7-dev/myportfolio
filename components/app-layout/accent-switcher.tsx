@@ -62,7 +62,7 @@ export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
           onClick={() => onChange(theme.className)}
         >
           <span
-            className="block size-6 rounded-full border-2 border-border relative"
+            className="block size-6 rounded-base border-2 border-border relative"
             style={{ backgroundColor: theme.labelColor }}
           ></span>
           <span className="sr-only">

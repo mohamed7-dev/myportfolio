@@ -3,8 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
-import { toast } from "sonner";
-import type { ClientUploadedFileData } from "uploadthing/types";
 import {
   Select,
   SelectContent,
@@ -12,17 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StyledUploadDropzone } from "@/components/ut-components";
 import type {
   Asset as AssetEntity,
   AssetListOutputSchema,
-  CreateAssetInputSchema,
-  CreateAssetOutputSchema,
 } from "@/lib/dto/asset";
+import { AssetUploader } from "@/lib/upload/asset-uploader";
+import { UploadDropZone } from "../../upload-drop-zone";
 import { AssetBulkActions } from "../asset-bulk-actions";
 import { DeleteAssetsBulkAction } from "../delete-assets-bulk-action";
 import { ActionsBar, AssetType, type AssetTypeUnion } from "./actions-bar";
-import { AssetPreviewUploadDialog } from "./asset-preview-upload-dialog";
 import { AssetGridView } from "./assets-grid-view";
 import { AssetsPagination } from "./assets-pagination";
 
@@ -46,11 +42,11 @@ export function AssetGallery({
   const qClient = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
-  const [openAssetPreviewDialog, setOpenAssetPreviewDialog] =
-    React.useState(false);
-  const previewFileInfo = React.useRef<ClientUploadedFileData<any> | undefined>(
-    undefined,
-  );
+  const [source, setSource] = React.useState<File | null>(null);
+  const [preview, setPreview] = React.useState<File | null>(null);
+  const [sourceProgress, setSourceProgress] = React.useState(0);
+  const [previewProgress, setPreviewProgress] = React.useState(0);
+
   const [assetType, setAssetType] = React.useState<AssetTypeUnion>(
     AssetType.ALL,
   );
@@ -70,13 +66,16 @@ export function AssetGallery({
   ];
 
   const { mutate } = useMutation({
-    mutationFn: async (input: CreateAssetInputSchema) => {
-      const res = await fetch(`/api/assets`, {
-        method: "post",
-        credentials: "include",
-        body: JSON.stringify(input),
+    mutationFn: async (input: { source: File; preview: File }) => {
+      const assetUploader = new AssetUploader();
+      const ac = new AbortController();
+      const data = await assetUploader.upload({
+        source: input.source,
+        preview: input.preview,
+        signal: ac.signal,
+        onSourceProgress: (progress) => setSourceProgress(progress),
+        onPreviewProgress: (progress) => setPreviewProgress(progress),
       });
-      const data = (await res.json()) as CreateAssetOutputSchema;
       return data;
     },
     onSuccess: async () => {
@@ -181,6 +180,15 @@ export function AssetGallery({
   const onPageSizeChange = (pageSize: number) => {
     router.push(`${pathname}?pageSize=${pageSize}`);
   };
+
+  React.useEffect(() => {
+    console.log(source);
+    console.log(preview);
+    if (source && preview) {
+      mutate({ source, preview });
+    }
+  }, [source, preview, mutate]);
+
   return (
     <div className="flex flex-col gap-4">
       <ActionsBar
@@ -196,7 +204,23 @@ export function AssetGallery({
           refetch={refetch}
         />
       )}
-      <StyledUploadDropzone
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <UploadDropZone
+          assetType="source"
+          onFileSelected={(data) => {
+            setSource(data);
+          }}
+          progress={sourceProgress}
+        />
+        <UploadDropZone
+          assetType="preview"
+          onFileSelected={(data) => {
+            setPreview(data);
+          }}
+          progress={previewProgress}
+        />
+      </div>
+      {/* <StyledUploadDropzone
         endpoint="assetUploader"
         onChange={(acceptedFiles) => {
           if (acceptedFiles.length) {
@@ -220,7 +244,7 @@ export function AssetGallery({
         onUploadError={(error: Error) => {
           alert(`ERROR! ${error.message}`);
         }}
-      />
+      /> */}
       <AssetGridView
         assets={assets ?? []}
         isLoading={isLoadingAssets}
@@ -273,7 +297,7 @@ export function AssetGallery({
           />
         )}
       </div>
-      <AssetPreviewUploadDialog
+      {/* <AssetPreviewUploadDialog
         open={openAssetPreviewDialog}
         onClose={() => setOpenAssetPreviewDialog(false)}
         onUploadComplete={(info) => {
@@ -281,7 +305,7 @@ export function AssetGallery({
           setOpenAssetPreviewDialog(false);
           toast.success("Preview file was uploaded successfully");
         }}
-      />
+      /> */}
     </div>
   );
 }

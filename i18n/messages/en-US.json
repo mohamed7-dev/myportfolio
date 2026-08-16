@@ -100,8 +100,19 @@
       }
     }
   },
+  "achievements": {
+    "title": "Milestones & Recognition",
+    "description": "A curated timeline of professional certifications, industry awards, open-source contributions, and speaking engagements that define my technical journey.",
+    "types": {
+      "certificate": "certification",
+      "course": "course",
+      "internship": "internship"
+    },
+    "verifyCredentialsLabel": "Verify Credentials",
+    "issuedAt": "Issued at"
+  },
   "publicLayout": {
-    "copyright": "{name} All rights reserved.",
+    "copyright": "All rights reserved.",
     "nav": {
       "home": "home",
       "about": "about",

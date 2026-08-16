@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import type { ReplicationMode } from "typeorm";
-import type { LanguageCode } from "@/lib/dto/language-code";
+import { LanguageCode } from "@/lib/dto/language-code";
 import type { Profile } from "@/lib/dto/profile";
 
 interface RequestContextOptions {
@@ -20,7 +20,7 @@ export class RequestContext {
   private _isAuthenticated: boolean;
 
   constructor(options?: RequestContextOptions) {
-    this._languageCode = options?.languageCode ?? "en";
+    this._languageCode = options?.languageCode ?? LanguageCode["en-US "];
     this._req = options?.req;
     this._session = options?.session;
     this._isAuthenticated = options?.isAuthenticated ?? false;

@@ -83,6 +83,10 @@ export default async function AboutPage() {
     }
   };
 
+  const profileAssets = profile.assets?.filter(
+    (entry) => entry.asset.id !== profile.avatar?.id,
+  );
+
   return (
     <Page pageId="about">
       <PageTitle pageTitleBlockId="about-title">{i18n("title")}</PageTitle>
@@ -101,7 +105,7 @@ export default async function AboutPage() {
         >
           <SummaryCard />
         </PageBlock>
-        {!!profile.assets?.length && (
+        {!!profileAssets?.length && (
           <PageBlock
             id="media-gallery"
             column="full"
@@ -109,9 +113,7 @@ export default async function AboutPage() {
             srOnly={true}
           >
             <MediaGallery
-              entityAssets={profile.assets.filter(
-                (entry) => entry.asset.id !== profile.avatar?.id,
-              )}
+              entityAssets={profileAssets}
               title={profile.displayName}
             />
           </PageBlock>

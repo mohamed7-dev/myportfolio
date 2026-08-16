@@ -7,7 +7,7 @@ export default function ProjectNotFound() {
       <Card className="max-w-105">
         <CardContent className="flex items-center gap-2">
           <AlertTriangleIcon />
-          <p>Project Not Found</p>
+          <p>Not Found</p>
         </CardContent>
       </Card>
     </div>

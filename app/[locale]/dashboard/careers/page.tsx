@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -9,6 +8,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { careerListOutputSchema } from "@/lib/dto/career";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { careerService } from "@/services/domain/career.service";
@@ -41,7 +41,7 @@ export default async function CareersListPage({
 
   const find = wrapService({
     authenticatedOnly: true,
-    handler: careerService.find,
+    handler: careerService.find.bind(careerService),
   });
 
   const result = await find({
@@ -62,10 +62,10 @@ export default async function CareersListPage({
   const careers = validateOutput(result, careerListOutputSchema);
 
   return (
-    <Page pageId="careers">
-      <PageTitle pageTitleBlockName="careers-page-title">Careers</PageTitle>
-      <PageActionBar pageActionBarBlockName="careers-page-action-bar">
-        <PageActionBarItem actionBarItemBlockName="create-career-action-bar-item">
+    <Page pageId="dashboard-careers">
+      <PageTitle pageTitleBlockId="dashboard-careers-title">Careers</PageTitle>
+      <PageActionBar pageActionBarBlockId="dashboard-careers-action-bar">
+        <PageActionBarItem actionBarItemBlockId="add-new-career">
           <Button>
             <Link href={"/dashboard/careers/new"}>Add New Career</Link>
           </Button>

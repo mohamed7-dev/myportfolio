@@ -5,6 +5,7 @@ import {
   baseTranslationEntity,
   baseTranslationEntityInput,
   deletionResponseSchema,
+  inputIdSchema,
   inputIdsSchema,
 } from "./common";
 import { languageCodeSchema } from "./language-code";
@@ -39,7 +40,7 @@ export const skill = baseSchema.extend({
   isFeatured: z.boolean(),
   category: skillCategorySchema,
   assets: z.array(skillAssetSchema),
-  featuredAsset: asset.nullable(),
+  featuredAsset: asset,
   translations: z.array(skillTranslationSchema),
 });
 
@@ -55,7 +56,7 @@ export const createSkillInputSchema = z.object({
   category: skillCategorySchema,
   assetIds: z.array(z.string()),
   translations: z.array(skillTranslationInputSchema),
-  featuredAssetId: z.string().optional(),
+  featuredAssetId: z.string(),
   isFeatured: z.boolean().optional(),
 });
 
@@ -69,7 +70,7 @@ export type CreateSkillOutputSchema = z.infer<typeof createSkillOutputSchema>;
 export const updateSkillInputSchema = z.object({
   id: z.string(),
   category: skillCategorySchema.optional(),
-  assetIds: z.array(z.string()),
+  assetIds: z.array(z.string()).optional(),
   featuredAssetId: z.string().optional(),
   translations: z
     .array(
@@ -112,3 +113,12 @@ export type DeleteSkillsInputSchema = z.infer<typeof deleteSkillsInputSchema>;
 export const deleteSkillsOutputSchema = z.array(deletionResponseSchema);
 
 export type DeleteSkillsOutputSchema = z.infer<typeof deleteSkillsOutputSchema>;
+
+//###################### Find One #######################
+export const findOneSkillInputSchema = inputIdSchema;
+
+export type FindOneSkillInputSchema = z.infer<typeof findOneSkillInputSchema>;
+
+export const findOneSkillOutputSchema = skill;
+
+export type FindOneSkillOutputSchema = z.infer<typeof findOneSkillOutputSchema>;

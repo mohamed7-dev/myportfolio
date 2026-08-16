@@ -10,6 +10,7 @@ import { QueryClientProvider } from "@/components/providers/query-client-provide
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { routing } from "@/i18n/routing";
+import { isRtl } from "@/lib/helpers/locale-utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,9 +41,10 @@ export default async function RootLayout({
 
   return (
     <html
-      lang={locale}
+      lang={locale.split("_").slice(0, 1).join("")}
+      dir={isRtl(locale) ? "rtl" : "ltr"}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
+      // suppressHydrationWarning
     >
       {/* <head>
         <script

@@ -64,7 +64,7 @@ export default async function ProjectPage({
 
   const find = wrapService({
     authenticatedOnly: true,
-    handler: careerService.find,
+    handler: careerService.find.bind(careerService),
   });
   const result = await find({});
   const careers = validateOutput(result, careerListOutputSchema).items.map(
@@ -76,7 +76,7 @@ export default async function ProjectPage({
 
   const findEdu = wrapService({
     authenticatedOnly: true,
-    handler: educationService.find,
+    handler: educationService.find.bind(educationService),
   });
   const eduResult = await findEdu({});
   const educationItems = validateOutput(
@@ -89,7 +89,7 @@ export default async function ProjectPage({
 
   const findAchievements = wrapService({
     authenticatedOnly: true,
-    handler: achievementService.find,
+    handler: achievementService.find.bind(achievementService),
   });
   const achievementsResult = await findAchievements({});
   const achievements = validateOutput(
@@ -99,7 +99,7 @@ export default async function ProjectPage({
 
   const findSkills = wrapService({
     authenticatedOnly: true,
-    handler: skillService.find,
+    handler: skillService.find.bind(skillService),
   });
   const skillsResult = await findSkills({});
   const skills = validateOutput(skillsResult, skillListOutputSchema);

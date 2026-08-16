@@ -7,7 +7,7 @@ import type {
   UpdateSkillInputSchema,
 } from "@/lib/dto/skill";
 
-export function SkillFormFeaturedField() {
+export function SkillFormStatusField() {
   const form = useFormContext<
     CreateSkillInputSchema | UpdateSkillInputSchema
   >();

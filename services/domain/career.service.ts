@@ -1,4 +1,3 @@
-import { DateUtils } from "typeorm/util/DateUtils.js";
 import type { RequestContext } from "@/api/request-context/request-context";
 import type {
   CareerListInputSchema,
@@ -8,9 +7,13 @@ import type {
   UpdateCareerInputSchema,
 } from "@/lib/dto/career";
 import { Career } from "@/orm/entities/career/career.entity";
-import { listQueryBuilder } from "../helpers/list-query-builder.service";
+import {
+  convertDate,
+  listQueryBuilder,
+} from "../helpers/list-query-builder.service";
 import { translator } from "../helpers/translator.service";
 import "server-only";
+import type { FindOptionsRelations } from "typeorm";
 import type { DeletionResponse } from "@/lib/dto/common";
 import { EntityNotFoundError } from "@/lib/errors/errors";
 import type { AppEntity } from "@/orm/entities/app-entity";
@@ -30,7 +33,11 @@ export interface EntityCareerInput {
 }
 
 class CareerService {
-  public async findOne(ctx: RequestContext, input: FindOneCareerInputSchema) {
+  public async findOne(
+    ctx: RequestContext,
+    input: FindOneCareerInputSchema,
+    relations?: FindOptionsRelations<Career>,
+  ) {
     const repo = await ormService.getRepository(ctx, Career);
     const career = await repo.findOne({
       where: {
@@ -41,32 +48,20 @@ class CareerService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
     if (career) {
-      const translatedCareer = translator.translate(ctx.languageCode, career);
-      const translatedAssets = translatedCareer.assets.flatMap(
-        (careerAsset) => {
-          return {
-            ...careerAsset,
-            asset: translator.translate(ctx.languageCode, careerAsset.asset),
-          };
-        },
-      );
-
-      return {
-        ...translatedCareer,
-        assets: translatedAssets,
-        featuredAsset: translator.translate(
-          ctx.languageCode,
-          translatedCareer.featuredAsset,
-        ),
-      };
+      return this.translateCareer(ctx, career);
     }
   }
 
-  public async find(ctx: RequestContext, options: CareerListInputSchema) {
+  public async find(
+    ctx: RequestContext,
+    options: CareerListInputSchema,
+    relations?: FindOptionsRelations<Career>,
+  ) {
     const qb = await listQueryBuilder.build(Career, options, {
       ctx,
       alias: "career",
@@ -75,6 +70,7 @@ class CareerService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
@@ -135,30 +131,7 @@ class CareerService {
     return await qb.getManyAndCount().then((result) => {
       return {
         items: result[0].flatMap((career) => {
-          const translatedCareer = translator.translate(
-            ctx.languageCode,
-            career,
-          );
-          const translatedAssets = translatedCareer.assets.map(
-            (careerAsset) => {
-              return {
-                ...careerAsset,
-                asset: translator.translate(
-                  ctx.languageCode,
-                  careerAsset.asset,
-                ),
-              };
-            },
-          );
-
-          return {
-            ...translatedCareer,
-            assets: translatedAssets,
-            featuredAsset: translator.translate(
-              ctx.languageCode,
-              translatedCareer.featuredAsset,
-            ),
-          };
+          return this.translateCareer(ctx, career);
         }),
         itemsCount: result[1],
       };
@@ -263,13 +236,25 @@ class CareerService {
     }
     return entity;
   }
+
+  private translateCareer(ctx: RequestContext, career: Career) {
+    const translatedCareer = translator.translate(ctx.languageCode, career);
+    const translatedAssets = translatedCareer.assets.flatMap((careerAsset) => {
+      return {
+        ...careerAsset,
+        asset: translator.translate(ctx.languageCode, careerAsset.asset),
+      };
+    });
+
+    return {
+      ...translatedCareer,
+      assets: translatedAssets,
+      featuredAsset: translator.translate(
+        ctx.languageCode,
+        translatedCareer.featuredAsset,
+      ),
+    };
+  }
 }
 
 export const careerService = new CareerService();
-
-function convertDate(input: Date | string | number): string | number {
-  if (input instanceof Date) {
-    return DateUtils.mixedDateToUtcDatetimeString(input);
-  }
-  return input;
-}

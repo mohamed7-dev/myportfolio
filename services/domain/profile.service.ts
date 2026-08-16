@@ -1,9 +1,7 @@
 import "server-only";
-import bcrypt from "bcryptjs";
 import type { FindOptionsRelations } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
-import { appConfig } from "@/lib/config/app-config";
-import { ADMIN_CREDENTIALS } from "@/lib/config/server-config";
+import { serverConfig } from "@/lib/config/server-config";
 import type { UpdateProfileInputSchema } from "@/lib/dto/profile";
 import { EntityNotFoundError } from "@/lib/errors/errors";
 import { Profile } from "@/orm/entities/profile/profile.entity";
@@ -63,7 +61,7 @@ class ProfileService {
     const repo = await ormService.getRepository(ctx, Profile);
     const profile = await repo.findOne({
       where: {
-        username: ADMIN_CREDENTIALS.username,
+        username: serverConfig.adminCredentials.username,
       },
       relations: relations ?? {
         assets: {
@@ -95,44 +93,6 @@ class ProfileService {
         translatedProfile.featuredAsset,
       ),
     };
-  }
-
-  public async initAdminProfile() {
-    const repo = await ormService.getRepository(Profile);
-    const foundAdmin = await repo.findOne({
-      where: {
-        username: ADMIN_CREDENTIALS.username,
-      },
-    });
-
-    if (!foundAdmin) {
-      const hashedPassword = await bcrypt.hash(
-        ADMIN_CREDENTIALS.password,
-        await bcrypt.genSalt(10),
-      );
-
-      const newAdmin = new Profile({
-        username: ADMIN_CREDENTIALS.username,
-        password: hashedPassword,
-        handle: "?",
-      });
-      await repo.save(newAdmin);
-
-      const translation = new ProfileTranslation({
-        displayName: "?",
-        summary: "?",
-        intro: "?",
-        subHeading: "?",
-        subtitle: "?",
-        jobTitle: "?",
-        location: "?",
-        currentFocus: "?",
-        languageCode: appConfig.defaultLanguageCode,
-        base: newAdmin,
-      });
-      const transRepo = await ormService.getRepository(ProfileTranslation);
-      await transRepo.save(translation);
-    }
   }
 
   public async findAdminUserByToken(

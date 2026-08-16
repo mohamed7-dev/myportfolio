@@ -6,14 +6,12 @@ export function SummaryCard() {
   const ctx = usePublicLayout("SummaryCard");
   return (
     <div className="flex gap-4">
-      <div className="w-full md:w-1/3 h-fit shrink-0 relative bg-background rounded-base overflow-hidden border-2 border-border">
-        {ctx.profile.avatar && (
-          <AppImage
-            asset={ctx.profile.avatar}
-            transform={{ preset: "small", mode: "resize" }}
-            className="object-cover grayscale-20 hover:grayscale-0 transition-all duration-500"
-          />
-        )}
+      <div className="h-fit shrink-0 relative bg-background rounded-base overflow-hidden border-2 border-border">
+        <AppImage
+          asset={ctx.profile.avatar ?? undefined}
+          transform={{ preset: "small", mode: "resize" }}
+          className="object-cover grayscale-20 hover:grayscale-0 transition-all duration-500"
+        />
       </div>
       <div
         dangerouslySetInnerHTML={{ __html: ctx.profile.summary }}

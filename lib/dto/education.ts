@@ -37,7 +37,7 @@ export const education = baseSchema.extend({
   gpa: z.number().nullish(),
   translations: z.array(educationTranslationSchema),
   assets: z.array(educationAssetSchema),
-  featuredAsset: asset.nullish(), // TODO: remove nullish once all entities have featured asset
+  featuredAsset: asset,
 });
 
 export type Education = z.infer<typeof education>;

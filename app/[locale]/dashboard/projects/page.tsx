@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -9,6 +8,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { projectListOutputSchema } from "@/lib/dto/project";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { projectService } from "@/services/domain/project.service";

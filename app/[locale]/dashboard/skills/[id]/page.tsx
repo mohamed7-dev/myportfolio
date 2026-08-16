@@ -15,8 +15,8 @@ import { skillService } from "@/services/domain/skill.service";
 import { SkillForm } from "./_components/skill-form";
 import { SkillFormAssetField } from "./_components/skill-form-asset-field";
 import { SkillFormCategoryField } from "./_components/skill-form-category-field";
-import { SkillFormFeaturedField } from "./_components/skill-form-featured-field";
 import { SkillFormMainFields } from "./_components/skill-form-main-fields";
+import { SkillFormStatusField } from "./_components/skill-form-status-field";
 import { SubmitButton } from "./_components/submit-button";
 
 export default async function SkillPage({
@@ -31,7 +31,7 @@ export default async function SkillPage({
   if (!creatingNewEntity) {
     const findOne = wrapService({
       authenticatedOnly: true,
-      handler: skillService.findOne,
+      handler: skillService.findOne.bind(skillService),
     });
     const result = await findOne({ id });
     skill = validateOutput(result, skillSchema);
@@ -43,12 +43,12 @@ export default async function SkillPage({
 
   return (
     <SkillForm initialValues={skill}>
-      <Page pageId="skill">
-        <PageTitle pageTitleBlockName="skill-detail-page-title">
+      <Page pageId="dashboard-skill">
+        <PageTitle pageTitleBlockId="dashboard-skill-title">
           {creatingNewEntity ? "New Skill" : "Update Skill"}
         </PageTitle>
-        <PageActionBar pageActionBarBlockName="skill-page-action-bar">
-          <PageActionBarItem actionBarItemBlockName="skill-page-action-bar-item">
+        <PageActionBar pageActionBarBlockId="dashboard-skill-action-bar">
+          <PageActionBarItem actionBarItemBlockId="create-edit-skill">
             <SubmitButton />
           </PageActionBarItem>
         </PageActionBar>
@@ -63,7 +63,7 @@ export default async function SkillPage({
             />
           </PageBlock>
           <PageBlock column="side" id="skill-featured">
-            <SkillFormFeaturedField />
+            <SkillFormStatusField />
           </PageBlock>
           <PageBlock column="side" id="skill-category">
             <SkillFormCategoryField />

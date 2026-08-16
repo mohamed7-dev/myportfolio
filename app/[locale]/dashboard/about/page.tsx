@@ -35,18 +35,18 @@ export default async function AboutPage() {
 
   return (
     <AboutForm initialValues={profile}>
-      <Page pageId="about-me">
-        <PageTitle pageTitleBlockName="about-me-page-title">About Me</PageTitle>
-        <PageActionBar pageActionBarBlockName="about-me-page-action-bar">
-          <PageActionBarItem actionBarItemBlockName="about-me-page-action-bar-item">
+      <Page pageId="dashboard-about">
+        <PageTitle pageTitleBlockId="dashboard-about-title">About Me</PageTitle>
+        <PageActionBar pageActionBarBlockId="dashboard-about-action-bar">
+          <PageActionBarItem actionBarItemBlockId="submit-button">
             <SubmitButton />
           </PageActionBarItem>
         </PageActionBar>
         <PageLayout>
-          <PageBlock column="main" id="profile-info">
+          <PageBlock column="main" id="info">
             <MainFields />
           </PageBlock>
-          <PageBlock column="side" id="project-assets">
+          <PageBlock column="side" id="assets">
             <AssetField
               profileAssets={profile.assets ?? []}
               featuredAsset={profile.featuredAsset ?? undefined}

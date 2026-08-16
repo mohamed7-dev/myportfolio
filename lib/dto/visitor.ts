@@ -186,3 +186,23 @@ export const getPublicContactMethodsOutputSchema =
 export type GetPublicContactMethodsOutputSchema = z.infer<
   typeof getPublicContactMethodsOutputSchema
 >;
+
+// ################### Achievements ############################
+const publicAchievementInList = achievement.pick({
+  id: true,
+  name: true,
+  slug: true,
+  featuredAsset: true,
+  organization: true,
+  issueDate: true,
+  type: true,
+  credentialUrl: true,
+  assets: true,
+});
+
+export const getPublicAchievementsOutputSchema =
+  createPaginatedListOutputSchema(publicAchievementInList);
+
+export type GetPublicAchievementsOutputSchema = z.infer<
+  typeof getPublicAchievementsOutputSchema
+>;

@@ -34,7 +34,7 @@ export default async function EducationPage({
   if (!creatingNewEntity) {
     const findOne = wrapService({
       authenticatedOnly: true,
-      handler: educationService.findOne,
+      handler: educationService.findOne.bind(educationService),
     });
     const result = await findOne({ id });
     education = validateOutput(result, findOneEducationOutputSchema);
@@ -46,26 +46,26 @@ export default async function EducationPage({
 
   return (
     <EducationForm initialValues={education}>
-      <Page pageId="education-item">
-        <PageTitle pageTitleBlockName="education-item-detail-page-title">
+      <Page pageId="dashboard-education-entry">
+        <PageTitle pageTitleBlockId="dashboard-education-entry-title">
           {creatingNewEntity ? "New Education Item" : "Update Education Item"}
         </PageTitle>
-        <PageActionBar pageActionBarBlockName="education-item-page-action-bar">
-          <PageActionBarItem actionBarItemBlockName="education-item-page-action-bar-item">
+        <PageActionBar pageActionBarBlockId="dashboard-education-entry-action-bar">
+          <PageActionBarItem actionBarItemBlockId="create-edit-education-entry">
             <EducationFormSubmitButton />
           </PageActionBarItem>
         </PageActionBar>
         <PageLayout>
-          <PageBlock column="main" id="education-item-main-fields">
+          <PageBlock column="main" id="main-fields">
             <EducationFormMainFields />
           </PageBlock>
-          <PageBlock column="side" id="education-item-assets">
+          <PageBlock column="side" id="assets">
             <EducationFormAssetField
               educationItemAssets={education?.assets ?? []}
               featuredAsset={education?.featuredAsset ?? undefined}
             />
           </PageBlock>
-          <PageBlock column="side" id="education-item-dates">
+          <PageBlock column="side" id="dates">
             <EducationFormDateFields />
           </PageBlock>
         </PageLayout>

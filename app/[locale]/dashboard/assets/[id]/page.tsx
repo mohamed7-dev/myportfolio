@@ -35,15 +35,13 @@ export default async function AssetDetailPage({
 
   return (
     <UpdateAssetForm asset={asset as unknown as Asset}>
-      <Page pageId="asset-detail-page">
-        <PageTitle pageTitleBlockName="asset-detail-page-title">
-          Asset
-        </PageTitle>
-        <PageActionBar pageActionBarBlockName="asset-detail-page-action-bar">
-          <PageActionBarItem actionBarItemBlockName="update-button">
+      <Page pageId="dashboard-asset">
+        <PageTitle pageTitleBlockId="dashboard-asset-title">Asset</PageTitle>
+        <PageActionBar pageActionBarBlockId="dashboard-asset-action-bar">
+          <PageActionBarItem actionBarItemBlockId="update-button">
             <SubmitButton />
           </PageActionBarItem>
-          <PageActionBarItem actionBarItemBlockName="download-button">
+          <PageActionBarItem actionBarItemBlockId="download-button">
             <DownloadButton asset={asset} />
           </PageActionBarItem>
         </PageActionBar>

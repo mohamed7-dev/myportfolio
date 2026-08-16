@@ -91,7 +91,7 @@ export class Project extends AppEntity implements Translatable, SoftDeletable {
   @ManyToOne(
     () => Asset,
     (asset) => asset.featuredInProjects,
-    { onDelete: "SET NULL" },
+    { onDelete: "RESTRICT" },
   )
   featuredAsset: Relation<Asset>;
 

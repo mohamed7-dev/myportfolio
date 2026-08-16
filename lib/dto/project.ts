@@ -71,7 +71,7 @@ export const project = baseSchema.extend({
   career: career.nullish(),
   education: education.nullish(),
   achievements: z.array(achievement).nullish(),
-  skills: z.array(skill).optional(), // TODO: remove the optional
+  skills: z.array(skill),
 });
 
 export type Project = z.infer<typeof project>;
@@ -85,12 +85,12 @@ export const createProjectInputSchema = z.object({
   liveDemoUrl: z.string().url(),
   repoUrl: z.string().url(),
   assetIds: z.array(z.string()),
-  featuredAssetId: z.string().optional(),
+  featuredAssetId: z.string(),
   translations: z.array(projectTranslationInputSchema),
   careerId: z.string().optional(),
   educationItemId: z.string().optional(),
   achievementIds: z.array(z.string()).optional(),
-  skillIds: z.array(z.string()).optional(), // TODO: remove optional
+  skillIds: z.array(z.string()),
 });
 
 export type CreateProjectInputSchema = z.infer<typeof createProjectInputSchema>;
@@ -127,7 +127,16 @@ export const updateProjectInputSchema = z.object({
 
 export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;
 
-export const updateProjectOutputSchema = project;
+export const updateProjectOutputSchema = project.extend({
+  skills: z.array(
+    skill.pick({
+      id: true,
+      name: true,
+      slug: true,
+      featuredAsset: true,
+    }),
+  ),
+});
 
 export type UpdateProjectOutputSchema = z.infer<
   typeof updateProjectOutputSchema
@@ -166,6 +175,7 @@ export const projectListInputSchema =
         slug: z.object({ equals: z.string() }).optional(),
         enabled: z.object({ equals: z.boolean() }).optional(),
         featured: z.object({ equals: z.boolean() }).optional(),
+        finished: z.object({ equals: z.boolean() }).optional(),
         liveDemoUrl: z.object({ contains: z.string() }).optional(),
         repoUrl: z.object({ contains: z.string() }).optional(),
       })
@@ -173,7 +183,9 @@ export const projectListInputSchema =
   });
 export type ProjectListInputSchema = z.infer<typeof projectListInputSchema>;
 
-export const projectListOutputSchema = createPaginatedListOutputSchema(project);
+export const projectListOutputSchema = createPaginatedListOutputSchema(
+  project.omit({ skills: true }),
+);
 
 export type ProjectListOutputSchema = z.infer<typeof projectListOutputSchema>;
 

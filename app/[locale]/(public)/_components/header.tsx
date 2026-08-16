@@ -19,22 +19,22 @@ export function HomePageHeader({ children }: { children: React.ReactNode }) {
 
   return (
     <div>
-      <div className="h-48 w-full bg-background relative">
+      <div className="overflow-hidden w-full bg-background relative">
         <AppImage
           asset={randomCover?.asset}
-          transform={{ preset: "medium", mode: "resize" }}
-          className="object-cover size-full"
+          width={randomCover?.asset.width ?? 900}
+          height={200}
+          transform={{ mode: "resize" }}
+          className="object-cover aspect-video"
         />
       </div>
       <div className="px-8 flex justify-between items-end relative -mt-16 z-10">
         <div className="p-1 bg-secondary-background">
-          {ctx.profile.avatar && (
-            <AppImage
-              asset={ctx.profile.avatar}
-              transform={{ preset: "thumb", mode: "resize" }}
-              className="rounded-base grayscale-20 hover:grayscale-0 transition-all duration-500"
-            />
-          )}
+          <AppImage
+            asset={ctx.profile.avatar ?? undefined}
+            transform={{ preset: "thumb", mode: "resize" }}
+            className="rounded-base grayscale-20 hover:grayscale-0 transition-all duration-500"
+          />
         </div>
         <div className="mb-4 flex gap-3">
           <Button asChild>

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -9,6 +8,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { achievementListOutputSchema } from "@/lib/dto/achievement";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { achievementService } from "@/services/domain/achievement.service";
@@ -27,7 +27,7 @@ export default async function AchievementListPage({
 
   const find = wrapService({
     authenticatedOnly: true,
-    handler: achievementService.find,
+    handler: achievementService.find.bind(achievementService),
   });
 
   const result = await find({
@@ -41,12 +41,12 @@ export default async function AchievementListPage({
   const achievements = validateOutput(result, achievementListOutputSchema);
 
   return (
-    <Page pageId="achievement-list-page">
-      <PageTitle pageTitleBlockName="achievement-list-page-title">
+    <Page pageId="dashboard-achievements">
+      <PageTitle pageTitleBlockId="dashboard-achievements-title">
         Achievements
       </PageTitle>
-      <PageActionBar pageActionBarBlockName="achievement-list-page-action-bar">
-        <PageActionBarItem actionBarItemBlockName="new-achievement-action-bar-item">
+      <PageActionBar pageActionBarBlockId="dashboard-achievements-action-bar">
+        <PageActionBarItem actionBarItemBlockId="add-new-achievement">
           <Button>
             <Link href={"/dashboard/achievements/new"}>
               Add New Achievement

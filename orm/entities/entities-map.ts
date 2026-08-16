@@ -3,6 +3,7 @@ import { AchievementAsset } from "./achievement/achievement-asset.entity";
 import { AchievementTranslation } from "./achievement/achievement-translation.entity";
 import { Asset } from "./asset/asset.entity";
 import { AssetTranslation } from "./asset/asset-translation.entity";
+import { AssetUpload } from "./asset-upload/asset-upload.entity";
 import { Career } from "./career/career.entity";
 import { CareerTranslation } from "./career/career.translation";
 import { CareerAsset } from "./career/career-asset.entity";
@@ -48,4 +49,5 @@ export const entitiesMap = {
   EducationAsset,
   EducationTranslation,
   Tag,
+  AssetUpload,
 };

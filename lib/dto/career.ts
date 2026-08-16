@@ -61,7 +61,7 @@ export const career = baseSchema.extend({
   type: careerTypeSchema,
   translations: z.array(careerTranslationSchema),
   assets: z.array(careerAssetSchema),
-  featuredAsset: asset.nullish(), // TODO: remove this once all entities has featured asset
+  featuredAsset: asset,
 });
 
 export type Career = z.infer<typeof career>;

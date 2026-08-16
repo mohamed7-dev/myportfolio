@@ -18,7 +18,7 @@ export default async function PublicLayout({
   const profile = await getSuperAdminProfile();
   return (
     <PublicLayoutProvider profile={profile}>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background text-foreground overflow-hidden">
         <PublicLayoutImpl>{children}</PublicLayoutImpl>
       </div>
     </PublicLayoutProvider>

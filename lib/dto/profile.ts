@@ -65,7 +65,7 @@ export const updateProfileInputSchema = z.object({
   projectsShipped: z.coerce.number().optional(),
   openSourceContributions: z.coerce.number().optional(),
   yearsOfExperience: z.coerce.number().optional(),
-  assetIds: z.array(z.string()),
+  assetIds: z.array(z.string()).optional(),
   featuredAssetId: z.string().optional(),
   translations: z
     .array(

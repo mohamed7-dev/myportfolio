@@ -1,5 +1,8 @@
-import { z } from "@/lib/helpers/zod";
+import { z } from "../../lib/helpers/zod";
 
-export const languageCodeSchema = z.enum(["en", "ar"]);
+export enum LanguageCode {
+  "en-US " = "en-US",
+  "ar-EG" = "ar-EG",
+}
 
-export type LanguageCode = z.infer<typeof languageCodeSchema>;
+export const languageCodeSchema = z.nativeEnum(LanguageCode);

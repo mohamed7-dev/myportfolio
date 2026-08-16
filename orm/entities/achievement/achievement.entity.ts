@@ -56,7 +56,7 @@ export class Achievement extends AppEntity {
   @ManyToOne(
     () => Asset,
     (asset) => asset.featuredInAchievements,
-    { onDelete: "SET NULL" },
+    { onDelete: "RESTRICT" },
   )
   featuredAsset: Relation<Asset>;
 

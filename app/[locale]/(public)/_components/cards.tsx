@@ -9,12 +9,14 @@ import { useTranslations } from "next-intl";
 import type React from "react";
 import { usePublicLayout } from "@/components/app-layout/public-layout/public-layout-provider";
 import { CardWrapper } from "@/components/shared/card-wrapper";
+import { useLocalFormatter } from "@/hooks/use-locale-formatter";
 import { IconTile } from "../../../../components/shared/icon-tile";
 import { BentoLink } from "./bento-link";
 
 export function Cards({ children }: { children: React.ReactNode }) {
   const ctx = usePublicLayout("Cards");
   const i18n = useTranslations("home.cards");
+  const { formatNumber } = useLocalFormatter();
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-4 ">
       <CardWrapper
@@ -33,7 +35,8 @@ export function Cards({ children }: { children: React.ReactNode }) {
             <p className="w-full text-sm font-base flex items-center justify-between">
               <span>{i18n("stats.experience")}:</span>
               <strong className="text-sm font-base">
-                {ctx.profile.yearsOfExperience} {i18n("stats.years")}
+                {formatNumber(ctx.profile.yearsOfExperience)}{" "}
+                {i18n("stats.years")}
               </strong>
             </p>
           </li>
@@ -41,7 +44,7 @@ export function Cards({ children }: { children: React.ReactNode }) {
             <p className="w-full text-sm font-base flex items-center justify-between">
               <span>{i18n("stats.projectsShipped")}: </span>
               <strong className="text-sm font-base">
-                {ctx.profile.projectsShipped}
+                {formatNumber(ctx.profile.projectsShipped)}
               </strong>
             </p>
           </li>
@@ -49,7 +52,7 @@ export function Cards({ children }: { children: React.ReactNode }) {
             <p className="w-full text-sm font-base flex items-center justify-between">
               <span>{i18n("stats.openSourceContributions")}: </span>
               <strong className="text-sm font-base">
-                {ctx.profile.openSourceContributions}
+                {formatNumber(ctx.profile.openSourceContributions)}
               </strong>
             </p>
           </li>

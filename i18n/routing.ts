@@ -1,7 +1,7 @@
 import { defineRouting } from "next-intl/routing";
-import { i18nConfig } from "./config";
+import { sharedConfig } from "@/lib/config/shared-config";
 
 export const routing = defineRouting({
-  locales: i18nConfig.locales.map((l) => l.key),
-  defaultLocale: i18nConfig.defaultLocale,
+  locales: sharedConfig.i18n.locales.map((l) => l.key),
+  defaultLocale: sharedConfig.i18n.defaultLocale,
 });

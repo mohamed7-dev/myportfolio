@@ -1,3 +1,4 @@
+"use client";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 import { Slot } from "radix-ui";
@@ -149,6 +150,7 @@ function SidebarProvider({
 }
 
 function Sidebar({
+  innerSidebarClassName,
   side = "left",
   variant = "sidebar",
   collapsible = "offcanvas",
@@ -160,23 +162,9 @@ function Sidebar({
   side?: "left" | "right";
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
+  innerSidebarClassName?: string;
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
-
-  if (collapsible === "none") {
-    return (
-      <div
-        data-slot="sidebar"
-        className={cn(
-          "flex h-full w-(--sidebar-width) flex-col bg-secondary-background text-foreground",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
 
   if (isMobile) {
     return (
@@ -201,6 +189,21 @@ function Sidebar({
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
       </Sheet>
+    );
+  }
+
+  if (collapsible === "none") {
+    return (
+      <div
+        data-slot="sidebar"
+        className={cn(
+          "flex h-full w-(--sidebar-width) flex-col bg-secondary-background text-foreground",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </div>
     );
   }
 
@@ -241,7 +244,10 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="flex size-full flex-col bg-secondary-background group-data-[variant=floating]:rounded-base group-data-[variant=floating]:shadow-default group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border"
+          className={cn(
+            "flex size-full flex-col bg-secondary-background group-data-[variant=floating]:rounded-base group-data-[variant=floating]:shadow-default group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border",
+            innerSidebarClassName,
+          )}
         >
           {children}
         </div>

@@ -3,7 +3,7 @@ import type { RequestContext } from "@/api/request-context/request-context";
 import { listQueryBuilder } from "../helpers/list-query-builder.service";
 import { translator } from "../helpers/translator.service";
 import "server-only";
-import { In } from "typeorm";
+import { type FindOptionsRelations, In } from "typeorm";
 import type {
   AchievementListInputSchema,
   CreateAchievementInputSchema,
@@ -13,9 +13,11 @@ import type {
 } from "@/lib/dto/achievement";
 import type { DeletionResponse } from "@/lib/dto/common";
 import { EntityNotFoundError } from "@/lib/errors/errors";
+import type { Translated } from "@/lib/types/translatable";
 import { Achievement } from "@/orm/entities/achievement/achievement.entity";
 import { AchievementTranslation } from "@/orm/entities/achievement/achievement-translation.entity";
 import type { AppEntity } from "@/orm/entities/app-entity";
+import type { Career } from "@/orm/entities/career/career.entity";
 import { ormService } from "@/orm/orm.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { assetService } from "./asset.service";
@@ -32,6 +34,7 @@ class AchievementService {
   public async findOne(
     ctx: RequestContext,
     input: FindOneAchievementInputSchema,
+    relations?: FindOptionsRelations<Achievement>,
   ) {
     const repo = await ormService.getRepository(ctx, Achievement);
     const achievement = await repo.findOne({
@@ -43,38 +46,20 @@ class AchievementService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
     if (achievement) {
-      const translatedAchievement = translator.translate(
-        ctx.languageCode,
-        achievement,
-      );
-      const translatedAssets = translatedAchievement.assets.flatMap(
-        (achievementAsset) => {
-          return {
-            ...achievementAsset,
-            asset: translator.translate(
-              ctx.languageCode,
-              achievementAsset.asset,
-            ),
-          };
-        },
-      );
-
-      return {
-        ...translatedAchievement,
-        assets: translatedAssets,
-        featuredAsset: translator.translate(
-          ctx.languageCode,
-          translatedAchievement.featuredAsset,
-        ),
-      };
+      return this.translateAchievement(ctx, achievement);
     }
   }
 
-  public async find(ctx: RequestContext, options: AchievementListInputSchema) {
+  public async find(
+    ctx: RequestContext,
+    options: AchievementListInputSchema,
+    relations?: FindOptionsRelations<Achievement>,
+  ) {
     const qb = await listQueryBuilder.build(Achievement, options, {
       ctx,
       alias: "achievement",
@@ -83,6 +68,7 @@ class AchievementService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
@@ -98,30 +84,7 @@ class AchievementService {
     return await qb.getManyAndCount().then((result) => {
       return {
         items: result[0].flatMap((achievement) => {
-          const translatedAchievement = translator.translate(
-            ctx.languageCode,
-            achievement,
-          );
-          const translatedAssets = translatedAchievement.assets.map(
-            (achievementAsset) => {
-              return {
-                ...achievementAsset,
-                asset: translator.translate(
-                  ctx.languageCode,
-                  achievementAsset.asset,
-                ),
-              };
-            },
-          );
-
-          return {
-            ...translatedAchievement,
-            assets: translatedAssets,
-            featuredAsset: translator.translate(
-              ctx.languageCode,
-              translatedAchievement.featuredAsset,
-            ),
-          };
+          return this.translateAchievement(ctx, achievement);
         }),
         itemsCount: result[1],
       };
@@ -229,6 +192,39 @@ class AchievementService {
     }
 
     return entity;
+  }
+
+  private translateAchievement(ctx: RequestContext, achievement: Achievement) {
+    const translatedAchievement = translator.translate(
+      ctx.languageCode,
+      achievement,
+    );
+    const translatedAssets = translatedAchievement.assets.flatMap(
+      (achievementAsset) => {
+        return {
+          ...achievementAsset,
+          asset: translator.translate(ctx.languageCode, achievementAsset.asset),
+        };
+      },
+    );
+
+    return {
+      ...translatedAchievement,
+      assets: translatedAssets,
+      featuredAsset: translator.translate(
+        ctx.languageCode,
+        translatedAchievement.featuredAsset,
+      ),
+      ...(achievement.career && {
+        career: translator.translate<any>(ctx.languageCode, {
+          ...achievement.career,
+          featuredAsset: translator.translate(
+            ctx.languageCode,
+            achievement.career.featuredAsset,
+          ),
+        }) as Translated<Career>,
+      }),
+    };
   }
 }
 

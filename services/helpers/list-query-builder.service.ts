@@ -6,7 +6,7 @@ import {
 } from "typeorm";
 import { DateUtils } from "typeorm/util/DateUtils.js";
 import type { RequestContext } from "@/api/request-context/request-context";
-import { appConfig } from "@/lib/config/app-config";
+import { serverConfig } from "@/lib/config/server-config";
 import { DEFAULT_ENTITY_TRANSLATION_LANGUAGE_CODE } from "@/lib/constants";
 import { UserInputError } from "@/lib/errors/errors";
 import type { ListQueryOptions } from "@/lib/types/list-query-options";
@@ -70,14 +70,14 @@ class ListQueryBuilder {
     if (ignoreQueryLimits) {
       max = Number.MAX_SAFE_INTEGER;
     } else {
-      max = appConfig.listQueryLimit;
+      max = serverConfig.listQueryLimit;
     }
 
     const takeOptionExists = isObject(options) && "take" in options;
 
     if (takeOptionExists && options.take && options.take > max) {
       throw new UserInputError(
-        `Cannot take more than ${appConfig.listQueryLimit} results from a list query`,
+        `Cannot take more than ${serverConfig.listQueryLimit} results from a list query`,
       );
     }
 

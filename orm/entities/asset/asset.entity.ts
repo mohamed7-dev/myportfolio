@@ -6,7 +6,7 @@ import {
   OneToMany,
   type Relation,
 } from "typeorm";
-import type { AssetType } from "@/lib/dto/asset";
+import type { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type {
   LocaleString,
@@ -37,13 +37,7 @@ export class Asset extends AppEntity implements Translatable {
   mimetype: string;
 
   @Column({ type: "varchar" })
-  type: AssetType;
-
-  @Column()
-  sourceFileKey: string;
-
-  @Column()
-  previewFileKey: string;
+  type: ObjectStorageResourceType;
 
   @Column({
     default: 0,

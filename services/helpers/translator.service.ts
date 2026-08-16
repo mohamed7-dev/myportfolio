@@ -1,5 +1,5 @@
 import "server-only";
-import { appConfig } from "@/lib/config/app-config";
+import { serverConfig } from "@/lib/config/server-config";
 import { DEFAULT_ENTITY_TRANSLATION_LANGUAGE_CODE } from "@/lib/constants";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import { InternalServerError } from "@/lib/errors/errors";
@@ -17,7 +17,7 @@ class Translator {
   ) {
     return this.translateRecursively(translatableEntity, [
       contextLanguageCode,
-      appConfig.defaultLanguageCode,
+      serverConfig.defaultLanguageCode,
     ]);
   }
 

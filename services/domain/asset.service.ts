@@ -1,32 +1,44 @@
 import { Asset } from "@/orm/entities/asset/asset.entity";
 import "server-only";
-import { imageSize } from "image-size";
-import mime from "mime-types";
+import { randomUUID } from "node:crypto";
 import { In } from "typeorm";
 import { camelCase } from "typeorm/util/StringUtils.js";
 import type { RequestContext } from "@/api/request-context/request-context";
-import {
-  type AssetListInputSchema,
-  AssetType,
-  type CreateAssetInputSchema,
-  type DeleteAssetsInputSchema,
-  type UpdateAssetInputSchema,
+import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
+import { serverConfig } from "@/lib/config/server-config";
+import { sharedConfig } from "@/lib/config/shared-config";
+import type {
+  AssetListInputSchema,
+  CreateAssetInputSchema,
+  DeleteAssetsInputSchema,
+  UpdateAssetInputSchema,
 } from "@/lib/dto/asset";
+import {
+  type AbortUploadSessionInputSchema,
+  AssetUploadStatus,
+  type CommitUploadSessionInputSchema,
+  type CommitUploadSessionOutputSchema,
+  type CreateAssetUploadInputSchema,
+  type CreateAssetUploadOutputSchema,
+} from "@/lib/dto/asset-upload";
 import type { DeletionResponse, InputIdSchema } from "@/lib/dto/common";
 import {
+  ConflictError,
   EntityNotFoundError,
   InternalServerError,
   UserInputError,
 } from "@/lib/errors/errors";
 import { DefaultAssetNamingStrategy } from "@/lib/helpers/asset-naming";
-import { utApi } from "@/lib/helpers/utapi";
 import type { ClassType } from "@/lib/types/shared-types";
+import { normalizeFileTypes } from "@/lib/utils/normalize-file-types";
 import { notNullOrUndefined } from "@/lib/utils/not-null-or-undefined";
 import { omit } from "@/lib/utils/omit";
+import { validateMimeType } from "@/lib/utils/validate-mimetype";
 import { AchievementAsset } from "@/orm/entities/achievement/achievement-asset.entity";
 import type { AppEntity } from "@/orm/entities/app-entity";
 import { AssetTranslation } from "@/orm/entities/asset/asset-translation.entity";
 import type { OrderableAsset } from "@/orm/entities/asset/orderable-asset.entity";
+import { AssetUpload } from "@/orm/entities/asset-upload/asset-upload.entity";
 import { CareerAsset } from "@/orm/entities/career/career-asset.entity";
 import { ContactMethodAsset } from "@/orm/entities/contact-method/contact-method-asset.entity";
 import { EducationAsset } from "@/orm/entities/education/education-asset.entity";
@@ -98,42 +110,46 @@ class AssetService {
       );
   }
 
-  public async create(ctx: RequestContext, input: CreateAssetInputSchema) {
-    const allowedFileTypes = ["image/*", ".pdf", "video/*"];
+  public async create(
+    ctx: RequestContext,
+    input: CreateAssetInputSchema & { type?: ObjectStorageResourceType },
+  ) {
+    // const allowedFileTypes = Object.keys(serverConfig.asset.sourceFileTypes);
 
-    const normalizedMimeTypes = this.normalizeFileTypes(allowedFileTypes);
+    // const normalizedMimeTypes = this.normalizeFileTypes(allowedFileTypes);
 
-    // 1. validate mimetype and get asset type
-    const isValidMimetype = this.validateMimeType(
-      input.sourceFileMimetype,
-      normalizedMimeTypes,
-    );
-    if (!isValidMimetype) {
-      throw new UserInputError("Invalid mimetype", {
-        mimeType: input.sourceFileMimetype,
-        fileName: input.sourceFilename,
-      });
-    }
-    const type = this.getAssetType(input.sourceFileMimetype);
+    // // 1. validate mimetype and get asset type
+    // const isValidMimetype = this.validateMimeType(
+    //   input.sourceFileMimetype,
+    //   normalizedMimeTypes,
+    // );
+    // if (!isValidMimetype) {
+    //   throw new UserInputError("Invalid mimetype", {
+    //     mimeType: input.sourceFileMimetype,
+    //     fileName: input.sourceFilename,
+    //   });
+    // }
+    // const type = this.getAssetType(input.sourceFileMimetype);
 
-    // 2. calculate dimensions
-    const fileBuffer = await this.getFileAsBuffer(
-      type === AssetType.IMAGE ? input.sourceFileKey : input.previewFileKey,
-    );
-    const dimensions = this.calculateDimensions(fileBuffer);
+    // let dimensions = { width: input.width, height: input.height };
+    // if (!input.width || !input.height) {
+    //   // 2. calculate dimensions
+    //   const fileBuffer = await this.getFileAsBuffer(
+    //     type === AssetType.IMAGE ? input.sourceFileKey : input.previewFileKey,
+    //   );
+    //   dimensions = this.calculateDimensions(fileBuffer);
+    // }
 
     const repo = await ormService.getRepository(ctx, Asset);
 
     const newAsset = new Asset({
       sourceIdentifier: input.sourceIdentifier,
       previewIdentifier: input.previewIdentifier,
-      width: dimensions.width,
-      height: dimensions.height,
+      width: input.width,
+      height: input.height,
       mimetype: input.sourceFileMimetype,
-      type: type,
+      type: input.type,
       fileSize: input.sourceFileSize,
-      sourceFileKey: input.sourceFileKey,
-      previewFileKey: input.previewFileKey,
     });
 
     const asset = await repo.save(newAsset);
@@ -165,7 +181,7 @@ class AssetService {
     );
     const savedTranslations = await translationRepo.save(assetTranslations);
     asset.translations = savedTranslations as any;
-
+    await repo.save(asset);
     return translator.translate(ctx.languageCode, asset);
   }
 
@@ -223,7 +239,7 @@ class AssetService {
 
     return await Promise.all(
       foundAssets.map(async (asset) => {
-        await utApi.deleteFiles([asset.sourceFileKey, asset.previewFileKey]);
+        // await utApi.deleteFiles([asset.sourceFileKey, asset.previewFileKey]);
         await repo.remove(asset);
         return {
           result: "DELETED",
@@ -291,6 +307,328 @@ class AssetService {
     return entity;
   }
 
+  public async createUploadSession(
+    ctx: RequestContext,
+    input: CreateAssetUploadInputSchema,
+  ): Promise<CreateAssetUploadOutputSchema> {
+    const validationResult = this.validateUploadSessionInput(input);
+
+    if (Array.isArray(validationResult) && validationResult.length) {
+      throw new UserInputError(
+        "Invalid upload session input",
+        Object.fromEntries(
+          validationResult.map((error) => [error.fileName, error.message]),
+        ),
+      );
+    }
+
+    const uploadId = randomUUID();
+
+    const sourceFileKey = "source";
+
+    const previewFileKey = "preview";
+
+    const [sourceUploadUrl, previewUploadUrl] = await Promise.all([
+      serverConfig.asset.objectStorageStrategy.createUploadRequest({
+        location: {
+          folder: ["portfolio", uploadId],
+          key: "source",
+        },
+        contentType: input.source.mimeType,
+        contentLength: input.source.size,
+        expiresInSeconds: 15 * 60,
+        resourceType: this.getStorageResourceType(input.source.mimeType),
+      }),
+
+      serverConfig.asset.objectStorageStrategy.createUploadRequest({
+        location: {
+          folder: ["portfolio", uploadId],
+          key: "preview",
+        },
+        contentType: input.preview.mimeType,
+        contentLength: input.preview.size,
+        expiresInSeconds: 15 * 60,
+        resourceType: this.getStorageResourceType(input.preview.mimeType),
+      }),
+    ]);
+
+    const repo = await ormService.getRepository(ctx, AssetUpload);
+
+    const upload = new AssetUpload({
+      id: uploadId,
+      sourceFileLocation: {
+        folder: ["portfolio", uploadId],
+        key: "source",
+      },
+      previewFileLocation: {
+        folder: ["portfolio", uploadId],
+        key: "preview",
+      },
+      sourceFileName: input.source.name,
+      sourceMimeType: input.source.mimeType,
+      sourceSize: input.source.size,
+      sourceResourceType: this.getStorageResourceType(input.source.mimeType),
+      previewMimeType: input.preview.mimeType,
+      previewSize: input.preview.size,
+      previewResourceType: this.getStorageResourceType(input.preview.mimeType),
+      status: AssetUploadStatus.PENDING,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+    });
+
+    await repo.save(upload);
+
+    return {
+      uploadId,
+      source: {
+        key: sourceFileKey,
+        upload: sourceUploadUrl,
+      },
+      preview: {
+        key: previewFileKey,
+        upload: previewUploadUrl,
+      },
+    };
+  }
+
+  public async abortUpload(
+    ctx: RequestContext,
+    input: AbortUploadSessionInputSchema,
+  ): Promise<void> {
+    const repo = await ormService.getRepository(ctx, AssetUpload);
+
+    const upload = await repo.findOne({
+      where: {
+        id: input.uploadSessionId,
+      },
+    });
+
+    if (!upload) {
+      return;
+    }
+
+    if (upload.status === AssetUploadStatus.ABORTED) {
+      return;
+    }
+
+    if (upload.status === AssetUploadStatus.COMMITTED) {
+      throw new ConflictError("This upload has already been completed.");
+    }
+
+    const [source, preview] = await Promise.allSettled([
+      serverConfig.asset.objectStorageStrategy.headObject(
+        {
+          folder: ["portfolio", upload.id],
+          key: upload.sourceFileLocation.key,
+        },
+        upload.sourceResourceType,
+      ),
+      serverConfig.asset.objectStorageStrategy.headObject(
+        {
+          folder: ["portfolio", upload.id],
+          key: upload.previewFileLocation.key,
+        },
+        upload.previewResourceType,
+      ),
+    ]);
+
+    const deletionPromises: Promise<void>[] = [];
+
+    if (source.status === "fulfilled") {
+      deletionPromises.push(
+        serverConfig.asset.objectStorageStrategy.deleteObject(
+          {
+            folder: ["portfolio", upload.id],
+            key: upload.sourceFileLocation.key,
+          },
+          upload.sourceResourceType,
+        ),
+      );
+    }
+
+    if (preview.status === "fulfilled") {
+      deletionPromises.push(
+        serverConfig.asset.objectStorageStrategy.deleteObject(
+          {
+            folder: ["portfolio", upload.id],
+            key: upload.previewFileLocation.key,
+          },
+          upload.previewResourceType,
+        ),
+      );
+    }
+
+    await Promise.all(deletionPromises);
+
+    // INFO: If deletion promises reject, we still get orphaned assets
+    // this can be handled by a worker, so in that case we would need a logging mechanism
+
+    await repo.update(upload.id, {
+      status: AssetUploadStatus.ABORTED,
+    });
+  }
+
+  public async completeAssetUpload(
+    ctx: RequestContext,
+    input: CommitUploadSessionInputSchema,
+  ): Promise<CommitUploadSessionOutputSchema> {
+    const uploadRepo = await ormService.getRepository(ctx, AssetUpload);
+
+    const upload = await uploadRepo.findOne({
+      where: {
+        id: input.uploadSessionId,
+      },
+    });
+
+    if (!upload) {
+      throw new EntityNotFoundError("Upload session was not found.");
+    }
+
+    /*
+     * Idempotency.
+     */
+    if (upload.status === AssetUploadStatus.COMMITTED) {
+      if (!upload.asset.id) {
+        throw new InternalServerError(
+          "Completed upload has no associated asset.",
+        );
+      }
+
+      return {
+        assetId: upload.asset.id,
+      };
+    }
+
+    if (upload.status === AssetUploadStatus.ABORTED) {
+      throw new ConflictError("Upload session has already been aborted.");
+    }
+
+    if (upload.expiresAt.getTime() < Date.now()) {
+      throw new ConflictError("Upload session has expired.");
+    }
+
+    /*
+     * Verify the actual objects in storage.
+     */
+    const [sourceObject, previewObject] = await Promise.allSettled([
+      serverConfig.asset.objectStorageStrategy.headObject(
+        {
+          folder: ["portfolio", upload.id],
+          key: upload.sourceFileLocation.key,
+        },
+        upload.sourceResourceType,
+      ),
+      serverConfig.asset.objectStorageStrategy.headObject(
+        {
+          folder: ["portfolio", upload.id],
+          key: upload.previewFileLocation.key,
+        },
+        upload.previewResourceType,
+      ),
+    ]);
+
+    if (sourceObject.status !== "fulfilled") {
+      throw new UserInputError("Source file was not uploaded.");
+    }
+
+    if (previewObject.status !== "fulfilled") {
+      throw new UserInputError("Preview file was not uploaded.");
+    }
+
+    const sourceIdentifier = upload.sourceFileLocation.folder
+      .concat(upload.sourceFileLocation.key)
+      .join("/");
+    const previewIdentifier = upload.previewFileLocation.folder
+      .concat(upload.previewFileLocation.key)
+      .join("/");
+
+    const asset = await this.create(ctx, {
+      sourceIdentifier,
+      previewIdentifier,
+      sourceFilename: upload.sourceFileName,
+      sourceFileMimetype: upload.sourceMimeType,
+      sourceFileSize: upload.sourceSize,
+      type: upload.sourceResourceType,
+      width: sourceObject.value?.metadata["width"] as number,
+      height: sourceObject.value?.metadata["height"] as number,
+    });
+
+    upload.status = AssetUploadStatus.COMMITTED;
+
+    upload.asset = asset;
+
+    await uploadRepo.save(upload);
+
+    return {
+      assetId: asset.id,
+    };
+  }
+
+  private getStorageResourceType(mimeType: string): ObjectStorageResourceType {
+    if (mimeType.startsWith("image/")) {
+      return ObjectStorageResourceType.image;
+    }
+
+    if (mimeType.startsWith("video/")) {
+      return ObjectStorageResourceType.video;
+    }
+
+    return ObjectStorageResourceType.raw;
+  }
+
+  private validateUploadSessionInput(input: CreateAssetUploadInputSchema) {
+    const errors: {
+      message: string;
+      code: "file-invalid-type" | "file-too-large";
+      fileName: string;
+    }[] = [];
+
+    for (const [key, value] of Object.entries(input)) {
+      type TypedKey = keyof typeof input;
+
+      const assetConfig =
+        (key as TypedKey) === "source"
+          ? sharedConfig.asset.sourceFileTypes
+          : sharedConfig.asset.previewFileTypes;
+
+      const allowedExtensions = Object.values(assetConfig).flatMap(
+        (item) => item.extensions,
+      );
+
+      const mimeTypes = normalizeFileTypes(allowedExtensions);
+
+      if (!validateMimeType(value.mimeType, mimeTypes)) {
+        errors.push({
+          code: "file-invalid-type",
+          message: `${key} file can end only by one of these extensions (${allowedExtensions.join(", ")}).`,
+          fileName: value.name,
+        });
+      }
+
+      const normalizedMimeType = mimeTypes.find(
+        (m) => m.type === value.mimeType.split("/")[0],
+      );
+
+      const maxSizeForFileType = assetConfig[`${normalizedMimeType?.type}/*`]
+        ? assetConfig[`${normalizedMimeType?.type}/*`].maxSizeInMb
+        : undefined;
+
+      if (
+        !maxSizeForFileType ||
+        value.size > maxSizeForFileType * 1024 * 1024
+      ) {
+        errors.push({
+          code: "file-too-large",
+          message: `${key} file size must be less than or equal to ${
+            maxSizeForFileType ?? "the configured"
+          } MB.`,
+          fileName: value.name,
+        });
+      }
+    }
+
+    return errors.length > 0 ? errors : null;
+  }
+
   private async getSourceFileName(
     ctx: RequestContext,
     filename: string,
@@ -321,101 +659,101 @@ class AssetService {
     return outputFileName;
   }
 
-  private validateMimeType(
-    mimetype: string,
-    allowedMimeTypes: NormalizedMimeType[],
-  ): boolean {
-    const [type, subtype] = mimetype.split("/");
-    const typeMatches = allowedMimeTypes.filter((t) => t.type === type);
+  // private validateMimeType(
+  //   mimetype: string,
+  //   allowedMimeTypes: NormalizedMimeType[],
+  // ): boolean {
+  //   const [type, subtype] = mimetype.split("/");
+  //   const typeMatches = allowedMimeTypes.filter((t) => t.type === type);
 
-    for (const typeMatch of typeMatches) {
-      if (typeMatch.subtype === subtype || typeMatch.subtype === "*") {
-        return true;
-      }
-    }
+  //   for (const typeMatch of typeMatches) {
+  //     if (typeMatch.subtype === subtype || typeMatch.subtype === "*") {
+  //       return true;
+  //     }
+  //   }
 
-    return false;
-  }
+  //   return false;
+  // }
 
-  private getAssetType(mimeType: string): AssetType {
-    const type = mimeType.split("/")[0];
-    switch (type) {
-      case "image":
-        return AssetType.IMAGE;
-      case "video":
-        return AssetType.VIDEO;
-      default:
-        return AssetType.BINARY;
-    }
-  }
+  // private getAssetType(mimeType: string): AssetType {
+  //   const type = mimeType.split("/")[0];
+  //   switch (type) {
+  //     case "image":
+  //       return AssetType.IMAGE;
+  //     case "video":
+  //       return AssetType.VIDEO;
+  //     default:
+  //       return AssetType.BINARY;
+  //   }
+  // }
 
-  private normalizeFileTypes(
-    allowedFileTypes: string[],
-  ): Array<NormalizedMimeType> {
-    const extensionRegex = /\.[\w]+/;
+  // private normalizeFileTypes(
+  //   allowedFileTypes: string[],
+  // ): Array<NormalizedMimeType> {
+  //   const extensionRegex = /\.[\w]+/;
 
-    const mimeTypes = allowedFileTypes
-      .map((fileType) => {
-        return extensionRegex.test(fileType)
-          ? mime.lookup(fileType) || undefined
-          : fileType;
-      })
-      .filter(notNullOrUndefined)
-      .map((mimetype) => {
-        const [type, subtype] = mimetype.split("/");
-        return {
-          type,
-          subtype,
-        };
-      });
+  //   const mimeTypes = allowedFileTypes
+  //     .map((fileType) => {
+  //       return extensionRegex.test(fileType)
+  //         ? mime.lookup(fileType) || undefined
+  //         : fileType;
+  //     })
+  //     .filter(notNullOrUndefined)
+  //     .map((mimetype) => {
+  //       const [type, subtype] = mimetype.split("/");
+  //       return {
+  //         type,
+  //         subtype,
+  //       };
+  //     });
 
-    return mimeTypes;
-  }
+  //   return mimeTypes;
+  // }
 
-  private async getFileAsBuffer(fileKey: string) {
-    // 1. Get the file URL using the file key
-    const fileUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${fileKey}`;
+  // private async getFileAsBuffer(fileKey: string) {
+  //   // 1. Get the file URL using the file key
+  //   const fileUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${fileKey}`;
 
-    // 2. Fetch the file data from the URL
-    const response = await fetch(fileUrl);
+  //   // 2. Fetch the file data from the URL
+  //   const response = await fetch(fileUrl);
 
-    if (!response.ok) {
-      throw new InternalServerError(
-        `Failed to fetch file: ${response.statusText}`,
-      );
-    }
+  //   if (!response.ok) {
+  //     throw new InternalServerError(
+  //       `Failed to fetch file: ${response.statusText}`,
+  //     );
+  //   }
 
-    // 3. Convert the response to an ArrayBuffer
-    const arrayBuffer = await response.arrayBuffer();
+  //   // 3. Convert the response to an ArrayBuffer
+  //   const arrayBuffer = await response.arrayBuffer();
 
-    // 4. Convert the ArrayBuffer to a Node.js Buffer
-    const buffer = Buffer.from(arrayBuffer);
+  //   // 4. Convert the ArrayBuffer to a Node.js Buffer
+  //   const buffer = Buffer.from(arrayBuffer);
 
-    return buffer;
-  }
+  //   return buffer;
+  // }
 
-  private calculateDimensions(imageFile: Buffer): {
-    width: number;
-    height: number;
-  } {
-    try {
-      const { width, height } = imageSize(
-        imageFile as Uint8Array<ArrayBufferLike>,
-      );
-      return {
-        width: width ?? 0,
-        height: height ?? 0,
-      };
-    } catch (e: any) {
-      console.error(
-        `Could not determine Asset dimensions: ${JSON.stringify(e)}`,
-      );
-      return {
-        width: 0,
-        height: 0,
-      };
-    }
-  }
+  // private calculateDimensions(imageFile: Buffer): {
+  //   width: number;
+  //   height: number;
+  // } {
+  //   try {
+  //     const { width, height } = imageSize(
+  //       imageFile as Uint8Array<ArrayBufferLike>,
+  //     );
+  //     return {
+  //       width: width ?? 0,
+  //       height: height ?? 0,
+  //     };
+  //   } catch (e: any) {
+  //     console.error(
+  //       `Could not determine Asset dimensions: ${JSON.stringify(e)}`,
+  //     );
+  //     return {
+  //       width: 0,
+  //       height: 0,
+  //     };
+  //   }
+  // }
 
   private async createOrderableAssets(
     ctx: RequestContext,
@@ -509,3 +847,11 @@ class AssetService {
   }
 }
 export const assetService = new AssetService();
+
+export function getAssetSourceKey(uploadId: string) {
+  return `assets/${uploadId}/source`;
+}
+
+export function getAssetPreviewKey(uploadId: string) {
+  return `assets/${uploadId}/preview`;
+}

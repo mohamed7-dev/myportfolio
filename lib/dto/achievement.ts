@@ -88,7 +88,7 @@ export const updateAchievementInputSchema = z.object({
         ),
     )
     .optional(),
-  assetIds: z.array(z.string()),
+  assetIds: z.array(z.string()).optional(),
   featuredAssetId: z.string().optional(),
 });
 

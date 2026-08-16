@@ -23,12 +23,16 @@ interface MediaGalleryProps {
   entityAssets: EntityAsset[];
   title?: string;
   className?: string;
+  staticImageProps?: Partial<React.ComponentProps<typeof AppImage>>;
+  overlayImageProps?: Partial<React.ComponentProps<typeof AppImage>>;
 }
 
 export function MediaGallery({
   entityAssets,
   title,
   className,
+  staticImageProps,
+  overlayImageProps,
 }: MediaGalleryProps) {
   const mediaItems = entityAssets.filter((entry) => !!entry.asset) ?? [];
   const mediaRef = useRef<HTMLDivElement | null>(null);
@@ -128,6 +132,7 @@ export function MediaGallery({
                     !isCurrent && "brightness-75",
                   )}
                   alt={entry.asset.name ?? title ?? "Media asset"}
+                  {...staticImageProps}
                 />
               </div>
             );

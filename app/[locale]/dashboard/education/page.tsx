@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -9,6 +8,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { educationListOutputSchema } from "@/lib/dto/education";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { educationService } from "@/services/domain/education.service";
@@ -41,7 +41,7 @@ export default async function EducationListPage({
 
   const find = wrapService({
     authenticatedOnly: true,
-    handler: educationService.find,
+    handler: educationService.find.bind(educationService),
   });
 
   const result = await find({
@@ -62,10 +62,12 @@ export default async function EducationListPage({
   const education = validateOutput(result, educationListOutputSchema);
 
   return (
-    <Page pageId="education">
-      <PageTitle pageTitleBlockName="education-page-title">Education</PageTitle>
-      <PageActionBar pageActionBarBlockName="education-page-action-bar">
-        <PageActionBarItem actionBarItemBlockName="create-education-action-bar-item">
+    <Page pageId="dashboard-education-list">
+      <PageTitle pageTitleBlockId="dashboard-education-list-title">
+        Education
+      </PageTitle>
+      <PageActionBar pageActionBarBlockId="dashboard-education-list-action-bar">
+        <PageActionBarItem actionBarItemBlockId="add-new-education-entry">
           <Button>
             <Link href={"/dashboard/education/new"}>Add New Education</Link>
           </Button>

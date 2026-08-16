@@ -35,7 +35,7 @@ export default async function CareerPage({
   if (!creatingNewEntity) {
     const findOne = wrapService({
       authenticatedOnly: true,
-      handler: careerService.findOne,
+      handler: careerService.findOne.bind(careerService),
     });
     const result = await findOne({ id });
     career = validateOutput(result, findOneCareerOutputSchema);
@@ -47,7 +47,7 @@ export default async function CareerPage({
 
   const findAchievements = wrapService({
     authenticatedOnly: true,
-    handler: achievementService.find,
+    handler: achievementService.find.bind(achievementService),
   });
   const achievementsResult = await findAchievements({});
   const achievements = validateOutput(
@@ -57,12 +57,12 @@ export default async function CareerPage({
 
   return (
     <CareerForm initialValues={career}>
-      <Page pageId="career">
-        <PageTitle pageTitleBlockName="career-detail-page-title">
+      <Page pageId="dashboard-career">
+        <PageTitle pageTitleBlockId="dashboard-career-title">
           {creatingNewEntity ? "New Career" : "Update Career"}
         </PageTitle>
-        <PageActionBar pageActionBarBlockName="career-page-action-bar">
-          <PageActionBarItem actionBarItemBlockName="career-page-action-bar-item">
+        <PageActionBar pageActionBarBlockId="dashboard-career-action-bar">
+          <PageActionBarItem actionBarItemBlockId="create-edit-career">
             <CareerFormSubmitButton />
           </PageActionBarItem>
         </PageActionBar>

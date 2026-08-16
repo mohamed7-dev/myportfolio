@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import bcrypt from "bcryptjs";
+import { LanguageCode } from "../lib/dto/language-code";
 import dataSource from "./data-source";
 import { Profile } from "./entities/profile/profile.entity";
 import { ProfileTranslation } from "./entities/profile/profile-translation.entity";
@@ -50,7 +51,7 @@ async function ensureAdmin() {
         jobTitle: "?",
         location: "?",
         currentFocus: "?",
-        languageCode: "en",
+        languageCode: LanguageCode["en-US "],
         base: existingProfile,
       }),
     );

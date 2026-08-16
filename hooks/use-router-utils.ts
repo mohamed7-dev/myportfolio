@@ -1,13 +1,12 @@
 import { useSearchParams } from "next/navigation";
-import { useLocale } from "next-intl";
 import React from "react";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { apiUrl } from "@/lib/helpers/router";
 
 export function useRouterUtils() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const currentLocale = useLocale();
 
   const updateSearchParams = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -22,12 +21,9 @@ export function useRouterUtils() {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const getApiHandlerUrl = React.useCallback(
-    (path: string) => {
-      return `${process.env.BASE_URL ?? "http://localhost:3000"}/${currentLocale}/api/${path}`;
-    },
-    [currentLocale],
-  );
+  const getApiHandlerUrl = React.useCallback((path: string) => {
+    return apiUrl(path);
+  }, []);
 
   return { updateSearchParams, searchParams, getApiHandlerUrl };
 }

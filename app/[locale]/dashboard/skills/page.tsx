@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -9,6 +8,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { skillListOutputSchema } from "@/lib/dto/skill";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { skillService } from "@/services/domain/skill.service";
@@ -27,7 +27,7 @@ export default async function SkillsListPage({
   const { skip, pageSize, name, category } = await searchParams;
   const find = wrapService({
     authenticatedOnly: true,
-    handler: skillService.find,
+    handler: skillService.find.bind(skillService),
   });
 
   const result = await find({
@@ -46,10 +46,10 @@ export default async function SkillsListPage({
   const skills = validateOutput(result, skillListOutputSchema);
 
   return (
-    <Page pageId="skills">
-      <PageTitle pageTitleBlockName="skills-page-title">Skills</PageTitle>
-      <PageActionBar pageActionBarBlockName="skills-page-action-bar">
-        <PageActionBarItem actionBarItemBlockName="create-skill-action-bar-item">
+    <Page pageId="dashboard-skills">
+      <PageTitle pageTitleBlockId="dashboard-skills-title">Skills</PageTitle>
+      <PageActionBar pageActionBarBlockId="dashboard-skills-action-bar">
+        <PageActionBarItem actionBarItemBlockId="add-new-skill">
           <Button>
             <Link href={"/dashboard/skills/new"}>Add New Skill</Link>
           </Button>

@@ -198,7 +198,11 @@ class ProjectService {
       },
     });
 
-    return await this.findOne(ctx, { id: updatedProject.id });
+    return await this.findOne(
+      ctx,
+      { id: updatedProject.id },
+      { skills: { featuredAsset: true } },
+    );
   }
 
   public async softDelete(

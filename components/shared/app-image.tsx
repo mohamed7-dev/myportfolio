@@ -39,20 +39,21 @@ export function AppImage({
   ...props
 }: AppImageProps) {
   const { quality, preset = null, mode = null, format = null } = transform;
+
+  const size = resolveSize(preset, width, height);
+
   if (!asset) {
     return (
       placeholder ?? (
         <PlaceholderImage
           preset={preset}
-          width={width}
-          height={height}
+          width={size.width}
+          height={size.height}
           className={className}
         />
       )
     );
   }
-
-  const size = resolveSize(preset, width, height);
 
   return (
     <Image

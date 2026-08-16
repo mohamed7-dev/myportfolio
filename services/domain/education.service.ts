@@ -1,8 +1,11 @@
-import { DateUtils } from "typeorm/util/DateUtils.js";
 import type { RequestContext } from "@/api/request-context/request-context";
-import { listQueryBuilder } from "../helpers/list-query-builder.service";
+import {
+  convertDate,
+  listQueryBuilder,
+} from "../helpers/list-query-builder.service";
 import { translator } from "../helpers/translator.service";
 import "server-only";
+import type { FindOptionsRelations } from "typeorm";
 import type { DeletionResponse } from "@/lib/dto/common";
 import type {
   CreateEducationInputSchema,
@@ -32,6 +35,7 @@ class EducationService {
   public async findOne(
     ctx: RequestContext,
     input: FindOneEducationInputSchema,
+    relations?: FindOptionsRelations<Education>,
   ) {
     const repo = await ormService.getRepository(ctx, Education);
     const education = await repo.findOne({
@@ -43,30 +47,20 @@ class EducationService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
     if (education) {
-      const translatedEdu = translator.translate(ctx.languageCode, education);
-      const translatedAssets = translatedEdu.assets.flatMap((eduAsset) => {
-        return {
-          ...eduAsset,
-          asset: translator.translate(ctx.languageCode, eduAsset.asset),
-        };
-      });
-
-      return {
-        ...translatedEdu,
-        assets: translatedAssets,
-        featuredAsset: translator.translate(
-          ctx.languageCode,
-          translatedEdu.featuredAsset,
-        ),
-      };
+      return this.translateEducation(ctx, education);
     }
   }
 
-  public async find(ctx: RequestContext, options: EducationListInputSchema) {
+  public async find(
+    ctx: RequestContext,
+    options: EducationListInputSchema,
+    relations?: FindOptionsRelations<Education>,
+  ) {
     const qb = await listQueryBuilder.build(Education, options, {
       ctx,
       alias: "edu",
@@ -75,6 +69,7 @@ class EducationService {
           asset: true,
         },
         featuredAsset: true,
+        ...relations,
       },
     });
 
@@ -135,22 +130,7 @@ class EducationService {
     return await qb.getManyAndCount().then((result) => {
       return {
         items: result[0].flatMap((edu) => {
-          const translatedEdu = translator.translate(ctx.languageCode, edu);
-          const translatedAssets = translatedEdu.assets.map((eduAsset) => {
-            return {
-              ...eduAsset,
-              asset: translator.translate(ctx.languageCode, eduAsset.asset),
-            };
-          });
-
-          return {
-            ...translatedEdu,
-            assets: translatedAssets,
-            featuredAsset: translator.translate(
-              ctx.languageCode,
-              translatedEdu.featuredAsset,
-            ),
-          };
+          return this.translateEducation(ctx, edu);
         }),
         itemsCount: result[1],
       };
@@ -253,13 +233,25 @@ class EducationService {
     }
     return entity;
   }
+
+  private translateEducation(ctx: RequestContext, education: Education) {
+    const translatedEdu = translator.translate(ctx.languageCode, education);
+    const translatedAssets = translatedEdu.assets.flatMap((eduAsset) => {
+      return {
+        ...eduAsset,
+        asset: translator.translate(ctx.languageCode, eduAsset.asset),
+      };
+    });
+
+    return {
+      ...translatedEdu,
+      assets: translatedAssets,
+      featuredAsset: translator.translate(
+        ctx.languageCode,
+        translatedEdu.featuredAsset,
+      ),
+    };
+  }
 }
 
 export const educationService = new EducationService();
-
-function convertDate(input: Date | string | number): string | number {
-  if (input instanceof Date) {
-    return DateUtils.mixedDateToUtcDatetimeString(input);
-  }
-  return input;
-}

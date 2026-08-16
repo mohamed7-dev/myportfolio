@@ -2,9 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@import "uploadthing/tw/v4";
-@source "../../node_modules/@uploadthing/react/dist";
-
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -59,10 +56,15 @@
 }
 
 @layer base {
+  html[dir="rtl"] * {
+    direction: rtl;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
   }
+
   ::-webkit-scrollbar {
     width: 6px;
   }

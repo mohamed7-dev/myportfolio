@@ -47,7 +47,7 @@ export class Skill extends AppEntity implements Translatable {
   @ManyToOne(
     () => Asset,
     (asset) => asset.featuredInSkills,
-    { onDelete: "SET NULL" },
+    { onDelete: "RESTRICT" },
   )
   featuredAsset: Relation<Asset>;
 
