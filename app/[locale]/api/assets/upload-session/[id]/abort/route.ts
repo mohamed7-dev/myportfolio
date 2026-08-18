@@ -13,8 +13,13 @@ export const { POST } = createRouter({
         { uploadSessionId: id },
         abortUploadSessionInputSchema,
       );
-      await assetService.abortUpload(ctx, parsedInput);
-      return NextResponse.json(null, { status: 204 });
+      try {
+        await assetService.abortUpload(ctx, parsedInput);
+        return NextResponse.json(null, { status: 204 });
+      } catch (error) {
+        console.log(error);
+        return NextResponse.json(error);
+      }
     },
   },
 });

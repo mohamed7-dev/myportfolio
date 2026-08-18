@@ -1,4 +1,3 @@
-import "server-only";
 import type { FindManyOptions } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
 import type { ClassType } from "@/lib/types/shared-types";

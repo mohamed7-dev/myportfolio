@@ -9,9 +9,12 @@ import {
 } from "@/components/page-layout/page";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
-import { type Asset, AssetType, asset as assetSchema } from "@/lib/dto/asset";
+import { AppImage } from "@/components/shared/app-image";
+import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
+import { type Asset, asset as assetSchema } from "@/lib/dto/asset";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/domain/asset.service";
+import { AssetPreview } from "./_components/asset-preview";
 import { DownloadButton } from "./_components/download-button";
 import { NameField } from "./_components/name-field";
 import { SubmitButton } from "./_components/submit-button";
@@ -47,48 +50,7 @@ export default async function AssetDetailPage({
         </PageActionBar>
         <PageLayout>
           <PageBlock id="asset-preview" column="main">
-            <div className="relative flex items-center justify-center bg-secondary-background/50 rounded-lg min-h-75 overflow-auto resize-y">
-              {asset.type === AssetType.VIDEO && (
-                <div
-                  className="relative w-full overflow-hidden rounded-base"
-                  style={{
-                    aspectRatio: `${asset.width} / ${asset.height}`,
-                  }}
-                >
-                  <video
-                    className="absolute inset-0 h-full w-full object-cover"
-                    controls
-                    preload="metadata"
-                    poster={asset.previewIdentifier}
-                  >
-                    <source
-                      src={asset.sourceIdentifier}
-                      type={asset.mimetype}
-                    />
-                  </video>
-                </div>
-              )}
-              {asset.type === AssetType.IMAGE && (
-                <Image
-                  alt={asset.name}
-                  src={asset.sourceIdentifier}
-                  width={500}
-                  height={500}
-                  loading="eager"
-                  className="max-w-full object-contain"
-                />
-              )}
-              {asset.type === AssetType.BINARY && (
-                <Image
-                  alt={asset.name}
-                  src={asset.previewIdentifier}
-                  width={500}
-                  height={500}
-                  loading="eager"
-                  className="max-w-full object-contain"
-                />
-              )}
-            </div>
+            <AssetPreview asset={asset} />
           </PageBlock>
           <PageBlock id="asset-name" column="side">
             <NameField />

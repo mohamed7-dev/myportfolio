@@ -1,4 +1,3 @@
-import "server-only";
 import type { EntityMetadata, ObjectLiteral, Repository } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
 import { UserInputError } from "@/lib/errors/errors";

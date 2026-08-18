@@ -16,11 +16,14 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
-import { Link } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
+import { Link, usePathname } from "@/i18n/navigation";
+import { cn, isRouteActive } from "@/lib/utils";
 import { AccentSwitcher } from "../accent-switcher";
 import { LanguageSwitcher } from "../language-switcher";
 import { usePublicLayout } from "./public-layout-provider";
@@ -40,6 +43,10 @@ export function PublicSidebar() {
   const { formatNumber } = useLocalFormatter();
   const { isMobile } = useSidebar();
 
+  const pathname = usePathname();
+
+  const isActive = (href: string) => isRouteActive(pathname, href);
+
   return (
     <header className={cn(!isMobile && "relative col-span-3 mx-auto")}>
       <Sidebar
@@ -53,16 +60,36 @@ export function PublicSidebar() {
         </SidebarHeader>
         <SidebarContent className="py-4">
           <nav className="flex flex-col gap-y-1">
-            {navLinks.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group flex items-center gap-4 rounded-lg px-4 py-2.5 font-base transition-all duration-300 hover:scale-[1.03]"
-              >
-                <item.icon className="size-5 transition-all duration-300 group-hover:-rotate-12" />
-                <span className="capitalize">{i18n(`nav.${item.key}`)}</span>
-              </Link>
-            ))}
+            <SidebarMenu className="gap-4 px-2">
+              {navLinks.map((item) => {
+                const active = isActive(item.href);
+
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          "group/nav flex items-center gap-4 rounded-lg px-4 py-2.5 text-base! font-heading! transition-all duration-300 hover:scale-[1.03]",
+                          active && "relative hover:bg-secondary-background",
+                        )}
+                      >
+                        <item.icon className="size-5! transition-all duration-300 group-hover/nav:-rotate-12" />
+                        <span className="capitalize">
+                          {i18n(`nav.${item.key}`)}
+                        </span>
+                        {active && (
+                          <span
+                            aria-hidden="true"
+                            className="ml-auto size-3 rounded-base bg-primary border-2 border-border"
+                          />
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
           </nav>
         </SidebarContent>
         <SidebarFooter className="py-4 flex flex-col items-center gap-4">
@@ -112,12 +139,13 @@ function ProfilePhoto() {
       size={"icon-lg"}
       onClick={ctx.openAvatar}
       aria-label="View profile photo"
-      className="rounded-base relative w-fit h-fit"
+      className="rounded-base size-auto"
     >
       <AppImage
         asset={ctx.profile.avatar ?? undefined}
         transform={{ preset: "thumb", mode: "resize" }}
-        className="rounded-base object-cover transition duration-500 hover:scale-105"
+        loading="eager"
+        className="size-32 object-cover rounded-base transition duration-500 hover:scale-105"
       />
     </Button>
   );

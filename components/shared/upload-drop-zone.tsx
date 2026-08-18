@@ -24,6 +24,7 @@ export type UploadDropZoneProps = {
   onFileSelected?: (file: File) => void;
   onRejected?: (errors: string[]) => void;
   progress: number;
+  isPending: boolean;
 };
 
 export function UploadDropZone({
@@ -32,6 +33,7 @@ export function UploadDropZone({
   onFileSelected,
   onRejected,
   progress,
+  isPending,
 }: UploadDropZoneProps) {
   const [uploadingInfo, setUploadingInfo] = React.useState<UploadingInfo>({
     file: null,
@@ -110,7 +112,7 @@ export function UploadDropZone({
     [assetConfig, allowedExtensions],
   );
 
-  const { getInputProps, getRootProps, isDragActive } = useDropzone({
+  const { getInputProps, getRootProps, isDragActive, inputRef } = useDropzone({
     multiple: false,
     maxFiles: 1,
     accept: Object.fromEntries(
@@ -124,6 +126,15 @@ export function UploadDropZone({
     validator: validateDropzoneFile,
   });
 
+  React.useEffect(() => {
+    if (!isPending) {
+      setUploadingInfo({ file: null, error: [] });
+      if (inputRef.current?.files) {
+        inputRef.current.files = null;
+      }
+    }
+  }, [isPending, inputRef]);
+
   return (
     <div
       className={cn(
@@ -132,7 +143,7 @@ export function UploadDropZone({
         className,
       )}
     >
-      {uploadingInfo.file && (
+      {uploadingInfo.file && !isPending && (
         <Alert>
           <AlertTitle>File Accepted</AlertTitle>
           <AlertDescription>
@@ -140,7 +151,7 @@ export function UploadDropZone({
           </AlertDescription>
         </Alert>
       )}
-      {!!uploadingInfo.error.length && (
+      {!!uploadingInfo.error.length && !isPending && (
         <Alert variant={"destructive"}>
           <AlertTitle>File Rejection</AlertTitle>
           <AlertDescription>
@@ -154,34 +165,37 @@ export function UploadDropZone({
           </AlertDescription>
         </Alert>
       )}
-      {progress > 0 && (
+      {isPending && (
         <div className="flex items-center justify-center gap-2">
-          <Loader2Icon className="animate-spin size-10" />
+          <Loader2Icon className="animate-spin size-10 stroke-primary" />
           <p className="text-md">Uploading...</p>
           <p className="text-md">{progress}%</p>
         </div>
       )}
-      {!progress && (
+
+      {!isPending && (
         <div
           className={cn(
             "size-full flex cursor-pointer items-center justify-center",
           )}
           {...getRootProps()}
         >
-          <CloudIcon className="size-20" />
+          <CloudIcon className="size-20 stroke-primary" />
           <input className="size-full cursor-pointer" {...getInputProps()} />
         </div>
       )}
-      <p className="flex flex-col gap-2 items-center">
-        <span>Drag/Drop or select file.</span>
-        <span>
-          Only files with these extensions{" "}
-          <strong className="text-foreground font-semibold">
-            ({allowedExtensions.join(", ")})
-          </strong>{" "}
-          are allowed
-        </span>
-      </p>
+      {!isPending && (
+        <p className="flex flex-col gap-2 items-center text-center">
+          <span>Drag/Drop or select file.</span>
+          <span>
+            Only files with these extensions{" "}
+            <strong className="text-foreground font-semibold">
+              ({allowedExtensions.join(", ")})
+            </strong>{" "}
+            are allowed
+          </span>
+        </p>
+      )}
     </div>
   );
 }

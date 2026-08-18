@@ -4,17 +4,20 @@ import {
   getFeaturedProjectsOutputSchema,
   getFeaturedSkillsOutputSchema,
   getPublicAchievementsOutputSchema,
+  getPublicCareerOutputSchema,
   getPublicContactMethodsOutputSchema,
+  getPublicEducationOutputSchema,
   getPublicProjectOutputSchema,
   getPublicProjectsOutputSchema,
   getSkillsOutputSchema,
   getSuperAdminProfileOutputSchema,
 } from "@/lib/dto/visitor";
 import { validateOutput } from "@/lib/helpers/validate-output";
-import { profileService } from "./profile.service";
-import "server-only";
 import { achievementService } from "./achievement.service";
+import { careerService } from "./career.service";
 import { contactMethodService } from "./contact-method.service";
+import { educationService } from "./education.service";
+import { profileService } from "./profile.service";
 import { projectService } from "./project.service";
 import { skillService } from "./skill.service";
 
@@ -52,12 +55,16 @@ class VisitorService {
     return result;
   }
   public async getProjects(ctx: RequestContext) {
-    const projects = await projectService.find(ctx, {
-      filter: {
-        enabled: { equals: true },
+    const projects = await projectService.find(
+      ctx,
+      {
+        filter: {
+          enabled: { equals: true },
+        },
+        includeSoftDeleted: false,
       },
-      includeSoftDeleted: false,
-    });
+      { skills: true },
+    );
 
     const result = validateOutput(projects, getPublicProjectsOutputSchema);
     return result;
@@ -124,6 +131,20 @@ class VisitorService {
       achievements,
       getPublicAchievementsOutputSchema,
     );
+    return result;
+  }
+
+  public async getCareer(ctx: RequestContext) {
+    const career = await careerService.find(ctx, {});
+
+    const result = validateOutput(career, getPublicCareerOutputSchema);
+    return result;
+  }
+
+  public async getEducation(ctx: RequestContext) {
+    const edu = await educationService.find(ctx, {});
+
+    const result = validateOutput(edu, getPublicEducationOutputSchema);
     return result;
   }
 }

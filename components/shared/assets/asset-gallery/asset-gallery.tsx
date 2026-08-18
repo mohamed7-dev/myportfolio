@@ -65,7 +65,7 @@ export function AssetGallery({
     pageSize,
   ];
 
-  const { mutate } = useMutation({
+  const { mutate, isPending: isUploadingAsset } = useMutation({
     mutationFn: async (input: { source: File; preview: File }) => {
       const assetUploader = new AssetUploader();
       const ac = new AbortController();
@@ -80,6 +80,10 @@ export function AssetGallery({
     },
     onSuccess: async () => {
       await qClient.invalidateQueries({ queryKey });
+    },
+    onSettled: () => {
+      setSource(null);
+      setPreview(null);
     },
   });
 
@@ -182,8 +186,6 @@ export function AssetGallery({
   };
 
   React.useEffect(() => {
-    console.log(source);
-    console.log(preview);
     if (source && preview) {
       mutate({ source, preview });
     }
@@ -204,47 +206,31 @@ export function AssetGallery({
           refetch={refetch}
         />
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <UploadDropZone
-          assetType="source"
-          onFileSelected={(data) => {
-            setSource(data);
-          }}
-          progress={sourceProgress}
-        />
-        <UploadDropZone
-          assetType="preview"
-          onFileSelected={(data) => {
-            setPreview(data);
-          }}
-          progress={previewProgress}
-        />
-      </div>
-      {/* <StyledUploadDropzone
-        endpoint="assetUploader"
-        onChange={(acceptedFiles) => {
-          if (acceptedFiles.length) {
-            setOpenAssetPreviewDialog(true);
-          }
-        }}
-        onClientUploadComplete={(res) => {
-          const file = res[0];
-          if (file && previewFileInfo.current) {
-            mutate({
-              sourceIdentifier: file.ufsUrl,
-              previewIdentifier: previewFileInfo.current.ufsUrl,
-              sourceFileMimetype: file.type,
-              sourceFileSize: file.size,
-              sourceFileKey: file.key,
-              previewFileKey: previewFileInfo.current.key,
-              sourceFilename: file.name,
-            });
-          }
-        }}
-        onUploadError={(error: Error) => {
-          alert(`ERROR! ${error.message}`);
-        }}
-      /> */}
+      <article className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <section className="space-y-2">
+          <h3 className="text-sm font-heading">Source File</h3>
+          <UploadDropZone
+            assetType="source"
+            onFileSelected={(data) => {
+              setSource(data);
+            }}
+            progress={sourceProgress}
+            isPending={isUploadingAsset}
+          />
+        </section>
+        <section className="space-y-2">
+          <h3 className="text-sm font-heading">Preview File</h3>
+          <UploadDropZone
+            assetType="preview"
+            onFileSelected={(data) => {
+              setPreview(data);
+            }}
+            progress={previewProgress}
+            isPending={isUploadingAsset}
+          />
+        </section>
+      </article>
+
       <AssetGridView
         assets={assets ?? []}
         isLoading={isLoadingAssets}
@@ -297,15 +283,6 @@ export function AssetGallery({
           />
         )}
       </div>
-      {/* <AssetPreviewUploadDialog
-        open={openAssetPreviewDialog}
-        onClose={() => setOpenAssetPreviewDialog(false)}
-        onUploadComplete={(info) => {
-          previewFileInfo.current = info;
-          setOpenAssetPreviewDialog(false);
-          toast.success("Preview file was uploaded successfully");
-        }}
-      /> */}
     </div>
   );
 }

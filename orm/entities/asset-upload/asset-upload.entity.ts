@@ -79,7 +79,7 @@ export class AssetUpload extends AppEntity {
   @Column({ type: "timestamptz" })
   expiresAt!: Date;
 
-  @OneToOne(() => Asset, { nullable: true, eager: true })
+  @OneToOne(() => Asset, { onDelete: "CASCADE", nullable: true, eager: true })
   @JoinColumn()
   asset: Relation<Asset>;
 }

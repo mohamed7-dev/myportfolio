@@ -6,14 +6,12 @@ interface FeaturedAssetProps {
   featuredAsset?: Asset | null;
   compact?: boolean;
   onSelectAssets: () => void;
-  onPreviewAsset: (asset: Asset) => void;
 }
 
 export function FeaturedAsset({
   featuredAsset,
   compact = false,
   onSelectAssets,
-  onPreviewAsset,
 }: FeaturedAssetProps) {
   return (
     <div
@@ -23,12 +21,14 @@ export function FeaturedAsset({
         <AssetDisplay
           asset={featuredAsset}
           image={{
-            fill: true,
-            sizes: "15rem",
+            transform: {
+              preset: "small",
+              mode: "resize",
+            },
             loading: "eager",
-            className: "object-contain cursor-pointer",
+            className: "object-contain",
           }}
-          containerClassName="relative"
+          containerClassName="flex justify-center"
         />
       ) : (
         // biome-ignore lint/a11y/noStaticElementInteractions: none

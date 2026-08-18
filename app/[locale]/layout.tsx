@@ -40,8 +40,9 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
+    // biome-ignore lint/a11y/useHtmlLang: testing
     <html
-      lang={locale.split("_").slice(0, 1).join("")}
+      // lang={locale.split("_").slice(0, 1).join("")}
       dir={isRtl(locale) ? "rtl" : "ltr"}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       // suppressHydrationWarning

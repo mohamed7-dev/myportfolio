@@ -20,6 +20,7 @@ export enum CareerType {
   INTERNSHIP = "INTERNSHIP",
   TRAINING = "TRAINING",
   CONTRACT = "CONTRACT",
+  OPEN_SOURCE_CONTRIBUTION = "OPEN_SOURCE_CONTRIBUTION",
 }
 
 export enum CareerMode {

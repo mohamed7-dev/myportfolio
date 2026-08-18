@@ -1,4 +1,3 @@
-import "server-only";
 import { type FindOptionsRelations, IsNull } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
 import type { DeletionResponse, InputIdSchema } from "@/lib/dto/common";
@@ -11,6 +10,7 @@ import type {
 } from "@/lib/dto/project";
 import { EntityNotFoundError } from "@/lib/errors/errors";
 import type { Translated } from "@/lib/types/translatable";
+import { notNullOrUndefined } from "@/lib/utils/not-null-or-undefined";
 import type { Achievement } from "@/orm/entities/achievement/achievement.entity";
 import type { Career } from "@/orm/entities/career/career.entity";
 import type { Education } from "@/orm/entities/education/education.entity";
@@ -18,6 +18,8 @@ import { Project } from "@/orm/entities/project/project.entity";
 import { ProjectTranslation } from "@/orm/entities/project/project-translation.entity";
 import type { Skill } from "@/orm/entities/skill/skill.entity";
 import { ormService } from "@/orm/orm.service";
+import { projectsSeed } from "@/orm/seed/projects";
+import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
 import { listQueryBuilder } from "../helpers/list-query-builder.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
@@ -29,6 +31,52 @@ import { educationService } from "./education.service";
 import { skillService } from "./skill.service";
 
 class ProjectService {
+  /**@internal */
+  public async seedProjects(
+    ctx: RequestContext,
+    projectAssetsMap: Map<string, SeededAssetGroup>,
+    skillIds: Map<string, string>,
+    careerIds: Map<string, string>,
+    educationIds: Map<string, string>,
+    achievementIds: Map<string, string>,
+  ) {
+    const projectIds = new Map<string, string>();
+
+    await Promise.all(
+      projectsSeed.map(
+        async ({
+          skillKeys,
+          careerKey,
+          educationKey,
+          achievementKeys,
+          ...project
+        }) => {
+          const assetGroup = projectAssetsMap.get(project.key);
+          if (assetGroup?.featuredAsset.id) {
+            const savedProject = await projectService.create(ctx, {
+              ...project,
+              featuredAssetId: assetGroup?.featuredAsset.id,
+              assetIds: assetGroup.assets.map((item) => item.id),
+              skillIds: skillKeys
+                .map((key) => skillIds.get(key))
+                .filter(notNullOrUndefined),
+              careerId: careerKey ? careerIds?.get(careerKey) : undefined,
+              educationItemId: educationKey
+                ? educationIds?.get(educationKey)
+                : undefined,
+              achievementIds: achievementKeys
+                ?.map((key) => achievementIds.get(key))
+                .filter(notNullOrUndefined),
+            });
+            projectIds.set(project.key, savedProject?.id ?? "");
+          }
+        },
+      ),
+    );
+
+    return projectIds;
+  }
+
   public async findOne(
     ctx: RequestContext,
     input: InputIdSchema,

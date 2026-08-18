@@ -1,7 +1,9 @@
 import { ImageIcon } from "lucide-react";
 import Image, { type ImageProps } from "next/image";
+import { CldImage, type CldImageProps } from "next-cloudinary";
 import type React from "react";
-import { buildImageUrl, resolveSize } from "@/lib/helpers/image";
+import { isDevelopmentMode } from "@/lib/helpers/env";
+import { resolveSize } from "@/lib/helpers/image";
 import type {
   AssetLike,
   ImageFormat,
@@ -10,8 +12,11 @@ import type {
 } from "@/lib/types/image";
 import { cn } from "@/lib/utils";
 
-interface AppImageProps
-  extends Omit<ImageProps, "src" | "placeholder" | "alt"> {
+type ImageCompProps =
+  | Omit<CldImageProps, "src" | "placeholder" | "alt">
+  | Omit<ImageProps, "src" | "placeholder" | "alt">;
+
+type AppImageProps = ImageCompProps & {
   asset: AssetLike | undefined;
   placeholder?: React.ReactNode;
   width?: number;
@@ -23,8 +28,8 @@ interface AppImageProps
     quality?: number;
   };
   ref?: React.Ref<HTMLImageElement>;
-  alt?: ImageProps["alt"];
-}
+  alt?: string;
+};
 
 export function AppImage({
   ref,
@@ -35,7 +40,6 @@ export function AppImage({
   height,
   alt,
   className,
-  style,
   ...props
 }: AppImageProps) {
   const { quality, preset = null, mode = null, format = null } = transform;
@@ -55,23 +59,33 @@ export function AppImage({
     );
   }
 
+  if (isDevelopmentMode()) {
+    return (
+      <Image
+        ref={ref}
+        src={asset.previewIdentifier}
+        alt={alt ?? asset.name ?? ""}
+        width={size.width === undefined ? asset.width : size.width}
+        height={size.height === undefined ? asset.height : size.height}
+        className={cn("rounded-base size-auto", className)}
+        quality={quality as any}
+        {...props}
+      />
+    );
+  }
+
   return (
-    <Image
+    <CldImage
       ref={ref}
-      src={buildImageUrl(asset, {
-        preset,
-        mode,
-        format,
-        width,
-        height,
-        quality,
-      })}
+      src={asset.previewIdentifier}
       alt={alt ?? asset.name ?? ""}
-      width={size.width}
-      height={size.height}
-      className={cn("rounded-base", className)}
+      width={size.width === undefined ? asset.width : size.width}
+      height={size.height === undefined ? asset.height : size.height}
+      className={cn("rounded-base size-auto", className)}
       loading="lazy"
-      style={style}
+      quality={quality}
+      format={format ?? undefined}
+      crop={mode === "resize" ? "fit" : "fill"}
       {...props}
     />
   );
@@ -96,7 +110,7 @@ export function PlaceholderImage({
   return (
     <div
       className={cn(
-        "rounded-base flex items-center justify-center bg-secondary-background",
+        "rounded-base flex items-center justify-center bg-background",
         className,
       )}
       style={{

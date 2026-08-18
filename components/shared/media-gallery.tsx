@@ -1,12 +1,12 @@
 "use client";
-
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
+  DownloadIcon,
   ExpandIcon,
   XIcon,
 } from "lucide-react";
-import { type CSSProperties, useRef, useState } from "react";
+import { useState } from "react";
 import { AppImage } from "@/components/shared/app-image";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,8 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useDownloadAsset } from "@/hooks/use-download-asset";
+import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
 import type { EntityAsset } from "@/lib/dto/asset";
 import { cn } from "@/lib/utils";
+import { Badge } from "../ui/badge";
+import { AppVideo } from "./app-video";
 
 interface MediaGalleryProps {
   entityAssets: EntityAsset[];
@@ -35,16 +39,10 @@ export function MediaGallery({
   overlayImageProps,
 }: MediaGalleryProps) {
   const mediaItems = entityAssets.filter((entry) => !!entry.asset) ?? [];
-  const mediaRef = useRef<HTMLDivElement | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [originRect, setOriginRect] = useState<{
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-  } | null>(null);
-  const [isExpanding, setIsExpanding] = useState(false);
+
+  const { downloadAsset, isDownloading } = useDownloadAsset();
 
   if (!mediaItems.length) {
     return null;
@@ -57,55 +55,26 @@ export function MediaGallery({
   };
 
   const openFullscreen = () => {
-    const rect = mediaRef.current?.getBoundingClientRect();
-    if (!rect) {
-      setDialogOpen(true);
-      return;
-    }
-
-    setOriginRect({
-      left: rect.left,
-      top: rect.top,
-      width: rect.width,
-      height: rect.height,
-    });
-    setIsExpanding(false);
     setDialogOpen(true);
-
-    requestAnimationFrame(() => {
-      setIsExpanding(true);
-    });
   };
 
   const closeFullscreen = () => {
-    setIsExpanding(false);
     setDialogOpen(false);
   };
 
-  const dialogStyle =
-    originRect && dialogOpen
-      ? ({
-          position: "fixed",
-          left: isExpanding ? "50%" : `${originRect.left}px`,
-          top: isExpanding ? "50%" : `${originRect.top}px`,
-          width: isExpanding ? "min(90vw, 1100px)" : `${originRect.width}px`,
-          height: isExpanding ? "min(80vh, 820px)" : `${originRect.height}px`,
-          transform: isExpanding ? "translate(-50%, -50%)" : "translate(0, 0)",
-          transition: "all 420ms cubic-bezier(0.22, 1, 0.36, 1)",
-          transformOrigin: "center center",
-          zIndex: 60,
-        } as CSSProperties)
-      : undefined;
+  const downloadFile = () => {
+    downloadAsset(``, currentItem.asset.name);
+  };
 
   return (
     <>
       <div
         className={cn(
-          "group relative w-full overflow-hidden rounded-base border-2 border-border bg-background shadow-default",
+          "group relative w-full overflow-hidden space-y-4 rounded-base border-2 border-border bg-background",
           className,
         )}
       >
-        <div className="relative aspect-[16/10] overflow-hidden bg-secondary-background">
+        <div className="relative aspect-video overflow-hidden bg-secondary-background">
           {mediaItems.map((entry, index) => {
             const offset = index - currentIndex;
             const isCurrent = index === currentIndex;
@@ -114,7 +83,7 @@ export function MediaGallery({
               <div
                 key={entry.asset.id}
                 className={cn(
-                  "absolute inset-0 transition-all duration-500 ease-out",
+                  "absolute inset-0 z-10 transition-all duration-500 ease-out",
                   isCurrent
                     ? "pointer-events-auto opacity-100"
                     : "pointer-events-none opacity-0",
@@ -123,40 +92,47 @@ export function MediaGallery({
                   transform: `translateX(${offset * 100}%) scale(${isCurrent ? 1 : 0.94})`,
                 }}
               >
-                <AppImage
-                  asset={entry.asset}
-                  width={entry.asset.width ?? undefined}
-                  height={entry.asset.height ?? undefined}
-                  className={cn(
-                    "size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]",
-                    !isCurrent && "brightness-75",
-                  )}
-                  alt={entry.asset.name ?? title ?? "Media asset"}
-                  {...staticImageProps}
-                />
+                {(entry.asset.type === ObjectStorageResourceType.image ||
+                  entry.asset.type === ObjectStorageResourceType.raw) && (
+                  <AppImage
+                    asset={entry.asset}
+                    transform={{
+                      preset: "full",
+                    }}
+                    className={cn(
+                      "size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]",
+                      !isCurrent && "brightness-75",
+                    )}
+                    alt={entry.asset.name ?? title ?? "Media asset"}
+                    {...staticImageProps}
+                  />
+                )}
+                {entry.asset.type === ObjectStorageResourceType.video && (
+                  <AppVideo
+                    asset={entry.asset}
+                    transform={{
+                      preset: "large",
+                      mode: "resize",
+                    }}
+                    className={cn(
+                      "size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]",
+                      !isCurrent && "brightness-75",
+                    )}
+                  />
+                )}
               </div>
             );
           })}
 
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent" />
+        </div>
 
-          <div className="absolute inset-x-0 top-4 flex items-center justify-between px-4">
-            <div className="rounded-full border-2 border-border bg-background/80 px-2 py-1 text-[10px] font-heading uppercase tracking-[0.2em] text-foreground backdrop-blur-sm">
-              {currentIndex + 1}/{mediaItems.length}
-            </div>
-            <Button
-              type="button"
-              size="icon-sm"
-              variant="neutral"
-              className="pointer-events-auto"
-              onClick={openFullscreen}
-              aria-label="Open media gallery fullscreen"
-            >
-              <ExpandIcon className="size-4" />
-            </Button>
-          </div>
+        <div className="flex items-center justify-between p-4">
+          <Badge variant={"neutral"}>
+            {currentIndex + 1}/{mediaItems.length}
+          </Badge>
 
-          <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2 px-4">
+          <div className="flex items-center justify-center gap-2">
             <Button
               type="button"
               size="icon"
@@ -178,13 +154,33 @@ export function MediaGallery({
               <ChevronRightIcon />
             </Button>
           </div>
+          <div className="flex items-center justify-center gap-2">
+            {currentItem.asset.type === ObjectStorageResourceType.raw && (
+              <Button
+                type="button"
+                size="icon-sm"
+                variant="neutral"
+                className="pointer-events-auto"
+                onClick={downloadFile}
+                // TODO: localize
+                aria-label="Download file"
+                disabled={isDownloading}
+              >
+                <DownloadIcon className="size-4" />
+              </Button>
+            )}
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="neutral"
+              className="pointer-events-auto"
+              onClick={openFullscreen}
+              aria-label="Open media gallery fullscreen"
+            >
+              <ExpandIcon className="size-4" />
+            </Button>
+          </div>
         </div>
-
-        <div
-          ref={mediaRef}
-          className="pointer-events-none absolute inset-0 z-10"
-          aria-hidden="true"
-        />
       </div>
 
       <Dialog
@@ -193,10 +189,9 @@ export function MediaGallery({
       >
         <DialogContent
           showCloseButton={false}
-          className="!z-[60] !m-0 !max-w-none !translate-x-0 !translate-y-0 !rounded-none !border-0 !bg-transparent !p-0 !shadow-none"
-          style={dialogStyle}
+          className="max-w-[80vw]! rounded-none border-0 bg-transparent p-0 shadow-none"
         >
-          <div className="relative flex h-full w-full flex-col overflow-hidden rounded-base border-2 border-border bg-background">
+          <div className="relative flex flex-col overflow-hidden rounded-base border-2 border-border bg-background">
             <div className="absolute right-3 top-3 z-10 flex gap-2">
               <Button
                 type="button"
@@ -209,14 +204,29 @@ export function MediaGallery({
               </Button>
             </div>
 
-            <div className="relative flex h-full w-full items-center justify-center bg-secondary-background">
-              <AppImage
-                asset={currentItem.asset}
-                width={currentItem.asset.width ?? undefined}
-                height={currentItem.asset.height ?? undefined}
-                className="size-full object-contain"
-                alt={currentItem.asset.name ?? title ?? "Media asset"}
-              />
+            <div className="max-w-[80vw] max-h-[80vh] flex items-center justify-center bg-background">
+              {(currentItem.asset.type === ObjectStorageResourceType.image ||
+                currentItem.asset.type === ObjectStorageResourceType.raw) && (
+                <AppImage
+                  asset={currentItem.asset}
+                  transform={{
+                    preset: "full",
+                  }}
+                  loading="eager"
+                  className="size-full object-contain"
+                />
+              )}
+              {currentItem.asset.type === ObjectStorageResourceType.video && (
+                <AppVideo
+                  asset={currentItem.asset}
+                  transform={{
+                    preset: "full",
+                  }}
+                  className={cn(
+                    "size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]",
+                  )}
+                />
+              )}
             </div>
 
             <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2 px-4">

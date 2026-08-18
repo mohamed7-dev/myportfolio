@@ -46,7 +46,7 @@ export const sharedConfig: SharedAppConfig = {
         extensions: [".png", ".jpeg", ".jpg", ".svg"],
         maxSizeInMb: 4,
       },
-      "application/pdf": { extensions: [".pdf"], maxSizeInMb: 4 },
+      "application/*": { extensions: [".pdf"], maxSizeInMb: 4 },
     },
     previewFileTypes: {
       "image/*": {

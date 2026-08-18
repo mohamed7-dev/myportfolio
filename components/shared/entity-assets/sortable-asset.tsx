@@ -1,7 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { BinaryIcon, EllipsisIcon, VideoIcon } from "lucide-react";
-import Image from "next/image";
+import { EllipsisIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,7 +16,6 @@ export function SortableAsset({
   compact,
   isFeatured,
   updatePermissions,
-  onPreview,
   onSetAsFeatured,
   onRemove,
 }: {
@@ -25,7 +23,6 @@ export function SortableAsset({
   compact: boolean;
   isFeatured: boolean;
   updatePermissions: boolean;
-  onPreview: (asset: Asset) => void;
   onSetAsFeatured: (asset: Asset) => void;
   onRemove: (asset: Asset) => void;
 }) {
@@ -65,7 +62,11 @@ export function SortableAsset({
                     ${isDragging ? "opacity-50 cursor-grabbing" : ""}
                 `}
       >
-        <AssetDisplay asset={asset} image={{ width: 50, height: 50 }} />
+        <AssetDisplay
+          asset={asset}
+          image={{ transform: { preset: "tiny", mode: "resize" } }}
+          containerClassName="flex items-center"
+        />
       </div>
 
       {/* Menu Trigger */}
@@ -82,9 +83,6 @@ export function SortableAsset({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onPreview(asset)}>
-                Preview
-              </DropdownMenuItem>
               <DropdownMenuItem
                 disabled={isFeatured}
                 onClick={() => onSetAsFeatured(asset)}

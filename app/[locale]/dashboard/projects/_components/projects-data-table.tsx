@@ -11,17 +11,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { useRouterUtils } from "@/hooks/use-router-utils";
 import type { DeletionResponse } from "@/lib/dto/common";
-import type { Project, SoftDeleteProjectsInputSchema } from "@/lib/dto/project";
+import type {
+  ProjectListOutputSchema,
+  SoftDeleteProjectsInputSchema,
+} from "@/lib/dto/project";
 
 export function ProjectsDataTable({
   projects,
   totalItemsCount,
 }: {
-  projects: Project[];
+  projects: ProjectListOutputSchema["items"];
   totalItemsCount: number;
 }) {
   const router = useRouter();
-  const columnHelper = createColumnHelper<Project>();
+  const columnHelper =
+    createColumnHelper<ProjectListOutputSchema["items"][number]>();
   const { updateSearchParams, searchParams } = useRouterUtils();
 
   const deleteProjects = async (
@@ -102,7 +106,7 @@ export function ProjectsDataTable({
           );
         },
       }),
-    ] as ColumnDef<Project>[];
+    ] as ColumnDef<ProjectListOutputSchema["items"][number]>[];
   }, [columnHelper.accessor]);
 
   return (

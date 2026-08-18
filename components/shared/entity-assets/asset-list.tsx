@@ -2,19 +2,12 @@ import {
   closestCenter,
   DndContext,
   type DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
   type useSensors,
 } from "@dnd-kit/core";
 import {
-  arrayMove,
   horizontalListSortingStrategy,
   SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import type { Asset } from "@/lib/dto/asset";
 import { SortableAsset } from "./sortable-asset";
 
@@ -24,7 +17,6 @@ interface AssetListProps {
   sensors: ReturnType<typeof useSensors>;
   updatePermissions: boolean;
   isFeatured: (asset: Asset) => boolean;
-  onPreview: (asset: Asset) => void;
   onSetAsFeatured: (asset: Asset) => void;
   onRemove: (asset: Asset) => void;
   onDragEnd: (event: DragEndEvent) => void;
@@ -36,7 +28,6 @@ export function AssetList({
   sensors,
   updatePermissions,
   isFeatured,
-  onPreview,
   onSetAsFeatured,
   onRemove,
   onDragEnd,
@@ -60,7 +51,6 @@ export function AssetList({
                 compact={compact}
                 isFeatured={isFeatured(asset)}
                 updatePermissions={updatePermissions}
-                onPreview={onPreview}
                 onSetAsFeatured={onSetAsFeatured}
                 onRemove={onRemove}
               />

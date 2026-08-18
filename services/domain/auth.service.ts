@@ -1,4 +1,6 @@
+import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
 import type { RequestContext } from "@/api/request-context/request-context";
 import type {
   AuthenticateAdminUserInputSchema,
@@ -7,20 +9,20 @@ import type {
 import { UnAuthorizedError } from "@/lib/errors/errors";
 import { Profile } from "@/orm/entities/profile/profile.entity";
 import { ormService } from "@/orm/orm.service";
-import "server-only";
-import { randomBytes } from "node:crypto";
-import { cookies } from "next/headers";
 import { translator } from "../helpers/translator.service";
 import { profileService } from "./profile.service";
 
 class AuthService {
   public async me(ctx: RequestContext) {
-    const translatedProfile = await profileService.findOne(
-      ctx,
-      ctx.activeUserId as string,
-    );
+    if (ctx.activeUserId) {
+      const translatedProfile = await profileService.findOne(
+        ctx,
+        ctx.activeUserId,
+      );
 
-    return translatedProfile;
+      return translatedProfile;
+    }
+    return undefined;
   }
 
   public async authenticateAdminUser(

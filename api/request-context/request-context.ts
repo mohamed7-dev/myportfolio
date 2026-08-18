@@ -43,7 +43,7 @@ export class RequestContext {
   }
 
   get activeUserId(): string | undefined {
-    return this.session?.profile.id;
+    return this.session?.profile?.id;
   }
 
   setReplicationMode(mode: ReplicationMode): void {

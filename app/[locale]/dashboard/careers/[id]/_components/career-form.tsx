@@ -15,7 +15,6 @@ import {
   updateCareerInputSchema,
 } from "@/lib/dto/career";
 import { Form } from "@/lib/helpers/form";
-import { normalizeString } from "@/lib/utils/normalize-string";
 
 export function CareerForm({
   children,
@@ -102,10 +101,6 @@ export function CareerForm({
     if (creatingNewEntity) {
       createCareer({
         ...values,
-        translations: values.translations.map((t, i) => ({
-          ...t,
-          slug: normalizeString(form.getValues(`translations.${i}.name`), "-"),
-        })),
       } as CreateCareerInputSchema);
     } else {
       updateCareer({

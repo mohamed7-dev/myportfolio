@@ -1,4 +1,3 @@
-import "server-only";
 import type { NextRequest } from "next/server";
 import { getLocale } from "next-intl/server";
 import { RequestContext } from "@/api/request-context/request-context";

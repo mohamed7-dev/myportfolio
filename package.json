@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "seed": "ts-node --project ./orm/tsconfig.seed.json ./orm/seed.ts",
-    "dev": "NODE_ENV=development pnpm run seed && next dev",
+    "seed": "NODE_ENV=development ts-node -r tsconfig-paths/register --project ./orm/tsconfig.json ./orm/seed/index.ts",
+    "dev": "next dev",
     "typeorm": "ts-node --project ./orm/tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./orm/data-source.ts",
     "migration:generate": "NODE_ENV=production npm run typeorm -- migration:generate ./orm/migrations/Initial",
     "migration:run": "npm run typeorm -- migration:run",
@@ -39,6 +39,7 @@
     "lucide-react": "^1.22.0",
     "mime-types": "^3.0.2",
     "next": "16.2.9",
+    "next-cloudinary": "^6.18.8",
     "next-intl": "^4.13.5",
     "next-themes": "^0.4.6",
     "pg": "^8.22.0",

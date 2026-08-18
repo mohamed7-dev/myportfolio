@@ -1,11 +1,5 @@
-import type { RequestContext } from "@/api/request-context/request-context";
-import {
-  convertDate,
-  listQueryBuilder,
-} from "../helpers/list-query-builder.service";
-import { translator } from "../helpers/translator.service";
-import "server-only";
 import type { FindOptionsRelations } from "typeorm";
+import type { RequestContext } from "@/api/request-context/request-context";
 import type { DeletionResponse } from "@/lib/dto/common";
 import type {
   CreateEducationInputSchema,
@@ -19,8 +13,15 @@ import type { AppEntity } from "@/orm/entities/app-entity";
 import { Education } from "@/orm/entities/education/education.entity";
 import { EducationTranslation } from "@/orm/entities/education/education-translation.entity";
 import { ormService } from "@/orm/orm.service";
+import { educationSeed } from "@/orm/seed/education";
+import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
+import {
+  convertDate,
+  listQueryBuilder,
+} from "../helpers/list-query-builder.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
+import { translator } from "../helpers/translator.service";
 import { assetService } from "./asset.service";
 
 interface EntityWithEducation extends AppEntity {
@@ -32,6 +33,30 @@ export interface EntityEducationInput {
 }
 
 class EducationService {
+  /**@internal */
+  public async seedEducation(
+    ctx: RequestContext,
+    assets: Map<string, SeededAssetGroup>,
+  ): Promise<Map<string, string>> {
+    const educationIds = new Map<string, string>();
+
+    await Promise.all(
+      educationSeed.map(async (edu) => {
+        const assetGroup = assets.get(edu.key);
+        if (assetGroup?.featuredAsset.id) {
+          const savedEdu = await educationService.create(ctx, {
+            ...edu,
+            featuredAssetId: assetGroup?.featuredAsset.id,
+            assetIds: assetGroup.assets.map((item) => item.id),
+          });
+          educationIds.set(edu.key, savedEdu?.id ?? "");
+        }
+      }),
+    );
+
+    return educationIds;
+  }
+
   public async findOne(
     ctx: RequestContext,
     input: FindOneEducationInputSchema,

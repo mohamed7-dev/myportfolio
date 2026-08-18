@@ -36,7 +36,6 @@ export function CareerFormMainFields() {
           control={form.control}
           name={"slug"}
           label={"Career Slug"}
-          disabled={true}
           render={({ field }) => (
             <SlugInput
               {...field}

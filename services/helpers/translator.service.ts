@@ -1,4 +1,3 @@
-import "server-only";
 import { serverConfig } from "@/lib/config/server-config";
 import { DEFAULT_ENTITY_TRANSLATION_LANGUAGE_CODE } from "@/lib/constants";
 import type { LanguageCode } from "@/lib/dto/language-code";

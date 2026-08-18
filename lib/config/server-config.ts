@@ -1,7 +1,8 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: we do pre-check and throw errors*/
 import { LanguageCode } from "../dto/language-code";
 import { CloudinaryObjectStorage } from "./cloudinary-object-storage.strategy";
 import type { ObjectStorage } from "./object-storage-strategy.interface";
-import "server-only";
+import { UploadThingObjectStorage } from "./uploadthing-object-storage.strategy";
 
 interface ServerConfig {
   defaultLanguageCode: LanguageCode;
@@ -19,14 +20,20 @@ export const serverConfig: ServerConfig = {
   defaultLanguageCode: LanguageCode["en-US "],
   listQueryLimit: 100,
   asset: {
-    objectStorageStrategy: new CloudinaryObjectStorage(
-      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!,
-      process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!,
-      process.env.CLOUDINARY_API_SECRET!,
-    ),
+    objectStorageStrategy:
+      process.env.NODE_ENV === "development"
+        ? new UploadThingObjectStorage(
+            process.env.UPLOADTHING_TOKEN!,
+            process.env.APP_URL!,
+          )
+        : new CloudinaryObjectStorage(
+            process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!,
+            process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!,
+            process.env.CLOUDINARY_API_SECRET!,
+          ),
   },
   adminCredentials: {
-    username: process.env.ADMIN_USERNAME ?? "superadmin",
-    password: process.env.ADMIN_PASSWORD ?? "Youcanguessit@100",
+    username: process.env.ADMIN_USERNAME ?? "",
+    password: process.env.ADMIN_PASSWORD ?? "",
   },
 };

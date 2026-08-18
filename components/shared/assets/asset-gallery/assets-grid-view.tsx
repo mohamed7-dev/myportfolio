@@ -151,14 +151,16 @@ export function AssetNavigateAction({
 
 export function AssetThumbnail({ asset }: { asset: Asset }) {
   return (
-    <div className="relative aspect-square overflow-hidden bg-background">
+    <div className="h-60 bg-background">
       <AssetDisplay
         asset={asset}
         image={{
+          transform: {
+            preset: "small",
+            mode: "crop",
+          },
           loading: "eager",
-          fill: true,
-          sizes: "15vw",
-          className: "absolute size-full object-cover",
+          className: "size-full object-contain",
         }}
       />
     </div>

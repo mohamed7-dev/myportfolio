@@ -1,26 +1,30 @@
 "use client";
-import Image from "next/image";
+import { AppImage } from "@/components/shared/app-image";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { usePublicLayout } from "./public-layout-provider";
 
 export function AvatarDisplayDialog() {
   const ctx = usePublicLayout("AvatarDisplayDialog");
+
+  if (!ctx.profile.avatar) return null;
+
   return (
     <Dialog
       open={ctx.isAvatarOpen}
       onOpenChange={(open) => !open && ctx.closeAvatar()}
     >
-      <DialogContent showCloseButton={false} className="p-0">
-        <div className="w-full h-112 relative">
-          <Image
-            src={ctx.profile.avatar?.sourceIdentifier ?? ""}
-            alt={ctx.profile.displayName}
-            className="size-full object-fill"
-            sizes="28rem"
-            fill
-            priority
+      <DialogContent
+        showCloseButton={false}
+        className="p-0 shadow-none border-0 max-w-[80vw] max-h-[80vh]"
+      >
+        {ctx.profile.avatar && (
+          <AppImage
+            asset={ctx.profile.avatar}
+            transform={{
+              preset: "full",
+            }}
           />
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );

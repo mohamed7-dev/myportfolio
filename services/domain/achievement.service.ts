@@ -1,9 +1,5 @@
-import "server-only";
-import type { RequestContext } from "@/api/request-context/request-context";
-import { listQueryBuilder } from "../helpers/list-query-builder.service";
-import { translator } from "../helpers/translator.service";
-import "server-only";
 import { type FindOptionsRelations, In } from "typeorm";
+import type { RequestContext } from "@/api/request-context/request-context";
 import type {
   AchievementListInputSchema,
   CreateAchievementInputSchema,
@@ -19,7 +15,11 @@ import { AchievementTranslation } from "@/orm/entities/achievement/achievement-t
 import type { AppEntity } from "@/orm/entities/app-entity";
 import type { Career } from "@/orm/entities/career/career.entity";
 import { ormService } from "@/orm/orm.service";
+import { achievementsSeed } from "@/orm/seed/achievements";
+import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
+import { listQueryBuilder } from "../helpers/list-query-builder.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
+import { translator } from "../helpers/translator.service";
 import { assetService } from "./asset.service";
 
 export interface EntityWithAchievement extends AppEntity {
@@ -31,6 +31,30 @@ export interface EntityAchievementInput {
 }
 
 class AchievementService {
+  /**@internal */
+  public async seedAchievements(
+    ctx: RequestContext,
+    assets: Map<string, SeededAssetGroup>,
+  ): Promise<Map<string, string>> {
+    const achievementIds = new Map<string, string>();
+
+    await Promise.all(
+      achievementsSeed.map(async (achievement) => {
+        const assetGroup = assets.get(achievement.key);
+        if (assetGroup?.featuredAsset.id) {
+          const savedAchievement = await achievementService.create(ctx, {
+            ...achievement,
+            featuredAssetId: assetGroup?.featuredAsset.id,
+            assetIds: assetGroup.assets.map((item) => item.id),
+          });
+          achievementIds.set(achievement.key, savedAchievement?.id ?? "");
+        }
+      }),
+    );
+
+    return achievementIds;
+  }
+
   public async findOne(
     ctx: RequestContext,
     input: FindOneAchievementInputSchema,

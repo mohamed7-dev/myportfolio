@@ -17,12 +17,17 @@ export const { POST } = createRouter({
         { uploadSessionId: id },
         commitUploadSessionInputSchema,
       );
-      const result = await assetService.completeAssetUpload(ctx, parsedInput);
-      const parsedResult = validateOutput(
-        result,
-        commitUploadSessionOutputSchema,
-      );
-      return NextResponse.json(parsedResult);
+      try {
+        const result = await assetService.completeAssetUpload(ctx, parsedInput);
+        const parsedResult = validateOutput(
+          result,
+          commitUploadSessionOutputSchema,
+        );
+        return NextResponse.json(parsedResult);
+      } catch (error) {
+        console.log(error);
+        return NextResponse.json(error);
+      }
     },
   },
 });

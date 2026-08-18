@@ -1,7 +1,5 @@
+import type { FindOptionsRelations } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
-import { listQueryBuilder } from "../helpers/list-query-builder.service";
-import { translator } from "../helpers/translator.service";
-import "server-only";
 import type { DeletionResponse } from "@/lib/dto/common";
 import type {
   ContactMethodListInputSchema,
@@ -14,12 +12,38 @@ import { EntityNotFoundError } from "@/lib/errors/errors";
 import { ContactMethod } from "@/orm/entities/contact-method/contact-method.entity";
 import { ContactMethodTranslation } from "@/orm/entities/contact-method/contact-method-translation.entity";
 import { ormService } from "@/orm/orm.service";
+import { contactMethodsSeed } from "@/orm/seed/contact-methods";
+import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
+import { listQueryBuilder } from "../helpers/list-query-builder.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
+import { translator } from "../helpers/translator.service";
 import { assetService } from "./asset.service";
-import "server-only";
-import type { FindOptionsRelations } from "typeorm";
 
 class ContactMethodService {
+  /**@internal */
+  public async seedContactMethods(
+    ctx: RequestContext,
+    assets: Map<string, SeededAssetGroup>,
+  ): Promise<Map<string, string>> {
+    const contactMethodIds = new Map<string, string>();
+
+    await Promise.all(
+      contactMethodsSeed.map(async (cm) => {
+        const assetGroup = assets.get(cm.key);
+        if (assetGroup?.featuredAsset.id) {
+          const savedContactMethod = await contactMethodService.create(ctx, {
+            ...cm,
+            featuredAssetId: assetGroup?.featuredAsset.id,
+            assetIds: assetGroup.assets.map((item) => item.id),
+          });
+          contactMethodIds.set(cm.key, savedContactMethod?.id ?? "");
+        }
+      }),
+    );
+
+    return contactMethodIds;
+  }
+
   public async findOne(
     ctx: RequestContext,
     input: FindOneContactMethodInputSchema,

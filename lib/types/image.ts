@@ -1,7 +1,11 @@
 export interface AssetLike {
   id: string;
   previewIdentifier: string;
+  sourceIdentifier: string;
   name?: string | null;
+  width?: number;
+  height?: number;
+  mimetype?: string;
 }
 
 export type ImagePreset =

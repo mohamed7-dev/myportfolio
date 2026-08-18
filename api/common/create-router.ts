@@ -1,11 +1,10 @@
 import type { NextRequest, NextResponse } from "next/server";
 import { authorize } from "@/lib/helpers/authorize";
+import type { NextCtx } from "@/lib/types/shared-types";
 import { ormService } from "@/orm/orm.service";
 import { transactionManager } from "@/orm/transaction-manager";
 import { requestContextService } from "@/services/helpers/request-context.service";
 import type { RequestContext } from "../request-context/request-context";
-import "server-only";
-import type { NextCtx } from "@/lib/types/shared-types";
 
 type RouteHandler<TCtx = unknown> = (
   req: NextRequest,

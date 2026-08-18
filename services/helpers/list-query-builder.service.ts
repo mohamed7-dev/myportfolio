@@ -1,4 +1,3 @@
-import "server-only";
 import {
   Brackets,
   type FindOptionsRelations,

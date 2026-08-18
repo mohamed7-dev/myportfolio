@@ -1,4 +1,3 @@
-import "server-only";
 import type { RequestContext } from "@/api/request-context/request-context";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type {

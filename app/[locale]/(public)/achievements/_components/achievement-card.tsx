@@ -57,12 +57,15 @@ export function AchievementCard({
       <div className="w-full overflow-hidden">
         <MediaGallery
           entityAssets={achievement.assets}
-          staticImageProps={{ transform: { preset: "thumb", mode: "resize" } }}
+          staticImageProps={{
+            transform: { preset: "thumb", mode: "resize" },
+            className: "size-full object-cover",
+          }}
         />
       </div>
       <div className="space-y-2 mt-4">
         <h4 className="capitalize text-sm font-heading">{achievement.name}</h4>
-        <Separator />
+        {/* <Separator /> */}
         <div className="flex items-center gap-2">
           <Badge variant={"neutral"}>{achievement.organization}</Badge>
           <Badge variant={"neutral"}>

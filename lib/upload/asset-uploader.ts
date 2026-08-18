@@ -34,22 +34,25 @@ export class AssetUploader {
       },
     });
     try {
-      // 2. upload source
-      await uploadFile({
-        file: input.source,
-        request: session.source.upload,
-        signal: input.signal,
-        onProgress: input.onSourceProgress,
+      return await Promise.all([
+        // 2. upload source
+        uploadFile({
+          file: input.source,
+          request: session.source.upload,
+          signal: input.signal,
+          onProgress: input.onSourceProgress,
+        }),
+        // 3. upload preview
+        uploadFile({
+          file: input.preview,
+          request: session.preview.upload,
+          signal: input.signal,
+          onProgress: input.onPreviewProgress,
+        }),
+      ]).then(async () => {
+        // 4. complete session
+        return await this.completeAssetUpload(session.uploadId);
       });
-      // 3. upload preview
-      await uploadFile({
-        file: input.preview,
-        request: session.preview.upload,
-        signal: input.signal,
-        onProgress: input.onPreviewProgress,
-      });
-      // 4. complete session
-      return await this.completeAssetUpload(session.uploadId);
     } catch (error) {
       // Best-effort compensation.
       try {

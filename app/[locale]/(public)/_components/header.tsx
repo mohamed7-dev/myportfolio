@@ -2,10 +2,16 @@
 import { useTranslations } from "next-intl";
 import { usePublicLayout } from "@/components/app-layout/public-layout/public-layout-provider";
 import { AppImage } from "@/components/shared/app-image";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import type { GetFeaturedSkillsOutputSchema } from "@/lib/dto/visitor";
 
-export function HomePageHeader({ children }: { children: React.ReactNode }) {
+export function HomePageHeader({
+  skills,
+}: {
+  skills: GetFeaturedSkillsOutputSchema["items"];
+}) {
   const i18n = useTranslations("home");
   const ctx = usePublicLayout("HomePageHeader");
 
@@ -19,13 +25,11 @@ export function HomePageHeader({ children }: { children: React.ReactNode }) {
 
   return (
     <div>
-      <div className="overflow-hidden w-full bg-background relative">
+      <div className="overflow-hidden w-full bg-background relative h-60">
         <AppImage
           asset={randomCover?.asset}
-          width={randomCover?.asset.width ?? 900}
-          height={200}
-          transform={{ mode: "resize" }}
-          className="object-cover aspect-video"
+          transform={{ preset: "full", mode: "resize" }}
+          className="size-full object-cover"
         />
       </div>
       <div className="px-8 flex justify-between items-end relative -mt-16 z-10">
@@ -33,7 +37,8 @@ export function HomePageHeader({ children }: { children: React.ReactNode }) {
           <AppImage
             asset={ctx.profile.avatar ?? undefined}
             transform={{ preset: "thumb", mode: "resize" }}
-            className="rounded-base grayscale-20 hover:grayscale-0 transition-all duration-500"
+            loading="eager"
+            className="size-32 object-cover rounded-base grayscale-20 hover:grayscale-0 transition-all duration-500"
           />
         </div>
         <div className="mb-4 flex gap-3">
@@ -53,7 +58,13 @@ export function HomePageHeader({ children }: { children: React.ReactNode }) {
         <p className="text-sm font-base text-foreground mt-4 max-w-2xl">
           {ctx.profile.subHeading}
         </p>
-        {children}
+        <div className="flex gap-2 mt-4 flex-wrap">
+          {skills?.map((skill) => (
+            <Badge variant="neutral" key={skill.id}>
+              {skill.name}
+            </Badge>
+          ))}
+        </div>
       </div>
     </div>
   );

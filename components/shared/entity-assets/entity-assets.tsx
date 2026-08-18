@@ -46,7 +46,6 @@ export function EntityAssets(props: EntityAssetsProps) {
   const [featuredAsset, setFeaturedAsset] = React.useState<
     Asset | undefined | null
   >(initialFeaturedAsset);
-  const [previewAsset, setPreviewAsset] = React.useState<Asset | null>(null);
   const [isAssetPickerOpen, setIsAssetPickerOpen] = React.useState(false);
 
   const sensors = useSensors(
@@ -177,7 +176,6 @@ export function EntityAssets(props: EntityAssetsProps) {
             featuredAsset={featuredAsset}
             compact={compact}
             onSelectAssets={handleSelectAssets}
-            onPreviewAsset={setPreviewAsset}
           />
           <AssetList
             assets={assets}
@@ -185,7 +183,6 @@ export function EntityAssets(props: EntityAssetsProps) {
             sensors={sensors}
             updatePermissions={updatePermissions}
             isFeatured={isFeatured}
-            onPreview={setPreviewAsset}
             onSetAsFeatured={handleSetAsFeatured}
             onRemove={handleRemoveAsset}
             onDragEnd={handleDragEnd}
@@ -198,7 +195,6 @@ export function EntityAssets(props: EntityAssetsProps) {
             featuredAsset={featuredAsset}
             compact={compact}
             onSelectAssets={handleSelectAssets}
-            onPreviewAsset={setPreviewAsset}
           />
           <div className="flex flex-col gap-4">
             <AssetList
@@ -207,7 +203,6 @@ export function EntityAssets(props: EntityAssetsProps) {
               sensors={sensors}
               updatePermissions={updatePermissions}
               isFeatured={isFeatured}
-              onPreview={setPreviewAsset}
               onSetAsFeatured={handleSetAsFeatured}
               onRemove={handleRemoveAsset}
               onDragEnd={handleDragEnd}

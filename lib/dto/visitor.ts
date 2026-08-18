@@ -76,21 +76,24 @@ export const getSkillsOutputSchema =
 export type GetSkillsOutputSchema = z.infer<typeof getSkillsOutputSchema>;
 
 // ################### Projects ############################
-const publicProjectInList = project.pick({
-  id: true,
-  liveDemoUrl: true,
-  repoUrl: true,
-  finished: true,
-  featured: true,
-  languageCode: true,
-  name: true,
-  slug: true,
-  description: true,
-  featuredAsset: true,
-  career: true,
-  education: true,
-  // skills: true, // TODO: uncomment once all projects have the required skills
-});
+const publicProjectInList = project
+  .pick({
+    id: true,
+    liveDemoUrl: true,
+    repoUrl: true,
+    finished: true,
+    featured: true,
+    languageCode: true,
+    name: true,
+    slug: true,
+    description: true,
+    featuredAsset: true,
+    career: true,
+    education: true,
+  })
+  .extend({
+    skills: z.array(skill.pick({ id: true, name: true, slug: true })),
+  });
 
 export const getPublicProjectsOutputSchema =
   createPaginatedListOutputSchema(publicProjectInList);
@@ -205,4 +208,51 @@ export const getPublicAchievementsOutputSchema =
 
 export type GetPublicAchievementsOutputSchema = z.infer<
   typeof getPublicAchievementsOutputSchema
+>;
+
+// ################### Career ############################
+const publicCareerInList = career.pick({
+  id: true,
+  name: true,
+  slug: true,
+  location: true,
+  organization: true,
+  responsibilities: true,
+  learned: true,
+  impact: true,
+  featuredAsset: true,
+  type: true,
+  mode: true,
+  startDate: true,
+  endDate: true,
+  isPresent: true,
+});
+
+export const getPublicCareerOutputSchema =
+  createPaginatedListOutputSchema(publicCareerInList);
+
+export type GetPublicCareerOutputSchema = z.infer<
+  typeof getPublicCareerOutputSchema
+>;
+
+// ################### Education ############################
+const publicEducationInList = education.pick({
+  id: true,
+  school: true,
+  slug: true,
+  location: true,
+  degree: true,
+  featuredAsset: true,
+  startDate: true,
+  endDate: true,
+  isPresent: true,
+  assets: true,
+});
+
+export const getPublicEducationOutputSchema = createPaginatedListOutputSchema(
+  publicEducationInList,
+);
+
+export type GetPublicEducationOutputSchema = z.infer<
+  typeof getPublicEducationOutputSchema
 >;

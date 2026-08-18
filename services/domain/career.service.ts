@@ -1,3 +1,4 @@
+import type { FindOptionsRelations } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
 import type {
   CareerListInputSchema,
@@ -6,21 +7,21 @@ import type {
   FindOneCareerInputSchema,
   UpdateCareerInputSchema,
 } from "@/lib/dto/career";
+import type { DeletionResponse } from "@/lib/dto/common";
+import { EntityNotFoundError } from "@/lib/errors/errors";
+import type { AppEntity } from "@/orm/entities/app-entity";
 import { Career } from "@/orm/entities/career/career.entity";
+import { CareerTranslation } from "@/orm/entities/career/career.translation";
+import { ormService } from "@/orm/orm.service";
+import { careersSeed } from "@/orm/seed/careers";
+import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
 import {
   convertDate,
   listQueryBuilder,
 } from "../helpers/list-query-builder.service";
-import { translator } from "../helpers/translator.service";
-import "server-only";
-import type { FindOptionsRelations } from "typeorm";
-import type { DeletionResponse } from "@/lib/dto/common";
-import { EntityNotFoundError } from "@/lib/errors/errors";
-import type { AppEntity } from "@/orm/entities/app-entity";
-import { CareerTranslation } from "@/orm/entities/career/career.translation";
-import { ormService } from "@/orm/orm.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
+import { translator } from "../helpers/translator.service";
 import { achievementService } from "./achievement.service";
 import { assetService } from "./asset.service";
 
@@ -33,6 +34,30 @@ export interface EntityCareerInput {
 }
 
 class CareerService {
+  /**@internal */
+  public async seedCareers(
+    ctx: RequestContext,
+    assets: Map<string, SeededAssetGroup>,
+  ): Promise<Map<string, string>> {
+    const careerIds = new Map<string, string>();
+
+    await Promise.all(
+      careersSeed.map(async (career) => {
+        const assetGroup = assets.get(career.key);
+        if (assetGroup?.featuredAsset.id) {
+          const savedCareer = await careerService.create(ctx, {
+            ...career,
+            featuredAssetId: assetGroup?.featuredAsset.id,
+            assetIds: assetGroup.assets.map((item) => item.id),
+          });
+          careerIds.set(career.key, savedCareer?.id ?? "");
+        }
+      }),
+    );
+
+    return careerIds;
+  }
+
   public async findOne(
     ctx: RequestContext,
     input: FindOneCareerInputSchema,

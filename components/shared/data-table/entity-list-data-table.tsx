@@ -122,14 +122,12 @@ export function EntityListDataTable<
                 ) {
                   return (
                     <AssetDisplay
-                      containerClassName={`relative h-[6rem] max-w-[10rem] aspect-video`}
+                      containerClassName={`h-40 max-w-80`}
                       asset={info.row.original.featuredAsset}
                       image={{
-                        fill: true,
-                        sizes: "10vw",
+                        transform: { preset: "small", mode: "resize" },
                         loading: "eager",
-                        className:
-                          "absolute size-full rounded-base object-contain",
+                        className: "size-full rounded-base object-contain",
                       }}
                     />
                   );

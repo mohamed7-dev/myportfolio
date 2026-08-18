@@ -3,6 +3,9 @@
     "en": "english",
     "ar": "arabic"
   },
+  "loading": "Loading",
+  "present": "Present",
+  "featured": "Featured",
   "home": {
     "location": "Based in {location}",
     "cv": "Download CV",
@@ -110,6 +113,30 @@
     },
     "verifyCredentialsLabel": "Verify Credentials",
     "issuedAt": "Issued at"
+  },
+  "career": {
+    "title": "Professional Odyssey",
+    "description": "A chronological map of my engineering career, highlighting architectural transitions, technical leadership, and system-scale impact across various technology ecosystems.",
+    "careerCard": {
+      "impact": "Technical Impact",
+      "learned": "What I Learned"
+    },
+    "educationBlock": {
+      "title": "Education"
+    },
+    "careerType": {
+      "fullTime": "full time",
+      "partTime": "part time",
+      "freelance": "freelance",
+      "internship": "internship",
+      "training": "training",
+      "contract": "contract",
+      "openSource": "open source contribution"
+    },
+    "careerMode": {
+      "onSite": "on site",
+      "remote": "remote"
+    }
   },
   "publicLayout": {
     "copyright": "All rights reserved.",

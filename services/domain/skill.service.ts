@@ -1,3 +1,6 @@
+import { type FindOptionsRelations, In } from "typeorm";
+import type { RequestContext } from "@/api/request-context/request-context";
+import type { DeletionResponse } from "@/lib/dto/common";
 import type {
   CreateSkillInputSchema,
   DeleteSkillsInputSchema,
@@ -5,15 +8,13 @@ import type {
   SkillListInputSchema,
   UpdateSkillInputSchema,
 } from "@/lib/dto/skill";
-import "server-only";
-import { type FindOptionsRelations, In } from "typeorm";
-import type { RequestContext } from "@/api/request-context/request-context";
-import type { DeletionResponse } from "@/lib/dto/common";
 import { EntityNotFoundError } from "@/lib/errors/errors";
 import type { AppEntity } from "@/orm/entities/app-entity";
 import { Skill } from "@/orm/entities/skill/skill.entity";
 import { SkillTranslation } from "@/orm/entities/skill/skill-translation.entity";
 import { ormService } from "@/orm/orm.service";
+import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
+import { skillsSeed } from "@/orm/seed/skills";
 import { listQueryBuilder } from "../helpers/list-query-builder.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
@@ -29,6 +30,30 @@ export interface EntitySkillInput {
 }
 
 export class SkillService {
+  /**@internal */
+  public async seedSkills(
+    ctx: RequestContext,
+    assets: Map<string, SeededAssetGroup>,
+  ): Promise<Map<string, string>> {
+    const skillIds = new Map<string, string>();
+
+    await Promise.all(
+      skillsSeed.map(async (skill) => {
+        const assetGroup = assets.get(skill.key);
+        if (assetGroup?.featuredAsset.id) {
+          const savedSkill = await skillService.create(ctx, {
+            ...skill,
+            featuredAssetId: assetGroup?.featuredAsset.id,
+            assetIds: assetGroup.assets.map((item) => item.id),
+          });
+          skillIds.set(skill.key, savedSkill?.id ?? "");
+        }
+      }),
+    );
+
+    return skillIds;
+  }
+
   async findOne(
     ctx: RequestContext,
     input: FindOneSkillInputSchema,

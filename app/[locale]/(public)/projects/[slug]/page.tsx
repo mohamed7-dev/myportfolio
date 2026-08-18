@@ -93,11 +93,12 @@ export default async function ProjectPage({
                   {i18n("relations.career")}:
                 </h3>
                 <Button variant={"neutral"} size="sm" asChild>
-                  <Link href={`/career/${project.career.slug}#career`}>
+                  <Link href={`/career#${project.career.slug}`}>
                     {project.career.featuredAsset && (
                       <AppImage
                         asset={project.career.featuredAsset}
                         transform={{ preset: "icon", mode: "resize" }}
+                        className="size-4.5 object-cover"
                       />
                     )}
                     <span className="text-foreground/80">Built during: </span>
@@ -112,11 +113,12 @@ export default async function ProjectPage({
                   {i18n("relations.education")}:
                 </h3>
                 <Button variant={"neutral"} size="sm" asChild>
-                  <Link href={`/career/${project.education.slug}#education`}>
+                  <Link href={`/career#${project.education.slug}`}>
                     {project.education.featuredAsset && (
                       <AppImage
                         asset={project.education.featuredAsset}
                         transform={{ preset: "icon", mode: "resize" }}
+                        className="size-4.5 object-cover"
                       />
                     )}
                     <span className="text-foreground/80">
@@ -140,11 +142,12 @@ export default async function ProjectPage({
                       size="sm"
                       asChild
                     >
-                      <Link href={`/achievements/${achievement.slug}`}>
+                      <Link href={`/achievements#${achievement.slug}`}>
                         {achievement.featuredAsset && (
                           <AppImage
                             asset={achievement.featuredAsset}
                             transform={{ preset: "icon", mode: "resize" }}
+                            className="size-4.5 object-cover"
                           />
                         )}
                         <span>{achievement.name}</span>
