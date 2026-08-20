@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { In } from "typeorm";
+import { type FindOptionsRelations, In } from "typeorm";
 import { camelCase } from "typeorm/util/StringUtils.js";
 import type { RequestContext } from "@/api/request-context/request-context";
 import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
@@ -63,14 +63,33 @@ export interface EntityAssetInput {
 }
 
 class AssetService {
-  public async find(ctx: RequestContext, options: AssetListInputSchema) {
+  public async find(
+    ctx: RequestContext,
+    options: AssetListInputSchema,
+    relations?: FindOptionsRelations<Asset>,
+  ) {
     const qb = await listQueryBuilder.build(Asset, options, {
       ctx,
       alias: "asset",
       relations: {
         translations: true,
+        ...relations,
       },
     });
+    const tag = options?.tag;
+    if (tag?.length) {
+      const subquery = qb.dataSource
+        .createQueryBuilder()
+        .select("asset.id")
+        .from(Asset, "asset")
+        .leftJoin("asset.tags", "tags")
+        .where("tags.id = :tag");
+
+      qb.andWhere(`asset.id = (${subquery.getQuery()})`).setParameters({
+        tag,
+      });
+    }
+
     return await qb.getManyAndCount().then((result) => {
       return {
         items: result[0].flatMap((asset) =>

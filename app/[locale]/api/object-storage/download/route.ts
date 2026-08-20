@@ -59,6 +59,7 @@ export async function GET(req: NextRequest) {
   ) as ReadableStream;
 
   return new NextResponse(stream, {
+    status: 200,
     headers: {
       "Content-Type": meta.contentType,
       "Content-Disposition": `inline; filename="${location.key}"`,

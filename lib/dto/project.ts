@@ -3,6 +3,7 @@ import { achievement } from "./achievement";
 import { asset, entityAssetSchema } from "./asset";
 import { career } from "./career";
 import {
+  apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
@@ -97,7 +98,7 @@ export const createProjectInputSchema = z.object({
 
 export type CreateProjectInputSchema = z.infer<typeof createProjectInputSchema>;
 
-export const createProjectOutputSchema = project;
+export const createProjectOutputSchema = z.union([project, apiErrorSchema]);
 
 export type CreateProjectOutputSchema = z.infer<
   typeof createProjectOutputSchema
@@ -129,16 +130,19 @@ export const updateProjectInputSchema = z.object({
 
 export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;
 
-export const updateProjectOutputSchema = project.extend({
-  skills: z.array(
-    skill.pick({
-      id: true,
-      name: true,
-      slug: true,
-      featuredAsset: true,
-    }),
-  ),
-});
+export const updateProjectOutputSchema = z.union([
+  project.extend({
+    skills: z.array(
+      skill.pick({
+        id: true,
+        name: true,
+        slug: true,
+        featuredAsset: true,
+      }),
+    ),
+  }),
+  apiErrorSchema,
+]);
 
 export type UpdateProjectOutputSchema = z.infer<
   typeof updateProjectOutputSchema
@@ -152,7 +156,10 @@ export type SoftDeleteProjectsInputSchema = z.infer<
   typeof softDeleteProjectsInputSchema
 >;
 
-export const softDeleteProjectsOutputSchema = z.array(deletionResponseSchema);
+export const softDeleteProjectsOutputSchema = z.union([
+  z.array(deletionResponseSchema),
+  apiErrorSchema,
+]);
 
 export type SoftDeleteProjectsOutputSchema = z.infer<
   typeof softDeleteProjectsOutputSchema
@@ -162,7 +169,10 @@ export const deleteProjectInputSchema = inputIdSchema;
 
 export type DeleteProjectInputSchema = z.infer<typeof deleteProjectInputSchema>;
 
-export const deleteProjectOutputSchema = deletionResponseSchema;
+export const deleteProjectOutputSchema = z.union([
+  deletionResponseSchema,
+  apiErrorSchema,
+]);
 
 export type DeleteProjectOutputSchema = z.infer<
   typeof deleteProjectOutputSchema

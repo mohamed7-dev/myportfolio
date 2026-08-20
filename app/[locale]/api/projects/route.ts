@@ -24,7 +24,7 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, createProjectOutputSchema);
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 201 });
     },
   },
   PATCH: {
@@ -38,7 +38,7 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, updateProjectOutputSchema);
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
   DELETE: {
@@ -55,7 +55,7 @@ export const { POST, PATCH, DELETE } = createRouter({
         softDeleteProjectsOutputSchema,
       );
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
 });

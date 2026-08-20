@@ -19,7 +19,7 @@ export default async function ProjectsPage({
 }: {
   searchParams: Promise<{
     pageSize: string;
-    skip: string;
+    page: string;
     includeSoftDeleted: string;
     name: string;
     enabled: string;
@@ -28,8 +28,8 @@ export default async function ProjectsPage({
   }>;
 }) {
   const {
-    skip,
-    pageSize,
+    page = 1,
+    pageSize = 24,
     includeSoftDeleted,
     name,
     enabled,
@@ -43,7 +43,7 @@ export default async function ProjectsPage({
 
   const result = await find({
     take: Number(pageSize),
-    skip: skip ? Number(skip) : undefined,
+    skip: (Number(page) - 1) * Number(pageSize),
     includeSoftDeleted: includeSoftDeleted === "true" ? true : false,
     filter: {
       name: {

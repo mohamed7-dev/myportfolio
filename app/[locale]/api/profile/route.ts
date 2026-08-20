@@ -17,7 +17,7 @@ export const { PATCH } = createRouter({
 
       const parsedOutput = validateOutput(result, clientSafeSchema);
 
-      return NextResponse.json(parsedOutput);
+      return NextResponse.json(parsedOutput, { status: 200 });
     },
   },
 });

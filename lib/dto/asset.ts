@@ -1,18 +1,24 @@
 import { z } from "@/lib/helpers/zod";
 import { objectStorageResourceTypeSchema } from "./asset-upload";
 import {
+  apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
   deletionResponseSchema,
+  entityNotFoundErrorSchema,
+  forbiddenErrorSchema,
   inputIdsSchema,
+  internalServerErrorSchema,
   stringFilterOperators,
+  unAuthorizedErrorSchema,
 } from "./common";
 import { languageCodeSchema } from "./language-code";
 import {
   createPaginatedListInputSchema,
   createPaginatedListOutputSchema,
 } from "./paginated-list";
+import { tag } from "./tag";
 
 const assetTranslationSchema = baseTranslationEntity.extend({
   name: z.string(),
@@ -28,13 +34,15 @@ export const asset = baseSchema.extend({
   fileSize: z.number(),
   sourceIdentifier: z.string(),
   previewIdentifier: z.string(),
-  tags: z.array(z.any()).nullish(), // TODO: change to tag schema
+  tags: z.array(tag).nullish(),
   translations: z.array(assetTranslationSchema),
 });
 
 export type Asset = z.infer<typeof asset>;
 
 // ################## Create ####################
+
+// Note: CreateAsset is not part of the api dto, it's now a step in the upload session
 const assetTranslationInputSchema = baseTranslationEntityInput.extend({
   name: z.string(),
 });
@@ -66,9 +74,31 @@ export const updateAssetInputSchema = z.object({
 });
 export type UpdateAssetInputSchema = z.infer<typeof updateAssetInputSchema>;
 
-export const updateAssetOutputSchema = asset;
+export const updateAssetOutputSchema = z.union([
+  asset,
+  unAuthorizedErrorSchema,
+  forbiddenErrorSchema,
+  internalServerErrorSchema,
+  entityNotFoundErrorSchema,
+]);
 
 export type UpdateAssetOutputSchema = z.infer<typeof updateAssetOutputSchema>;
+
+// ################## Delete ####################
+
+export const deleteAssetsInputSchema = inputIdsSchema;
+
+export type DeleteAssetsInputSchema = z.infer<typeof deleteAssetsInputSchema>;
+
+export const deleteAssetsOutputSchema = z.union([
+  z.array(deletionResponseSchema),
+  entityNotFoundErrorSchema,
+  unAuthorizedErrorSchema,
+  forbiddenErrorSchema,
+  internalServerErrorSchema,
+]);
+
+export type DeleteAssetsOutputSchema = z.infer<typeof deleteAssetsOutputSchema>;
 
 // ################## List ####################
 
@@ -82,19 +112,14 @@ export const assetListInputSchema = createPaginatedListInputSchema(
       type: stringFilterOperators,
     })
     .partial(),
-);
+)
+  .unwrap()
+  .extend({
+    tag: z.string().optional(),
+  })
+  .partial();
 
 export type AssetListInputSchema = z.infer<typeof assetListInputSchema>;
-
-// ################## Delete ####################
-
-export const deleteAssetsInputSchema = inputIdsSchema;
-
-export type DeleteAssetsInputSchema = z.infer<typeof deleteAssetsInputSchema>;
-
-export const deleteAssetsOutputSchema = z.array(deletionResponseSchema);
-
-export type DeleteAssetsOutputSchema = z.infer<typeof deleteAssetsOutputSchema>;
 
 //############################ Entity Asset ##########################
 export const entityAssetSchema = baseSchema.extend({
@@ -111,9 +136,12 @@ export const downloadAssetInputSchema = z.object({
 
 export type DownloadAssetInputSchema = z.infer<typeof downloadAssetInputSchema>;
 
-export const downloadAssetOutputSchema = z.object({
-  downloadUrl: z.string(),
-});
+export const downloadAssetOutputSchema = z.union([
+  z.object({
+    downloadUrl: z.string(),
+  }),
+  apiErrorSchema,
+]);
 
 export type DownloadAssetOutputSchema = z.infer<
   typeof downloadAssetOutputSchema

@@ -15,6 +15,7 @@ import { AssetPreview } from "./_components/asset-preview";
 import { DownloadButton } from "./_components/download-button";
 import { NameField } from "./_components/name-field";
 import { SubmitButton } from "./_components/submit-button";
+import { TagsField } from "./_components/tags-field";
 import { UpdateAssetForm } from "./_components/update-asset-form";
 
 export default async function AssetDetailPage({
@@ -53,7 +54,7 @@ export default async function AssetDetailPage({
             <NameField />
           </PageBlock>
           <PageBlock id="asset-tags" column="side">
-            <p>Tags</p>
+            <TagsField />
           </PageBlock>
         </PageLayout>
       </Page>

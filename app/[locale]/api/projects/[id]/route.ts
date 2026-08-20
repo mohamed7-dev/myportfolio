@@ -21,7 +21,7 @@ export const { DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, deleteProjectOutputSchema);
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
 });

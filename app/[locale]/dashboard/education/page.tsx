@@ -18,19 +18,19 @@ export default async function EducationListPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    pageSize?: string;
-    skip?: string;
-    school?: string;
-    location?: string;
-    degree?: string;
-    startDate?: string;
-    endDate?: string;
-    isPresent?: string;
+    pageSize: string;
+    page: string;
+    school: string;
+    location: string;
+    degree: string;
+    startDate: string;
+    endDate: string;
+    isPresent: string;
   }>;
 }) {
   const {
-    skip,
-    pageSize,
+    page = 1,
+    pageSize = 24,
     location,
     school,
     degree,
@@ -46,7 +46,7 @@ export default async function EducationListPage({
 
   const result = await find({
     take: Number(pageSize),
-    skip: skip ? Number(skip) : undefined,
+    skip: (Number(page) - 1) * Number(pageSize),
     filter: {
       ...(school && { school: { contains: school } }),
       ...(location && { location: { contains: location } }),

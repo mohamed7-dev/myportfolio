@@ -9,6 +9,9 @@ import type {
   DeleteEducationsOutputSchema,
   Education,
 } from "@/lib/dto/education";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function EducationDataTable({
   education,
@@ -21,13 +24,12 @@ export function EducationDataTable({
   const columnHelper = createColumnHelper<Education>();
 
   const deleteEducation = async (input: DeleteEducationsInputSchema) => {
-    const res = await fetch("/api/education", {
-      method: "DELETE",
-      credentials: "include",
-      body: JSON.stringify(input),
-    });
+    const res = await api(apiRoutes.education.delete, input, true);
 
     const data = (await res.json()) as DeleteEducationsOutputSchema;
+    if (isAppError(data)) {
+      throw data;
+    }
     return data;
   };
 

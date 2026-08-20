@@ -9,8 +9,8 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/domain/asset.service";
 
-export const { POST } = createRouter({
-  POST: {
+export const { PATCH } = createRouter({
+  PATCH: {
     authenticatedOnly: isDevelopmentMode() ? false : true,
     handler: async (_, nextCtx, ctx) => {
       const { id } = await nextCtx.params;
@@ -18,17 +18,12 @@ export const { POST } = createRouter({
         { uploadSessionId: id },
         commitUploadSessionInputSchema,
       );
-      try {
-        const result = await assetService.completeAssetUpload(ctx, parsedInput);
-        const parsedResult = validateOutput(
-          result,
-          commitUploadSessionOutputSchema,
-        );
-        return NextResponse.json(parsedResult);
-      } catch (error) {
-        console.log(error);
-        return NextResponse.json(error);
-      }
+      const result = await assetService.completeAssetUpload(ctx, parsedInput);
+      const parsedResult = validateOutput(
+        result,
+        commitUploadSessionOutputSchema,
+      );
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
 });

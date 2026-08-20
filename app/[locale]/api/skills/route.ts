@@ -24,7 +24,7 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, createSkillOutputSchema);
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 201 });
     },
   },
   PATCH: {
@@ -38,7 +38,7 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, updateSkillOutputSchema);
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
   DELETE: {
@@ -52,7 +52,7 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, deleteSkillsOutputSchema);
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
 });

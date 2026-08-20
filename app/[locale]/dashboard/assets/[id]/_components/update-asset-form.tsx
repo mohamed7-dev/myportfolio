@@ -10,7 +10,10 @@ import {
   type UpdateAssetOutputSchema,
   updateAssetInputSchema,
 } from "@/lib/dto/asset";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
 import { Form } from "@/lib/helpers/form";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function UpdateAssetForm({
   children,
@@ -22,7 +25,7 @@ export function UpdateAssetForm({
   const form = useForm<UpdateAssetInputSchema>({
     defaultValues: {
       id: asset.id,
-      tags: asset.tags ?? [],
+      tags: asset.tags?.map((t) => t.value) ?? [],
       translations: asset.translations,
     },
     resolver: zodResolver(updateAssetInputSchema),
@@ -31,20 +34,18 @@ export function UpdateAssetForm({
   const { mutate } = useMutation({
     mutationKey: ["update-asset"],
     mutationFn: async (input: UpdateAssetInputSchema) => {
-      const res = await fetch("/api/assets", {
-        method: "PATCH",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.assets.update, input, true);
       const data = (await res.json()) as UpdateAssetOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Asset was updated successfully");
     },
-    onError: () => {
-      toast.success("Something went wrong while updating the asset");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

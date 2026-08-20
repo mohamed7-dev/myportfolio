@@ -1,0 +1,8 @@
+.public-layout,
+.public-layout * {
+  direction: inherit;
+}
+
+:root[dir="rtl"] {
+  --font-sans-variable: var(--font-ibm-plex-sans-ar);
+}

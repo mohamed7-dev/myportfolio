@@ -8,6 +8,9 @@ import type {
   DeleteContactMethodsInputSchema,
   DeleteContactMethodsOutputSchema,
 } from "@/lib/dto/contact-method";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function ContactMethodDataTable({
   contactMethods,
@@ -21,13 +24,12 @@ export function ContactMethodDataTable({
   const deleteContactMethods = async (
     input: DeleteContactMethodsInputSchema,
   ) => {
-    const res = await fetch("/api/contact-methods", {
-      method: "DELETE",
-      credentials: "include",
-      body: JSON.stringify(input),
-    });
+    const res = await api(apiRoutes.contactMethods.delete, input, true);
 
     const data = (await res.json()) as DeleteContactMethodsOutputSchema;
+    if (isAppError(data)) {
+      throw data;
+    }
     return data;
   };
 

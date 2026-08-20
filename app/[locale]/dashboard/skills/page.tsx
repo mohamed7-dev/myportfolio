@@ -19,12 +19,12 @@ export default async function SkillsListPage({
 }: {
   searchParams: Promise<{
     pageSize: string;
-    skip: string;
+    page: string;
     name: string;
     category: string;
   }>;
 }) {
-  const { skip, pageSize, name, category } = await searchParams;
+  const { page = 1, pageSize = 24, name, category } = await searchParams;
   const find = wrapService({
     authenticatedOnly: true,
     handler: skillService.find.bind(skillService),
@@ -32,13 +32,13 @@ export default async function SkillsListPage({
 
   const result = await find({
     take: Number(pageSize),
-    skip: skip ? Number(skip) : undefined,
+    skip: (Number(page) - 1) * Number(pageSize),
     filter: {
       name: {
         contains: name,
       },
       category: {
-        equals: category as any,
+        equals: category,
       },
     },
   });

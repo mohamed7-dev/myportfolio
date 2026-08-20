@@ -21,11 +21,13 @@ import {
 } from "@/components/ui/sidebar";
 import type { LogoutOutputSchema } from "@/lib/dto/auth";
 import type { ClientSafeProfile } from "@/lib/dto/profile";
-import type { AppError } from "@/lib/errors/app-error";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
 import {
   getUserInfoFromLS,
   removeUserInfoFromLS,
 } from "@/lib/helpers/auth-storage";
+import { apiRoutes } from "@/lib/helpers/router";
 import { AccentSwitcher } from "./accent-switcher";
 import { LanguageSwitcher } from "./language-switcher";
 
@@ -38,9 +40,12 @@ export function UserNavMenu() {
   >();
 
   const handleLogout = async () => {
-    await fetch("/api/auth", { method: "put", credentials: "include" })
+    await api(apiRoutes.auth.logoutAdmin, undefined, true)
       .then(async (res) => {
         const data = (await res.json()) as LogoutOutputSchema;
+        if (isAppError(data)) {
+          throw data;
+        }
         if (data.success) {
           removeUserInfoFromLS();
           toast.success("Logged out successfully");
@@ -51,7 +56,7 @@ export function UserNavMenu() {
         }
       })
       .catch((e) => {
-        toast.error(`Failure: ${(e as AppError).message}`);
+        toast.error(`Failure: ${(e as Error).message}`);
       });
   };
 

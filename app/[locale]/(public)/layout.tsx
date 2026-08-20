@@ -3,6 +3,7 @@ import { PublicLayout as PublicLayoutImpl } from "@/components/app-layout/public
 import { PublicLayoutProvider } from "@/components/app-layout/public-layout/public-layout-provider";
 import { routing } from "@/i18n/routing";
 import { visitorService } from "@/services/domain/visitor.service";
+import "./public.css";
 
 export function generateStaticParams() {
   return routing.locales.map((l) => ({ locale: l }));
@@ -18,7 +19,7 @@ export default async function PublicLayout({
   const profile = await getSuperAdminProfile();
   return (
     <PublicLayoutProvider profile={profile}>
-      <div className="min-h-screen bg-background text-foreground overflow-hidden">
+      <div className="public-layout min-h-screen bg-background text-foreground overflow-hidden">
         <PublicLayoutImpl>{children}</PublicLayoutImpl>
       </div>
     </PublicLayoutProvider>

@@ -4,6 +4,10 @@ import {
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
+  entityNotFoundErrorSchema,
+  forbiddenErrorSchema,
+  internalServerErrorSchema,
+  unAuthorizedErrorSchema,
 } from "./common";
 import { languageCodeSchema } from "./language-code";
 
@@ -57,27 +61,6 @@ const profileTranslationInputSchema = baseTranslationEntityInput.extend({
   currentFocus: z.string(),
 });
 
-// ######################## Update ############################
-
-export const updateProfileInputSchema = z.object({
-  id: z.string(),
-  handle: z.string().optional(),
-  projectsShipped: z.coerce.number().optional(),
-  openSourceContributions: z.coerce.number().optional(),
-  yearsOfExperience: z.coerce.number().optional(),
-  assetIds: z.array(z.string()).optional(),
-  featuredAssetId: z.string().optional(),
-  translations: z
-    .array(
-      profileTranslationInputSchema
-        .partial()
-        .extend({ languageCode: languageCodeSchema }),
-    )
-    .optional(),
-});
-
-export type UpdateProfileInputSchema = z.infer<typeof updateProfileInputSchema>;
-
 // ###################### ClientSafe #####################
 export const clientSafeSchema = z.object({
   id: z.string(),
@@ -101,3 +84,35 @@ export const clientSafeSchema = z.object({
 });
 
 export type ClientSafeProfile = z.infer<typeof clientSafeSchema>;
+
+// ######################## Update ############################
+
+export const updateProfileInputSchema = z.object({
+  id: z.string(),
+  handle: z.string().optional(),
+  projectsShipped: z.coerce.number().optional(),
+  openSourceContributions: z.coerce.number().optional(),
+  yearsOfExperience: z.coerce.number().optional(),
+  assetIds: z.array(z.string()).optional(),
+  featuredAssetId: z.string().optional(),
+  translations: z
+    .array(
+      profileTranslationInputSchema
+        .partial()
+        .extend({ languageCode: languageCodeSchema }),
+    )
+    .optional(),
+});
+
+export type UpdateProfileInputSchema = z.infer<typeof updateProfileInputSchema>;
+
+export const updateProfileOutputSchema = z.union([
+  clientSafeSchema,
+  entityNotFoundErrorSchema,
+  internalServerErrorSchema,
+  unAuthorizedErrorSchema,
+  forbiddenErrorSchema,
+]);
+export type UpdateProfileOutputSchema = z.infer<
+  typeof updateProfileOutputSchema
+>;

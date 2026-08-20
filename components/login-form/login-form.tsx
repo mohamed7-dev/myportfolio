@@ -1,14 +1,21 @@
 "use client";
-import { useForm } from "@tanstack/react-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import React from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
-import { useRouterUtils } from "@/hooks/use-router-utils";
 import { useRouter } from "@/i18n/navigation";
-import type { ClientSafeProfile } from "@/lib/dto/profile";
-import type { AppError } from "@/lib/errors/app-error";
+import {
+  type AuthenticateAdminUserInputSchema,
+  type AuthenticateAdminUserOutputSchema,
+  authenticateAdminUserInputSchema,
+} from "@/lib/dto/auth";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
 import { setUserInfoToLS } from "@/lib/helpers/auth-storage";
+import { Form } from "@/lib/helpers/form";
+import { apiRoutes } from "@/lib/helpers/router";
+import { FormField } from "../shared/form-field";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -17,42 +24,28 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
+import { Field, FieldGroup } from "../ui/field";
 import { Input } from "../ui/input";
-
-const formSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-});
-
-type LoginSchema = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const router = useRouter();
-  const { getApiHandlerUrl } = useRouterUtils();
   const [isVerifying, setIsVerifying] = React.useState(false);
-  const form = useForm({
+  const form = useForm<AuthenticateAdminUserInputSchema>({
     defaultValues: {
       username: "",
       password: "",
     },
-    validators: {
-      onSubmit: formSchema,
-    },
-    onSubmit: async ({ value }) => {
-      await onFormSubmit(value);
-    },
+    resolver: zodResolver(authenticateAdminUserInputSchema),
   });
 
-  const onFormSubmit = async (value: LoginSchema) => {
+  const onSubmit = async (values: AuthenticateAdminUserInputSchema) => {
     setIsVerifying(true);
-    await fetch(getApiHandlerUrl("auth"), {
-      method: "post",
-      body: JSON.stringify(value),
-      credentials: "include",
-    })
+    await api(apiRoutes.auth.authenticateAdmin, values, false)
       .then(async (result) => {
-        const data = (await result.json()) as ClientSafeProfile;
+        const data = (await result.json()) as AuthenticateAdminUserOutputSchema;
+        if (isAppError(data)) {
+          throw data;
+        }
         if (data.username) {
           setUserInfoToLS(data);
           toast.success("Authenticated successfully");
@@ -60,16 +53,11 @@ export function LoginForm() {
         }
       })
       .catch((e) => {
-        toast.error(`Failure: ${(e as AppError).message}`);
+        toast.error(`Failure: ${(e as Error).message}`);
       })
       .finally(() => {
         setIsVerifying(false);
       });
-  };
-
-  const onSubmit = (e: React.SubmitEvent) => {
-    e.preventDefault();
-    form.handleSubmit();
   };
 
   return (
@@ -80,61 +68,25 @@ export function LoginForm() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form id="login-form" onSubmit={onSubmit}>
-          <FieldGroup>
-            <form.Field
-              name="username"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>User Name</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      placeholder={"User name"}
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
-            <form.Field
-              name="password"
-              children={(field) => {
-                const isInvalid =
-                  field.state.meta.isTouched && !field.state.meta.isValid;
-                return (
-                  <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      type="password"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      placeholder={"Password"}
-                      autoComplete="off"
-                    />
-                    {isInvalid && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                );
-              }}
-            />
-          </FieldGroup>
-        </form>
+        <Form {...form}>
+          <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <FieldGroup>
+              <FormField
+                control={form.control}
+                name="username"
+                label="User Name"
+                render={({ field }) => <Input {...field} />}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                label="Password"
+                render={({ field }) => <Input {...field} type="password" />}
+              />
+            </FieldGroup>
+          </form>
+        </Form>
       </CardContent>
       <CardFooter>
         <Field orientation={"horizontal"}>

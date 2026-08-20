@@ -1,6 +1,7 @@
 import { z } from "@/lib/helpers/zod";
 import { asset, entityAssetSchema } from "./asset";
 import {
+  apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
@@ -57,7 +58,10 @@ export type CreateContactMethodInputSchema = z.infer<
   typeof createContactMethodInputSchema
 >;
 
-export const createContactMethodOutputSchema = contactMethod;
+export const createContactMethodOutputSchema = z.union([
+  contactMethod,
+  apiErrorSchema,
+]);
 
 export type CreateContactMethodOutputSchema = z.infer<
   typeof createContactMethodOutputSchema
@@ -88,7 +92,10 @@ export type UpdateContactMethodInputSchema = z.infer<
   typeof updateContactMethodInputSchema
 >;
 
-export const updateContactMethodOutputSchema = contactMethod;
+export const updateContactMethodOutputSchema = z.union([
+  contactMethod,
+  apiErrorSchema,
+]);
 
 export type UpdateContactMethodOutputSchema = z.infer<
   typeof updateContactMethodOutputSchema
@@ -102,7 +109,10 @@ export type DeleteContactMethodsInputSchema = z.infer<
   typeof deleteContactMethodsInputSchema
 >;
 
-export const deleteContactMethodsOutputSchema = z.array(deletionResponseSchema);
+export const deleteContactMethodsOutputSchema = z.union([
+  z.array(deletionResponseSchema),
+  apiErrorSchema,
+]);
 
 export type DeleteContactMethodsOutputSchema = z.infer<
   typeof deleteContactMethodsOutputSchema

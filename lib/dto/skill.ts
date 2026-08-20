@@ -1,6 +1,7 @@
 import { z } from "@/lib/helpers/zod";
 import { asset, entityAssetSchema } from "./asset";
 import {
+  apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
@@ -64,7 +65,7 @@ export const createSkillInputSchema = z.object({
 
 export type CreateSkillInputSchema = z.infer<typeof createSkillInputSchema>;
 
-export const createSkillOutputSchema = skill;
+export const createSkillOutputSchema = z.union([skill, apiErrorSchema]);
 
 export type CreateSkillOutputSchema = z.infer<typeof createSkillOutputSchema>;
 
@@ -86,7 +87,7 @@ export const updateSkillInputSchema = z.object({
 
 export type UpdateSkillInputSchema = z.infer<typeof updateSkillInputSchema>;
 
-export const updateSkillOutputSchema = skill;
+export const updateSkillOutputSchema = z.union([skill, apiErrorSchema]);
 
 export type UpdateSkillOutputSchema = z.infer<typeof updateSkillOutputSchema>;
 
@@ -113,7 +114,10 @@ export const deleteSkillsInputSchema = inputIdsSchema;
 
 export type DeleteSkillsInputSchema = z.infer<typeof deleteSkillsInputSchema>;
 
-export const deleteSkillsOutputSchema = z.array(deletionResponseSchema);
+export const deleteSkillsOutputSchema = z.union([
+  z.array(deletionResponseSchema),
+  apiErrorSchema,
+]);
 
 export type DeleteSkillsOutputSchema = z.infer<typeof deleteSkillsOutputSchema>;
 

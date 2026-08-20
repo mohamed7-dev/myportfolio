@@ -1,6 +1,7 @@
 import { z } from "@/lib/helpers/zod";
 import { asset, entityAssetSchema } from "./asset";
 import {
+  apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
@@ -61,6 +62,7 @@ export const career = baseSchema.extend({
   startDate: z.coerce.date(),
   endDate: z.coerce.date().nullish(),
   isPresent: z.boolean(),
+  isFeatured: z.boolean(),
   mode: careerModeSchema,
   type: careerTypeSchema,
   translations: z.array(careerTranslationSchema),
@@ -88,6 +90,7 @@ export const createCareerInputSchema = z.object({
   startDate: z.coerce.date(),
   endDate: z.coerce.date().nullish(),
   isPresent: z.boolean(),
+  isFeatured: z.boolean().optional(),
   type: careerTypeSchema,
   mode: careerModeSchema,
   achievementIds: z.array(z.string()).optional(),
@@ -95,7 +98,7 @@ export const createCareerInputSchema = z.object({
 
 export type CreateCareerInputSchema = z.infer<typeof createCareerInputSchema>;
 
-export const createCareerOutputSchema = career;
+export const createCareerOutputSchema = z.union([career, apiErrorSchema]);
 
 export type CreateCareerOutputSchema = z.infer<typeof createCareerOutputSchema>;
 
@@ -116,6 +119,7 @@ export const updateCareerInputSchema = z.object({
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().nullish().optional(),
   isPresent: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
   type: careerTypeSchema.optional(),
   mode: careerModeSchema.optional(),
   achievementIds: z.array(z.string()).optional(),
@@ -123,7 +127,7 @@ export const updateCareerInputSchema = z.object({
 
 export type UpdateCareerInputSchema = z.infer<typeof updateCareerInputSchema>;
 
-export const updateCareerOutputSchema = career;
+export const updateCareerOutputSchema = z.union([career, apiErrorSchema]);
 
 export type UpdateCareerOutputSchema = z.infer<typeof updateCareerOutputSchema>;
 
@@ -133,7 +137,10 @@ export const deleteCareersInputSchema = inputIdsSchema;
 
 export type DeleteCareersInputSchema = z.infer<typeof deleteCareersInputSchema>;
 
-export const deleteCareersOutputSchema = z.array(deletionResponseSchema);
+export const deleteCareersOutputSchema = z.union([
+  z.array(deletionResponseSchema),
+  apiErrorSchema,
+]);
 
 export type DeleteCareersOutputSchema = z.infer<
   typeof deleteCareersOutputSchema
@@ -149,6 +156,7 @@ export const careerListInputSchema = createPaginatedListInputSchema(
       startDate: dateTimeFilterOperators,
       endDate: dateTimeFilterOperators,
       isPresent: booleanFilterOperators,
+      isFeatured: booleanFilterOperators,
     })
     .partial(),
 );

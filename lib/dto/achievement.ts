@@ -1,6 +1,7 @@
 import { z } from "@/lib/helpers/zod";
 import { asset, entityAssetSchema } from "./asset";
 import {
+  apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
@@ -68,7 +69,10 @@ export type CreateAchievementInputSchema = z.infer<
   typeof createAchievementInputSchema
 >;
 
-export const createAchievementOutputSchema = achievement;
+export const createAchievementOutputSchema = z.union([
+  achievement,
+  apiErrorSchema,
+]);
 
 export type CreateAchievementOutputSchema = z.infer<
   typeof createAchievementOutputSchema
@@ -97,7 +101,10 @@ export type UpdateAchievementInputSchema = z.infer<
   typeof updateAchievementInputSchema
 >;
 
-export const updateAchievementOutputSchema = achievement;
+export const updateAchievementOutputSchema = z.union([
+  achievement,
+  apiErrorSchema,
+]);
 
 export type UpdateAchievementOutputSchema = z.infer<
   typeof updateAchievementOutputSchema
@@ -111,7 +118,10 @@ export type DeleteAchievementsInputSchema = z.infer<
   typeof deleteAchievementsInputSchema
 >;
 
-export const deleteAchievementsOutputSchema = z.array(deletionResponseSchema);
+export const deleteAchievementsOutputSchema = z.union([
+  z.array(deletionResponseSchema),
+  apiErrorSchema,
+]);
 
 export type DeleteAchievementsOutputSchema = z.infer<
   typeof deleteAchievementsOutputSchema

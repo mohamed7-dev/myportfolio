@@ -14,7 +14,10 @@ import {
   type UpdateContactMethodOutputSchema,
   updateContactMethodInputSchema,
 } from "@/lib/dto/contact-method";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
 import { Form } from "@/lib/helpers/form";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function ContactMethodForm({
   children,
@@ -57,42 +60,37 @@ export function ContactMethodForm({
   const { mutate: createContactMethod } = useMutation({
     mutationKey: ["create-contact-method"],
     mutationFn: async (input: CreateContactMethodInputSchema) => {
-      const res = await fetch("/api/contact-methods", {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.contactMethods.create, input, true);
       const data = (await res.json()) as CreateContactMethodOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Contact method was created successfully");
-      form.reset();
       router.refresh();
     },
-    onError: () => {
-      toast.success("Something went wrong while creating the contact method");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   const { mutate: updateContactMethod } = useMutation({
     mutationKey: ["update-contact-method"],
     mutationFn: async (input: UpdateContactMethodInputSchema) => {
-      const res = await fetch("/api/contact-methods", {
-        method: "PATCH",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.contactMethods.update, input, true);
       const data = (await res.json()) as UpdateContactMethodOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Contact method was updated successfully");
     },
-    onError: () => {
-      toast.success("Something went wrong while updating the contact method");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

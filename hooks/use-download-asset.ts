@@ -1,6 +1,9 @@
 import React from "react";
+import { toast } from "sonner";
 import type { DownloadAssetOutputSchema } from "@/lib/dto/asset";
-import { apiUrl } from "@/lib/helpers/router";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function useDownloadAsset() {
   const [isDownloading, setIsDownloading] = React.useState(false);
@@ -9,8 +12,13 @@ export function useDownloadAsset() {
     try {
       setIsDownloading(true);
 
-      const getDownloadUrlResponse = await fetch(
-        apiUrl(`assets/${id}/download`),
+      const getDownloadUrlResponse = await api(
+        {
+          ...apiRoutes.assets.getDownloadUrl,
+          url: apiRoutes.assets.getDownloadUrl.url(id),
+        },
+        undefined,
+        false,
       );
 
       if (!getDownloadUrlResponse.ok) {
@@ -19,6 +27,10 @@ export function useDownloadAsset() {
 
       const downloadUrlData =
         (await getDownloadUrlResponse.json()) as DownloadAssetOutputSchema;
+
+      if (isAppError(downloadUrlData)) {
+        throw downloadUrlData;
+      }
 
       const downloadRes = await fetch(downloadUrlData.downloadUrl);
 
@@ -36,6 +48,8 @@ export function useDownloadAsset() {
       a.click();
 
       URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      toast.error((error as Error).message);
     } finally {
       setIsDownloading(false);
     }

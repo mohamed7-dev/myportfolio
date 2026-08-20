@@ -3,11 +3,15 @@ import { EditIcon, LockIcon, RefreshCwIcon } from "lucide-react";
 import { useLocale } from "next-intl";
 import React from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import { useRouterUtils } from "@/hooks/use-router-utils";
 import type {
   SlugForEntityInputSchema,
   SlugForEntityOutputSchema,
 } from "@/lib/dto/slug";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
+import { apiRoutes } from "@/lib/helpers/router";
 import type { FormComponentProps } from "@/lib/types/form";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
@@ -20,22 +24,24 @@ async function generateSlug(input: {
   entityId?: string;
   url: string;
 }) {
-  const response = await fetch(input.url, {
-    method: "POST",
-    credentials: "include",
-    body: JSON.stringify({
+  const response = await api(
+    apiRoutes.slug.slugForEntity,
+    {
       entityName: input.entityName,
       fieldName: input.fieldName,
       inputValue: input.inputValue,
       entityId: input.entityId,
-    } satisfies SlugForEntityInputSchema),
-  });
+    } satisfies SlugForEntityInputSchema,
+    true,
+  );
 
-  if (!response.ok) {
-    throw new Error("Failed to generate slug");
+  const data = (await response.json()) as SlugForEntityOutputSchema;
+
+  if (isAppError(data)) {
+    toast.error(data.message);
   }
 
-  return (await response.json()) as SlugForEntityOutputSchema;
+  return data as string;
 }
 
 function resolveWatchFieldPath(

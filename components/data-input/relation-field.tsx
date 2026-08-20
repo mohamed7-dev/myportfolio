@@ -53,9 +53,9 @@ export function RelationField<Data extends Item>({
   const labels = data
     .filter((item) => selectedIds.includes(item.id))
     .map((item) => item.label);
-
-  const hasSelectedIds = selectedIds.filter(notNullOrUndefined).length > 0;
-
+  const hasSelectedIds =
+    selectedIds.filter((item) => notNullOrUndefined(item) && item.length > 0)
+      .length > 0;
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>

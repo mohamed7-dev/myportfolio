@@ -102,7 +102,9 @@ export default async function ProjectPage({
                         className="size-4.5 object-cover"
                       />
                     )}
-                    <span className="text-foreground/80">Built during: </span>
+                    <span className="text-foreground/80">
+                      {i18n("relations.careerMessage")}:{" "}
+                    </span>
                     <span>{project.career.name}</span>
                   </Link>
                 </Button>
@@ -123,7 +125,7 @@ export default async function ProjectPage({
                       />
                     )}
                     <span className="text-foreground/80">
-                      While studying in:
+                      {i18n("relations.educationMessage")}:{" "}
                     </span>
                     <span>{project.education.school}</span>
                   </Link>

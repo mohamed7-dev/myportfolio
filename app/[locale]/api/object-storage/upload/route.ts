@@ -50,5 +50,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true, key });
+  return NextResponse.json({ ok: true, key }, { status: 200 });
 }

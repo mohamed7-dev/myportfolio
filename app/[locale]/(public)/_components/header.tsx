@@ -29,6 +29,7 @@ export function HomePageHeader({
         <AppImage
           asset={randomCover?.asset}
           transform={{ preset: "full", mode: "resize" }}
+          loading="eager"
           className="size-full object-cover"
         />
       </div>
@@ -42,10 +43,12 @@ export function HomePageHeader({
           />
         </div>
         <div className="mb-4 flex gap-3">
-          <Button asChild>
+          <Button size="sm" asChild>
             <Link href={"/contact"}>{i18n("connect")}</Link>
           </Button>
-          <Button variant={"neutral"}>{i18n("cv")}</Button>
+          <Button size="sm" variant={"neutral"}>
+            {i18n("cv")}
+          </Button>
         </div>
       </div>
       <div className="px-8 mt-4">

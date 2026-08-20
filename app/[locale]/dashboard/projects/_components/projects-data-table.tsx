@@ -10,11 +10,15 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { useRouterUtils } from "@/hooks/use-router-utils";
-import type { DeletionResponse } from "@/lib/dto/common";
 import type {
+  DeleteProjectOutputSchema,
   ProjectListOutputSchema,
   SoftDeleteProjectsInputSchema,
+  SoftDeleteProjectsOutputSchema,
 } from "@/lib/dto/project";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function ProjectsDataTable({
   projects,
@@ -31,17 +35,24 @@ export function ProjectsDataTable({
   const deleteProjects = async (
     input: SoftDeleteProjectsInputSchema & { softDelete: boolean },
   ) => {
-    const res = await fetch(
-      input.softDelete ? "/api/projects" : `/api/projects/${input.ids[0]}`,
-      {
-        method: "DELETE",
-        credentials: "include",
-        body: input.softDelete ? JSON.stringify(input) : undefined,
-      },
+    const res = await api(
+      input.softDelete
+        ? apiRoutes.projects.softDelete
+        : ({
+            ...apiRoutes.projects.delete,
+            url: apiRoutes.projects.delete.url(input.ids[0]),
+          } as any),
+      (input.softDelete ? input : undefined) as any,
+      true,
     );
+    const data = (await res.json()) as
+      | SoftDeleteProjectsOutputSchema
+      | DeleteProjectOutputSchema;
 
-    const data = (await res.json()) as DeletionResponse[];
-    return data;
+    if (isAppError(data)) {
+      throw data;
+    }
+    return data as any;
   };
 
   const columns = React.useMemo(() => {

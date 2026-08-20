@@ -91,14 +91,6 @@ type SeededAssets = {
 
 type UploadedFile = {
   assetId: string;
-  // key: string;
-  // url: string;
-  // name: string;
-  // size: number;
-  // mimetype: string;
-  // type: ObjectStorageResourceType;
-  // width: number | null;
-  // height: number | null;
   hash: string;
 };
 

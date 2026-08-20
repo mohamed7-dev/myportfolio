@@ -1,6 +1,7 @@
 "use client";
 import { useFormContext } from "react-hook-form";
 import { FormField } from "@/components/shared/form-field";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FieldGroup } from "@/components/ui/field";
 import {
   Select,
@@ -62,6 +63,18 @@ export function CareerFormModeTypeFields() {
               ))}
             </SelectContent>
           </Select>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="isFeatured"
+        label="Is featured?"
+        render={({ field }) => (
+          <Checkbox
+            {...(field as any)}
+            checked={field.value}
+            onCheckedChange={field.onChange}
+          />
         )}
       />
     </FieldGroup>

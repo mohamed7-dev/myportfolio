@@ -8,15 +8,15 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { slugService } from "@/services/helpers/slug.service";
 
-export const { POST } = createRouter({
-  POST: {
+export const { PUT } = createRouter({
+  PUT: {
     authenticatedOnly: true,
     handler: async (req, _, ctx) => {
       const body = await req.json();
       const parsedInput = validateInput(body, slugForEntityInputSchema);
       const result = await slugService.slugForEntity(ctx, parsedInput);
       const parsedResult = validateOutput(result, slugForEntityOutputSchema);
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
 });

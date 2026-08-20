@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import "reflect-metadata";
+import { Analytics } from "@vercel/analytics/next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -11,15 +12,17 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { routing } from "@/i18n/routing";
 import { isRtl } from "@/lib/helpers/locale-utils";
+import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: "--font-ibm-plex-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const ibmPlexSansAr = IBM_Plex_Sans_Arabic({
+  variable: "--font-ibm-plex-sans-ar",
+  subsets: ["arabic", "latin"],
+  weight: ["200", "400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -43,12 +46,14 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={isRtl(locale) ? "rtl" : "ltr"}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={cn(
+        "h-full antialiased",
+        isRtl(locale) ? ibmPlexSansAr.variable : ibmPlexSans.variable,
+      )}
       suppressHydrationWarning
     >
-      {/* <head>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: to avoid FOUC
           dangerouslySetInnerHTML={{
             __html: `
               (() => {
@@ -62,15 +67,15 @@ export default async function RootLayout({
               })();
             `,
           }}
+          suppressHydrationWarning
         />
-      </head> */}
-      <body className="min-h-full flex flex-col">
         <Toaster />
         <QueryClientProvider>
           <I18nProvider locale={locale} messages={messages}>
             <TooltipProvider>{children}</TooltipProvider>
           </I18nProvider>
         </QueryClientProvider>
+        <Analytics />
       </body>
     </html>
   );

@@ -14,7 +14,7 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { careerService } from "@/services/domain/career.service";
 
-export const { POST, PATCH, DELETE, GET } = createRouter({
+export const { POST, PATCH, DELETE } = createRouter({
   POST: {
     authenticatedOnly: true,
     handler: async (req, _, ctx) => {
@@ -25,7 +25,7 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const parsedResult = validateOutput(result, createCareerOutputSchema);
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 201 });
     },
   },
   PATCH: {
@@ -39,7 +39,7 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const parsedResult = validateOutput(result, updateCareerOutputSchema);
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
   DELETE: {
@@ -53,28 +53,7 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const parsedResult = validateOutput(result, deleteCareersOutputSchema);
 
-      return NextResponse.json(parsedResult);
-    },
-  },
-  GET: {
-    authenticatedOnly: true,
-    handler: async (req, _, ctx) => {
-      const searchParams = Object.fromEntries(
-        req.nextUrl.searchParams.entries(),
-      );
-
-      // TODO: we need to find a way to make zod parse the JSON input before validation
-      const parsedSearchParams = validateInput(
-        "filter" in searchParams && searchParams.filter
-          ? { ...searchParams, filter: JSON.parse(searchParams.filter) }
-          : searchParams,
-        careerListInputSchema,
-      );
-      const result = await careerService.find(ctx, parsedSearchParams);
-
-      const parsedResult = validateOutput(result, careerListOutputSchema);
-
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
 });

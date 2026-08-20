@@ -9,6 +9,9 @@ import type {
   DeleteCareersInputSchema,
   DeleteCareersOutputSchema,
 } from "@/lib/dto/career";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function CareerDataTable({
   careers,
@@ -21,13 +24,11 @@ export function CareerDataTable({
   const columnHelper = createColumnHelper<Career>();
 
   const deleteCareers = async (input: DeleteCareersInputSchema) => {
-    const res = await fetch("/api/careers", {
-      method: "DELETE",
-      credentials: "include",
-      body: JSON.stringify(input),
-    });
-
+    const res = await api(apiRoutes.careers.delete, input, true);
     const data = (await res.json()) as DeleteCareersOutputSchema;
+    if (isAppError(data)) {
+      throw data;
+    }
     return data;
   };
 

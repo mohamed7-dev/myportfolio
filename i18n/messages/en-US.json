@@ -1,11 +1,17 @@
 {
-  "languages": {
-    "en": "english",
-    "ar": "arabic"
-  },
   "loading": "Loading",
   "present": "Present",
   "featured": "Featured",
+  "defaultNotFoundPage": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or may have been moved.",
+    "linkLabel": "Go home"
+  },
+  "defaultErrorPage": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Please try again.",
+    "actionLabel": "Try again"
+  },
   "home": {
     "location": "Based in {location}",
     "cv": "Download CV",
@@ -38,7 +44,13 @@
       "title": "The Architect Mindset"
     },
     "skills": {
-      "title": "The technical arsenal"
+      "title": "The technical arsenal",
+      "categories": {
+        "frontend": "front end",
+        "backend": "back end",
+        "tools": "tools",
+        "programmingLanguages": "programming languages"
+      }
     },
     "mediaGallery": {
       "title": "Media Gallery"
@@ -56,7 +68,9 @@
       "techStack": "Tech Stack",
       "career": "career",
       "education": "education",
-      "achievements": "achievements"
+      "achievements": "achievements",
+      "careerMessage": "Built during",
+      "educationMessage": "While studying in"
     },
     "summary": { "title": "Overview" },
     "features": { "title": "Features" },
@@ -99,6 +113,11 @@
         "content": {
           "label": "Content",
           "description": "Tell me about your project.."
+        },
+        "submit": {
+          "label": "Send a Message",
+          "emailSuccess": "Email sent successfully",
+          "emailError": "Something went wrong while sending the email. choose another contact method if possible"
         }
       }
     }

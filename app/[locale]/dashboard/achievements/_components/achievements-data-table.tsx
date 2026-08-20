@@ -8,6 +8,9 @@ import type {
   DeleteAchievementsInputSchema,
   DeleteAchievementsOutputSchema,
 } from "@/lib/dto/achievement";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function AchievementsDataTable({
   achievements,
@@ -19,13 +22,11 @@ export function AchievementsDataTable({
   const router = useRouter();
 
   const deleteAchievements = async (input: DeleteAchievementsInputSchema) => {
-    const res = await fetch("/api/achievements", {
-      method: "DELETE",
-      credentials: "include",
-      body: JSON.stringify(input),
-    });
-
+    const res = await api(apiRoutes.achievements.delete, input, true);
     const data = (await res.json()) as DeleteAchievementsOutputSchema;
+    if (isAppError(data)) {
+      throw data;
+    }
     return data;
   };
 

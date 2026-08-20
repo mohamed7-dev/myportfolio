@@ -1,10 +1,5 @@
 "use client";
-import {
-  BrainCircuitIcon,
-  Heading4Icon,
-  MapPinIcon,
-  ZapIcon,
-} from "lucide-react";
+import { BrainCircuitIcon, MapPinIcon, ZapIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { AppImage } from "@/components/shared/app-image";
 import { IconTile } from "@/components/shared/icon-tile";

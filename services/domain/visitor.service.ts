@@ -1,17 +1,20 @@
 import type { RequestContext } from "@/api/request-context/request-context";
 import {
   type GetPublicProjectInputSchema,
+  getFeaturedCareersOutputSchema,
   getFeaturedProjectsOutputSchema,
   getFeaturedSkillsOutputSchema,
   getPublicAchievementsOutputSchema,
   getPublicCareerOutputSchema,
   getPublicContactMethodsOutputSchema,
   getPublicEducationOutputSchema,
+  getPublicProjectInputSchema,
   getPublicProjectOutputSchema,
   getPublicProjectsOutputSchema,
   getSkillsOutputSchema,
   getSuperAdminProfileOutputSchema,
 } from "@/lib/dto/visitor";
+import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { achievementService } from "./achievement.service";
 import { careerService } from "./career.service";
@@ -48,6 +51,15 @@ class VisitorService {
     const result = validateOutput(projects, getFeaturedProjectsOutputSchema);
     return result;
   }
+  public async getFeaturedCareers(ctx: RequestContext) {
+    const careers = await careerService.find(ctx, {
+      take: 5,
+      filter: { isFeatured: { equals: true } },
+    });
+
+    const result = validateOutput(careers, getFeaturedCareersOutputSchema);
+    return result;
+  }
   public async getSkills(ctx: RequestContext) {
     const skills = await skillService.find(ctx, {});
 
@@ -73,12 +85,13 @@ class VisitorService {
     ctx: RequestContext,
     input: GetPublicProjectInputSchema,
   ) {
+    const parsedInput = validateInput(input, getPublicProjectInputSchema);
     const projects = await projectService.find(
       ctx,
       {
         take: 1,
         filter: {
-          slug: { equals: input.slug },
+          slug: { equals: parsedInput.slug },
           enabled: { equals: true },
         },
         includeSoftDeleted: false,
@@ -98,13 +111,15 @@ class VisitorService {
         },
       },
     );
-
     try {
-      const result = validateOutput(
-        projects.items?.[0],
-        getPublicProjectOutputSchema,
-      );
-      return result;
+      if (projects.items?.length) {
+        const result = validateOutput(
+          projects.items?.[0],
+          getPublicProjectOutputSchema,
+        );
+        return result;
+      }
+      return undefined;
     } catch {
       return undefined;
     }

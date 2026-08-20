@@ -1,5 +1,6 @@
 import type { NextRequest, NextResponse } from "next/server";
 import { authorize } from "@/lib/helpers/authorize";
+import { handleApiErrors } from "@/lib/helpers/handle-api-errors";
 import type { NextCtx } from "@/lib/types/shared-types";
 import { ormService } from "@/orm/orm.service";
 import { transactionManager } from "@/orm/transaction-manager";
@@ -55,12 +56,16 @@ function wrapRoute<TCtx extends NextCtx>({
   authenticatedOnly?: boolean;
 }): (req: NextRequest, ctx: TCtx) => Promise<NextResponse> {
   return async (req, ctx) => {
-    return executeWithRequestContext({
-      req,
-      authenticatedOnly,
-      work: (requestContext) => handler(req, ctx, requestContext),
-      ctx: ctx,
-    });
+    try {
+      return await executeWithRequestContext({
+        req,
+        authenticatedOnly,
+        work: (requestContext) => handler(req, ctx, requestContext),
+        ctx,
+      });
+    } catch (error) {
+      return handleApiErrors(error);
+    }
   };
 }
 

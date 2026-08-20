@@ -9,6 +9,7 @@ import type { RequestContext } from "@/api/request-context/request-context";
 import { serverConfig } from "@/lib/config/server-config";
 import { DEFAULT_ENTITY_TRANSLATION_LANGUAGE_CODE } from "@/lib/constants";
 import { FilterGroupOperator } from "@/lib/dto/common";
+import { LanguageCode } from "@/lib/dto/language-code";
 import { UserInputError } from "@/lib/errors/errors";
 import type { ListQueryOptions } from "@/lib/types/list-query-options";
 import type { ClassType } from "@/lib/types/shared-types";
@@ -194,7 +195,7 @@ class ListQueryBuilder {
     filterParams: Record<string, any>,
     ctx?: RequestContext,
   ): Promise<void> {
-    const languageCode = ctx?.languageCode ?? "en";
+    const languageCode = ctx?.languageCode ?? LanguageCode["en-US "];
 
     const dataSource = await ormService.getDataSource();
     const { translationColumns } = getEntityMetadata(dataSource, entityType);

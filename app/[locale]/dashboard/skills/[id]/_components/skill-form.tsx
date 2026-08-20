@@ -14,7 +14,10 @@ import {
   type UpdateSkillOutputSchema,
   updateSkillInputSchema,
 } from "@/lib/dto/skill";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
 import { Form } from "@/lib/helpers/form";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function SkillForm({
   children,
@@ -51,42 +54,37 @@ export function SkillForm({
   const { mutate: createSkill } = useMutation({
     mutationKey: ["create-skill"],
     mutationFn: async (input: CreateSkillInputSchema) => {
-      const res = await fetch("/api/skills", {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.skills.create, input, true);
       const data = (await res.json()) as CreateSkillOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Skill was created successfully");
-      form.reset();
       router.refresh();
     },
-    onError: () => {
-      toast.success("Something went wrong while creating the skill");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   const { mutate: updateSkill } = useMutation({
     mutationKey: ["update-skill"],
     mutationFn: async (input: UpdateSkillInputSchema) => {
-      const res = await fetch("/api/skills", {
-        method: "PATCH",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.skills.update, input, true);
       const data = (await res.json()) as UpdateSkillOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Skill was updated successfully");
     },
-    onError: () => {
-      toast.success("Something went wrong while updating the skill");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

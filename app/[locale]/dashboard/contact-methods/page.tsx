@@ -18,12 +18,12 @@ export default async function ContactMethodListPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    pageSize?: string;
-    skip?: string;
-    name?: string;
+    pageSize: string;
+    page: string;
+    name: string;
   }>;
 }) {
-  const { skip, pageSize, name } = await searchParams;
+  const { page = 1, pageSize = 24, name } = await searchParams;
 
   const find = wrapService({
     authenticatedOnly: true,
@@ -32,7 +32,7 @@ export default async function ContactMethodListPage({
 
   const result = await find({
     take: Number(pageSize),
-    skip: skip ? Number(skip) : undefined,
+    skip: (Number(page) - 1) * Number(pageSize),
     filter: {
       ...(name && { name: { contains: name } }),
     },

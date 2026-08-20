@@ -23,7 +23,7 @@ export const { POST } = createRouter({
         createAssetUploadOutputSchema,
       );
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 201 });
     },
   },
 });

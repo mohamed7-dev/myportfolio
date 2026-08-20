@@ -13,6 +13,13 @@ export const educationSeed: SeedEducation[] = [
     key: "university-1",
     translations: [
       {
+        languageCode: LanguageCode["ar-EG"],
+        school: "جامعة المنيا",
+        slug: "جامعة-المنيا",
+        degree: "بكالوريوس الطب والجراحة",
+        location: "المنيا، مصر",
+      },
+      {
         languageCode: LanguageCode["en-US "],
         school: "Minya University",
         slug: "minya-university",

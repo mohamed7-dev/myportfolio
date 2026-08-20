@@ -5,8 +5,8 @@ import { isDevelopmentMode } from "@/lib/helpers/env";
 import { validateInput } from "@/lib/helpers/validate-input";
 import { assetService } from "@/services/domain/asset.service";
 
-export const { POST } = createRouter({
-  POST: {
+export const { PATCH } = createRouter({
+  PATCH: {
     authenticatedOnly: isDevelopmentMode() ? false : true,
     handler: async (_, nextCtx, ctx) => {
       const { id } = await nextCtx.params;
@@ -14,13 +14,8 @@ export const { POST } = createRouter({
         { uploadSessionId: id },
         abortUploadSessionInputSchema,
       );
-      try {
-        await assetService.abortUpload(ctx, parsedInput);
-        return new NextResponse(null, { status: 204 });
-      } catch (error) {
-        console.log(error);
-        return NextResponse.json(error);
-      }
+      await assetService.abortUpload(ctx, parsedInput);
+      return new NextResponse(null, { status: 204 });
     },
   },
 });

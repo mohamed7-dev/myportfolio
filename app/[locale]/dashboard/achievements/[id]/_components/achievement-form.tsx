@@ -14,7 +14,10 @@ import {
   type UpdateAchievementOutputSchema,
   updateAchievementInputSchema,
 } from "@/lib/dto/achievement";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
 import { Form } from "@/lib/helpers/form";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function AchievementForm({
   children,
@@ -55,42 +58,37 @@ export function AchievementForm({
   const { mutate: createAchievement } = useMutation({
     mutationKey: ["create-achievement"],
     mutationFn: async (input: CreateAchievementInputSchema) => {
-      const res = await fetch("/api/achievements", {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.achievements.create, input, true);
       const data = (await res.json()) as CreateAchievementOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Achievement was created successfully");
-      form.reset();
       router.refresh();
     },
-    onError: () => {
-      toast.success("Something went wrong while creating the achievement");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   const { mutate: updateAchievement } = useMutation({
     mutationKey: ["update-achievement"],
     mutationFn: async (input: UpdateAchievementInputSchema) => {
-      const res = await fetch("/api/achievements", {
-        method: "PATCH",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.achievements.update, input, true);
       const data = (await res.json()) as UpdateAchievementOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Achievement was updated successfully");
     },
-    onError: () => {
-      toast.success("Something went wrong while updating the achievement");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

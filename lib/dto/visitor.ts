@@ -48,6 +48,19 @@ export type GetFeaturedSkillsOutputSchema = z.infer<
   typeof getFeaturedSkillsOutputSchema
 >;
 
+// ################### Featured Careers ############################
+const featuredCareer = career.omit({
+  assets: true,
+  translations: true,
+});
+
+export const getFeaturedCareersOutputSchema =
+  createPaginatedListOutputSchema(featuredCareer);
+
+export type GetFeaturedCareersOutputSchema = z.infer<
+  typeof getFeaturedCareersOutputSchema
+>;
+
 // ################### Featured Projects ############################
 const featuredProject = project.pick({
   id: true,
@@ -104,7 +117,9 @@ export type GetPublicProjectsOutputSchema = z.infer<
 
 // ################### Project ############################
 
-export const getPublicProjectInputSchema = z.object({ slug: z.string() });
+export const getPublicProjectInputSchema = z.object({
+  slug: z.string().transform((slug) => decodeURIComponent(slug)),
+});
 
 export type GetPublicProjectInputSchema = z.infer<
   typeof getPublicProjectInputSchema

@@ -14,6 +14,11 @@ export const skillsSeed: SeedSkill[] = [
 
     translations: [
       {
+        languageCode: LanguageCode["ar-EG"],
+        name: "ريأكت",
+        slug: "ريأكت",
+      },
+      {
         languageCode: LanguageCode["en-US "],
         name: "React",
         slug: "reactjs",
@@ -29,6 +34,11 @@ export const skillsSeed: SeedSkill[] = [
 
     translations: [
       {
+        languageCode: LanguageCode["ar-EG"],
+        name: "نود.جي إس",
+        slug: "نود-جي-إس",
+      },
+      {
         languageCode: LanguageCode["en-US "],
         name: "Node.js",
         slug: "nodejs",
@@ -43,6 +53,11 @@ export const skillsSeed: SeedSkill[] = [
     key: "figma",
 
     translations: [
+      {
+        languageCode: LanguageCode["ar-EG"],
+        name: "فيجما",
+        slug: "فيجما",
+      },
       {
         languageCode: LanguageCode["en-US "],
         name: "Figma",

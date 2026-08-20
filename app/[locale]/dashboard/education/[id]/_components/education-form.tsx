@@ -14,7 +14,10 @@ import {
   type UpdateEducationOutputSchema,
   updateEducationInputSchema,
 } from "@/lib/dto/education";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
 import { Form } from "@/lib/helpers/form";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function EducationForm({
   children,
@@ -56,42 +59,37 @@ export function EducationForm({
   const { mutate: createEducation } = useMutation({
     mutationKey: ["create-education"],
     mutationFn: async (input: CreateEducationInputSchema) => {
-      const res = await fetch("/api/education", {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.education.create, input, true);
       const data = (await res.json()) as CreateEducationOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Education item was created successfully");
-      form.reset();
       router.refresh();
     },
-    onError: () => {
-      toast.success("Something went wrong while adding new education item");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   const { mutate: updateEducation } = useMutation({
     mutationKey: ["update-education"],
     mutationFn: async (input: UpdateEducationInputSchema) => {
-      const res = await fetch("/api/education", {
-        method: "PATCH",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.education.update, input, true);
       const data = (await res.json()) as UpdateEducationOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Education item was updated successfully");
     },
-    onError: () => {
-      toast.success("Something went wrong while updating education item");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

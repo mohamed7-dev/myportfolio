@@ -23,6 +23,12 @@ export const achievementsSeed: SeedAchievement[] = [
         slug: "professional-certificate",
         organization: "Organization Name",
       },
+      {
+        languageCode: LanguageCode["ar-EG"],
+        name: "شهادة مهنية",
+        slug: "شهادة-مهنية",
+        organization: "اسم المؤسسة",
+      },
     ],
 
     type: AchievementType.CERTIFICATE,

@@ -21,10 +21,10 @@ export const { POST, PUT } = createRouter({
 
       const parsedOutput = validateOutput(result.profile, clientSafeSchema);
 
-      return NextResponse.json(parsedOutput);
+      return NextResponse.json(parsedOutput, { status: 200 });
     },
   },
-  PUT: {
+  PATCH: {
     authenticatedOnly: true,
     handler: async (_req, _, ctx) => {
       const res: { success: boolean } = { success: false };
@@ -33,7 +33,7 @@ export const { POST, PUT } = createRouter({
         (await cookies()).delete("session");
         res.success = true;
       }
-      return NextResponse.json(res);
+      return NextResponse.json(res, { status: 200 });
     },
   },
 });

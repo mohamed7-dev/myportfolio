@@ -26,7 +26,7 @@ export const { POST, PATCH, DELETE } = createRouter({
         createAchievementOutputSchema,
       );
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 201 });
     },
   },
   PATCH: {
@@ -43,7 +43,7 @@ export const { POST, PATCH, DELETE } = createRouter({
         updateAchievementOutputSchema,
       );
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
   DELETE: {
@@ -60,7 +60,7 @@ export const { POST, PATCH, DELETE } = createRouter({
         deleteAchievementsOutputSchema,
       );
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
 });

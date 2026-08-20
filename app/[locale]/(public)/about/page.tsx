@@ -54,28 +54,28 @@ export default async function AboutPage() {
         return (
           <span className="flex items-center gap-2">
             <PaintRollerIcon className="stroke-primary" />
-            front-end
+            {i18n("skills.categories.frontend")}
           </span>
         );
       case SkillCategory.BACKEND:
         return (
           <span className="flex items-center gap-2">
             <ServerIcon className="stroke-primary" />
-            back-end
+            {i18n("skills.categories.backend")}
           </span>
         );
       case SkillCategory.PROGRAMMING_LANGUAGES:
         return (
           <span className="flex items-center gap-2">
             <CodeIcon className="stroke-primary" />
-            programming languages
+            {i18n("skills.categories.programmingLanguages")}
           </span>
         );
       case SkillCategory.TOOLS:
         return (
           <span className="flex items-center gap-2">
             <WrenchIcon className="stroke-primary" />
-            tool
+            {i18n("skills.categories.tools")}
           </span>
         );
       default:
@@ -144,7 +144,7 @@ export default async function AboutPage() {
                           <AppImage
                             asset={skill.featuredAsset}
                             transform={{ preset: "icon", mode: "resize" }}
-                            className="object-contain"
+                            className="size-10 object-contain"
                           />
                         )}
                         {skill.name}

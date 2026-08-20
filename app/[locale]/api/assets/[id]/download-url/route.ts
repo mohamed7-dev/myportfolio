@@ -8,7 +8,7 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/domain/asset.service";
 
-export const { POST, PATCH, DELETE, GET } = createRouter({
+export const { POST } = createRouter({
   POST: {
     authenticatedOnly: true,
     handler: async (_req, nextCtx, ctx) => {
@@ -26,7 +26,7 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
         downloadAssetOutputSchema,
       );
 
-      return NextResponse.json(parsedResult);
+      return NextResponse.json(parsedResult, { status: 200 });
     },
   },
 });

@@ -14,7 +14,10 @@ import {
   type UpdateCareerOutputSchema,
   updateCareerInputSchema,
 } from "@/lib/dto/career";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
 import { Form } from "@/lib/helpers/form";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function CareerForm({
   children,
@@ -34,6 +37,7 @@ export function CareerForm({
       isPresent: false,
       startDate: undefined,
       endDate: undefined,
+      isFeatured: false,
     },
     resolver: zodResolver(createCareerInputSchema),
   });
@@ -44,6 +48,7 @@ export function CareerForm({
       mode: initialValues?.mode ?? undefined,
       type: initialValues?.type ?? undefined,
       isPresent: initialValues?.isPresent,
+      isFeatured: initialValues?.isFeatured,
       startDate: initialValues?.startDate,
       endDate: initialValues?.endDate ?? undefined,
       translations: initialValues?.translations ?? [],
@@ -56,42 +61,37 @@ export function CareerForm({
   const { mutate: createCareer } = useMutation({
     mutationKey: ["create-career"],
     mutationFn: async (input: CreateCareerInputSchema) => {
-      const res = await fetch("/api/careers", {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.careers.create, input, true);
       const data = (await res.json()) as CreateCareerOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Career was created successfully");
-      form.reset();
       router.refresh();
     },
-    onError: () => {
-      toast.success("Something went wrong while creating the career");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   const { mutate: updateCareer } = useMutation({
     mutationKey: ["update-career"],
     mutationFn: async (input: UpdateCareerInputSchema) => {
-      const res = await fetch("/api/careers", {
-        method: "PATCH",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.careers.update, input, true);
       const data = (await res.json()) as UpdateCareerOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Career was updated successfully");
     },
-    onError: () => {
-      toast.success("Something went wrong while updating the career");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

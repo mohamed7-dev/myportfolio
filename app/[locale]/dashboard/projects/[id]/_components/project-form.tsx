@@ -14,7 +14,10 @@ import {
   type UpdateProjectOutputSchema,
   updateProjectInputSchema,
 } from "@/lib/dto/project";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
 import { Form } from "@/lib/helpers/form";
+import { apiRoutes } from "@/lib/helpers/router";
 
 export function ProjectForm({
   children,
@@ -65,42 +68,37 @@ export function ProjectForm({
   const { mutate: createProject } = useMutation({
     mutationKey: ["create-project"],
     mutationFn: async (input: CreateProjectInputSchema) => {
-      const res = await fetch("/api/projects", {
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.projects.create, input, true);
       const data = (await res.json()) as CreateProjectOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Project was created successfully");
-      form.reset();
       router.refresh();
     },
-    onError: () => {
-      toast.success("Something went wrong while creating the project");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
   const { mutate: updateProject } = useMutation({
     mutationKey: ["update-project"],
     mutationFn: async (input: UpdateProjectInputSchema) => {
-      const res = await fetch("/api/projects", {
-        method: "PATCH",
-        credentials: "include",
-        body: JSON.stringify(input),
-      });
-
+      const res = await api(apiRoutes.projects.update, input, true);
       const data = (await res.json()) as UpdateProjectOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
     onSuccess: () => {
       toast.success("Project was updated successfully");
     },
-    onError: () => {
-      toast.success("Something went wrong while updating the project");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -118,7 +116,6 @@ export function ProjectForm({
       } as UpdateProjectInputSchema);
     }
   };
-  console.log(updateForm.formState.errors);
 
   return (
     <Form {...((creatingNewEntity ? form : updateForm) as any)}>

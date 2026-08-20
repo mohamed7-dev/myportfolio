@@ -1,4 +1,6 @@
 import { SearchIcon } from "lucide-react";
+import React from "react";
+import { RelationField } from "@/components/data-input/relation-field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -7,20 +9,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
-
-export const AssetType = {
-  ...ObjectStorageResourceType,
-  all: "all",
-} as const;
-
-export type AssetTypeUnion = keyof typeof AssetType;
+import { useRouterUtils } from "@/hooks/use-router-utils";
+import type { Tag } from "@/lib/dto/tag";
+import { AssetType, type AssetTypeUnion } from "./asset-gallery";
 
 interface ActionsBarProps {
   searchInput: string;
   onSearchInputChange: (value: string) => void;
   assetType: AssetTypeUnion;
   onAssetTypeChange: (type: AssetTypeUnion) => void;
+  tags: Tag[];
 }
 
 export function ActionsBar({
@@ -28,7 +26,12 @@ export function ActionsBar({
   onSearchInputChange,
   assetType,
   onAssetTypeChange,
+  tags,
 }: ActionsBarProps) {
+  const [open, setOpen] = React.useState(false);
+  const { searchParams, updateSearchParams } = useRouterUtils();
+  const currentTag = searchParams.get("tag") ?? "";
+
   return (
     <div className="flex flex-col md:flex-row gap-2">
       <div className="flex-1 flex items-center gap-2 relative">
@@ -40,6 +43,20 @@ export function ActionsBar({
           className="ps-8"
         />
       </div>
+      <RelationField
+        entityName="tag"
+        open={open}
+        onOpenChange={setOpen}
+        onSelectChange={(tag) => {
+          if (tag !== currentTag) {
+            updateSearchParams({ tag: tag });
+          } else {
+            updateSearchParams({ tag: null });
+          }
+        }}
+        selectedIds={[tags.find((t) => t.id === currentTag)?.id ?? ""]}
+        data={tags.map((t) => ({ id: t.id, label: t.value }))}
+      />
       <Select
         value={assetType as AssetTypeUnion}
         onValueChange={(value) =>

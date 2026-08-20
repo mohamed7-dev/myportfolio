@@ -77,10 +77,8 @@ export function EntityListDataTable<
       );
       router.refresh();
     },
-    onError: (_, variables) => {
-      toast.error(
-        `${entityName.toLowerCase()}${variables.ids.length !== 1 ? "s" : ""} weren't deleted successfully`,
-      );
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

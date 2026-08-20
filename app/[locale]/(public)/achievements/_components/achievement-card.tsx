@@ -8,7 +8,6 @@ import { IconTile } from "@/components/shared/icon-tile";
 import { MediaGallery } from "@/components/shared/media-gallery";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
 import { AchievementType } from "@/lib/dto/achievement";
 import type { GetPublicAchievementsOutputSchema } from "@/lib/dto/visitor";

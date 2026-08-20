@@ -1,6 +1,7 @@
 import { z } from "@/lib/helpers/zod";
 import { asset, entityAssetSchema } from "./asset";
 import {
+  apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
@@ -67,7 +68,7 @@ export type CreateEducationInputSchema = z.infer<
   typeof createEducationInputSchema
 >;
 
-export const createEducationOutputSchema = education;
+export const createEducationOutputSchema = z.union([education, apiErrorSchema]);
 
 export type CreateEducationOutputSchema = z.infer<
   typeof createEducationOutputSchema
@@ -97,7 +98,7 @@ export type UpdateEducationInputSchema = z.infer<
   typeof updateEducationInputSchema
 >;
 
-export const updateEducationOutputSchema = education;
+export const updateEducationOutputSchema = z.union([education, apiErrorSchema]);
 
 export type UpdateEducationOutputSchema = z.infer<
   typeof updateEducationOutputSchema
@@ -134,7 +135,10 @@ export type DeleteEducationsInputSchema = z.infer<
   typeof deleteEducationsInputSchema
 >;
 
-export const deleteEducationsOutputSchema = z.array(deletionResponseSchema);
+export const deleteEducationsOutputSchema = z.union([
+  z.array(deletionResponseSchema),
+  apiErrorSchema,
+]);
 
 export type DeleteEducationsOutputSchema = z.infer<
   typeof deleteEducationsOutputSchema

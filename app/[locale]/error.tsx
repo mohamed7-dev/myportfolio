@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { ErrorPage } from "@/components/page-layout/error-page";
 
 type Props = {
   error: Error;
@@ -12,5 +13,5 @@ export default function GlobalError({ error, reset }: Props) {
     console.error(error);
   }, [error]);
 
-  return <div>Error</div>;
+  return <ErrorPage reset={reset} />;
 }

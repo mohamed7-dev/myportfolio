@@ -6,11 +6,11 @@ import { DashboardToolbar } from "./dashboard-toolbar";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
+    <SidebarProvider dir="ltr">
       <DashboardSidebar />
       <SidebarInset>
         <DashboardToolbar />
-        {children}
+        <main>{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

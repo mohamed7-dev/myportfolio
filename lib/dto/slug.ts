@@ -1,4 +1,5 @@
 import { z } from "@/lib/helpers/zod";
+import { apiErrorSchema } from "./common";
 
 export const slugForEntityInputSchema = z.object({
   entityName: z.string(),
@@ -9,7 +10,7 @@ export const slugForEntityInputSchema = z.object({
 
 export type SlugForEntityInputSchema = z.infer<typeof slugForEntityInputSchema>;
 
-export const slugForEntityOutputSchema = z.string();
+export const slugForEntityOutputSchema = z.union([z.string(), apiErrorSchema]);
 
 export type SlugForEntityOutputSchema = z.infer<
   typeof slugForEntityOutputSchema

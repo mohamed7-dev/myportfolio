@@ -14,6 +14,10 @@ export const contactMethodsSeed: SeedContactMethod[] = [
 
     translations: [
       {
+        languageCode: LanguageCode["ar-EG"],
+        name: "جيت هب",
+      },
+      {
         languageCode: LanguageCode["en-US "],
         name: "GitHub",
       },
@@ -23,13 +27,17 @@ export const contactMethodsSeed: SeedContactMethod[] = [
     copyableText: undefined,
 
     enabled: true,
-    primary: true,
+    primary: false,
   },
 
   {
     key: "linkedin",
 
     translations: [
+      {
+        languageCode: LanguageCode["ar-EG"],
+        name: "لينكد إن",
+      },
       {
         languageCode: LanguageCode["en-US "],
         name: "LinkedIn",
@@ -48,6 +56,10 @@ export const contactMethodsSeed: SeedContactMethod[] = [
 
     translations: [
       {
+        languageCode: LanguageCode["ar-EG"],
+        name: "البريد الإلكتروني",
+      },
+      {
         languageCode: LanguageCode["en-US "],
         name: "Email",
       },
@@ -57,6 +69,6 @@ export const contactMethodsSeed: SeedContactMethod[] = [
     copyableText: "your-email@example.com",
 
     enabled: true,
-    primary: false,
+    primary: true,
   },
 ];

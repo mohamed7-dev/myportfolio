@@ -1,3 +1,5 @@
-export default function NotFoundPage() {
-  return <p>Not Found</p>;
+import { NotFoundPage } from "@/components/page-layout/not-found-page";
+
+export default function LocaleNotFoundPage() {
+  return <NotFoundPage />;
 }

@@ -18,19 +18,19 @@ export default async function CareersListPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    pageSize?: string;
-    skip?: string;
-    name?: string;
-    location?: string;
-    organization?: string;
-    startDate?: string;
-    endDate?: string;
-    isPresent?: string;
+    pageSize: string;
+    page: string;
+    name: string;
+    location: string;
+    organization: string;
+    startDate: string;
+    endDate: string;
+    isPresent: string;
   }>;
 }) {
   const {
-    skip,
-    pageSize,
+    page = 1,
+    pageSize = 24,
     location,
     organization,
     name,
@@ -46,7 +46,7 @@ export default async function CareersListPage({
 
   const result = await find({
     take: Number(pageSize),
-    skip: skip ? Number(skip) : undefined,
+    skip: (Number(page) - 1) * Number(pageSize),
     filter: {
       ...(name && { name: { contains: name } }),
       ...(location && { location: { contains: location } }),

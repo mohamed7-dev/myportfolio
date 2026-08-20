@@ -111,3 +111,48 @@ export enum FilterGroupOperator {
 }
 
 export const filterGroupOperator = z.nativeEnum(FilterGroupOperator);
+
+//############################ Errors ##########################
+export enum ErrorCode {
+  INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
+  USER_INPUT_ERROR = "USER_INPUT_ERROR",
+  CONFLICT_ERROR = "CONFLICT_ERROR",
+  ENTITY_NOT_FOUND_ERROR = "ENTITY_NOT_FOUND_ERROR",
+  UNAUTHORIZED_ERROR = "UNAUTHORIZED_ERROR",
+  FORBIDDEN_ERROR = "FORBIDDEN_ERROR",
+}
+
+const errorCodeSchema = z.nativeEnum(ErrorCode);
+
+export const apiErrorSchema = z.object({
+  code: errorCodeSchema,
+  message: z.string(),
+  statusCode: z.number(),
+});
+
+export type ApiErrorSchema = z.infer<typeof apiErrorSchema>;
+
+export const userInputErrorSchema = apiErrorSchema.extend({
+  code: z.literal(ErrorCode.USER_INPUT_ERROR),
+  fields: z.record(z.string(), z.string()).optional(),
+});
+
+export const conflictErrorSchema = apiErrorSchema.extend({
+  code: z.literal(ErrorCode.CONFLICT_ERROR),
+});
+
+export const internalServerErrorSchema = apiErrorSchema.extend({
+  code: z.literal(ErrorCode.INTERNAL_SERVER_ERROR),
+});
+
+export const entityNotFoundErrorSchema = apiErrorSchema.extend({
+  code: z.literal(ErrorCode.ENTITY_NOT_FOUND_ERROR),
+});
+
+export const unAuthorizedErrorSchema = apiErrorSchema.extend({
+  code: z.literal(ErrorCode.UNAUTHORIZED_ERROR),
+});
+
+export const forbiddenErrorSchema = apiErrorSchema.extend({
+  code: z.literal(ErrorCode.FORBIDDEN_ERROR),
+});

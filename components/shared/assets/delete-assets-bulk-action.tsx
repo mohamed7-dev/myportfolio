@@ -7,6 +7,9 @@ import type {
   DeleteAssetsInputSchema,
   DeleteAssetsOutputSchema,
 } from "@/lib/dto/asset";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
+import { apiRoutes } from "@/lib/helpers/router";
 
 type AssetsInput = Array<Pick<Asset, "id">>;
 
@@ -20,15 +23,14 @@ export function DeleteAssetsBulkAction({
   const selectionLength = selection.length;
   const { mutate } = useMutation({
     mutationFn: async (input: DeleteAssetsInputSchema) => {
-      const res = await fetch("/api/assets", {
-        method: "delete",
-        body: JSON.stringify(input),
-        credentials: "include",
-      });
+      const res = await api(apiRoutes.assets.delete, input, true);
       const data = (await res.json()) as DeleteAssetsOutputSchema;
+      if (isAppError(data)) {
+        throw data;
+      }
       return data;
     },
-    onSuccess: (result: DeleteAssetsOutputSchema) => {
+    onSuccess: (result) => {
       if (result[0].result === "DELETED") {
         toast.success(`Deleted ${selectionLength} assets`);
       } else {
@@ -37,8 +39,8 @@ export function DeleteAssetsBulkAction({
       }
       refetch();
     },
-    onError: () => {
-      toast.error(`Failed to delete ${selectionLength} assets`);
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

@@ -46,6 +46,9 @@ export class Career extends AppEntity {
   @Column()
   isPresent: boolean;
 
+  @Column({ default: false })
+  isFeatured: boolean;
+
   @Column({ type: "varchar" })
   mode: CareerMode;
 

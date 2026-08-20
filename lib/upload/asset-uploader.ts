@@ -3,7 +3,9 @@ import type {
   CreateAssetUploadInputSchema,
   CreateAssetUploadOutputSchema,
 } from "../dto/asset-upload";
-import { apiUrl } from "../helpers/router";
+import { isAppError } from "../errors/app-error";
+import { api } from "../helpers/api";
+import { apiRoutes } from "../helpers/router";
 import type { UploadFileOptions } from "./upload";
 
 export type UploadAssetInput = {
@@ -67,54 +69,65 @@ export class AssetUploader {
   }
 
   private async createAssetUploadSession(input: CreateAssetUploadInputSchema) {
-    const response = await fetch(apiUrl("/assets/upload-session"), {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(input),
-    });
-
-    if (!response.ok) {
-      //   throw await parseApiError(response);
-      throw new Error(
-        `Creating Upload Session Failed With Error: (${response})`,
-      );
-    }
-
-    return response.json() as Promise<CreateAssetUploadOutputSchema>;
-  }
-
-  private async abortAssetUpload(id: string) {
-    const response = await fetch(apiUrl(`/assets/upload-session/${id}/abort`), {
-      method: "POST",
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      //   throw await parseApiError(response);
-      throw new Error(
-        `Aborting Upload Session Failed With Error: (${response})`,
-      );
-    }
-  }
-
-  private async completeAssetUpload(id: string) {
-    const response = await fetch(
-      apiUrl(`/assets/upload-session/${id}/commit`),
-      {
-        method: "POST",
-        credentials: "include",
-      },
+    const response = await api(
+      apiRoutes.assets.createUploadSession,
+      input,
+      true,
     );
 
     if (!response.ok) {
-      //   throw await parseApiError(response);
-      throw new Error(
-        `Committing upload Session Failed With Error: (${response})`,
-      );
+      throw new Error(`Creating Upload Session Failed`);
     }
-    return response.json() as Promise<CommitUploadSessionOutputSchema>;
+    const data = (await response.json()) as CreateAssetUploadOutputSchema;
+
+    if (isAppError(data)) {
+      throw data;
+    }
+
+    return data;
+  }
+
+  private async abortAssetUpload(id: string) {
+    const response = await api(
+      {
+        ...apiRoutes.assets.abortUploadSession,
+        url: apiRoutes.assets.abortUploadSession.url(id),
+      },
+      undefined,
+      true,
+    );
+    if (!response.ok) {
+      throw new Error(`Aborting Upload Session Failed`);
+    }
+
+    const data = (await response.json()) as undefined;
+
+    if (isAppError(data)) {
+      throw data;
+    }
+
+    return data;
+  }
+
+  private async completeAssetUpload(id: string) {
+    const response = await api(
+      {
+        ...apiRoutes.assets.commitUploadSession,
+        url: apiRoutes.assets.commitUploadSession.url(id),
+      },
+      undefined,
+      true,
+    );
+
+    if (!response.ok) {
+      throw new Error(`Committing upload Session Failed`);
+    }
+    const data = (await response.json()) as CommitUploadSessionOutputSchema;
+
+    if (isAppError(data)) {
+      throw data;
+    }
+
+    return data;
   }
 }

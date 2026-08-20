@@ -17,6 +17,58 @@ export const projectsSeed: SeedProject[] = [
     key: "vidora",
     translations: [
       {
+        languageCode: LanguageCode["ar-EG"],
+        name: "فيدورا",
+        slug: "فيدورا",
+        description:
+          "تطبيق وسائط مكتبي لتنزيل وإدارة مقاطع الفيديو عبر الإنترنت.",
+
+        overview:
+          "<p>فيدورا هو تطبيق مكتبي مبني على yt-dlp، ويوفر واجهة سهلة لتنزيل وإدارة الوسائط المتاحة عبر الإنترنت.</p>",
+
+        features: [
+          "<ul>",
+          "<li><p>تنزيل الوسائط</p></li>",
+          "<li><p>اختيار صيغ الفيديو والصوت</p></li>",
+          "<li><p>إدارة التنزيلات</p></li>",
+          "<li><p>تطبيق مكتبي</p></li>",
+          "<li><p>دعم تعدد اللغات</p></li>",
+          "</ul>",
+        ].join("\n"),
+
+        technicalHighlights: [
+          "<ul>",
+          "<li><p>بنية تطبيقات سطح المكتب باستخدام Electron</p></li>",
+          "<li><p>مكونات الويب (Web Components)</p></li>",
+          "<li><p>التكامل مع yt-dlp</p></li>",
+          "<li><p>أدوات مخصصة لدعم تعدد اللغات</p></li>",
+          "</ul>",
+        ].join("\n"),
+
+        contributions: [
+          "<ul>",
+          "<li><p>تصميم وتنفيذ بنية التطبيق</p></li>",
+          "<li><p>واجهة المستخدم</p></li>",
+          "<li><p>سير عمل تنزيل الوسائط</p></li>",
+          "<li><p>الأدوات المساندة</p></li>",
+          "</ul>",
+        ].join("\n"),
+
+        challengesAndSolutions: [
+          "<ul>",
+          "<li><p>كان التطبيق بحاجة إلى تنسيق واجهة سطح المكتب مع عملية خارجية لتنزيل الوسائط، مع الحفاظ على استجابة الواجهة.</p></li>",
+          "<li><p>تفصل البنية المعمارية بين واجهة المستخدم وطبقة معالجة الوسائط، ويتم التواصل بينهما من خلال حدود واضحة ومحددة.</p></li>",
+          "</ul>",
+        ].join("\n"),
+
+        techStack: [
+          "<ul>",
+          "<li><p><strong>الواجهة الأمامية: </strong> Electron وWeb Components وTypeScript</p></li>",
+          "<li><p><strong>الأدوات: </strong> yt-dlp وffmpeg</p></li>",
+          "</ul>",
+        ].join("\n"),
+      },
+      {
         languageCode: LanguageCode["en-US "],
         name: "Vidora",
         slug: "vidora",
@@ -57,8 +109,6 @@ export const projectsSeed: SeedProject[] = [
         challengesAndSolutions: [
           "<ul>",
           "<li><p>The application needed to coordinate a desktop UI with an external media downloading process while keeping the interface responsive</p></li>",
-          "</ul>",
-          "<ul>",
           "<li><p>The architecture separates the UI from the media-processing layer and communicates through well-defined boundaries.</p></li>",
           "</ul>",
         ].join("\n"),
@@ -87,6 +137,66 @@ export const projectsSeed: SeedProject[] = [
   {
     key: "snippetly",
     translations: [
+      {
+        languageCode: LanguageCode["ar-EG"],
+        name: "سنيبتلي",
+        slug: "سنيبتلي",
+
+        description:
+          "تطبيق جاهز للعمل دون اتصال بالإنترنت لتخزين وتنظيم وإدارة مقتطفات الأكواد القابلة لإعادة الاستخدام.",
+
+        overview: [
+          "<p>سنيبتلي هو تطبيق ويب مصمم لتسهيل تخزين وإدارة مقتطفات الأكواد القابلة لإعادة الاستخدام والوصول إليها.</p>",
+          "<p>يوفر التطبيق تجربة جاهزة للعمل دون اتصال بالإنترنت، مما يسمح للمستخدمين بالاستمرار في العمل على مقتطفاتهم حتى عند عدم توفر اتصال بالشبكة.</p>",
+        ].join("\n"),
+
+        features: [
+          "<ul>",
+          "<li><p>إدارة مقتطفات الأكواد</p></li>",
+          "<li><p>تنظيم مقتطفات الأكواد</p></li>",
+          "<li><p>تجربة جاهزة للعمل دون اتصال بالإنترنت</p></li>",
+          "<li><p>التخزين المحلي باستخدام IndexedDB</p></li>",
+          "<li><p>واجهة مستخدم متجاوبة</p></li>",
+          "</ul>",
+        ].join("\n"),
+
+        technicalHighlights: [
+          "<ul>",
+          "<li><p>بنية واجهة أمامية مبنية باستخدام React</p></li>",
+          "<li><p>خلفية مبنية باستخدام Node.js وExpress</p></li>",
+          "<li><p>تخزين البيانات باستخدام PostgreSQL</p></li>",
+          "<li><p>استخدام Drizzle ORM</p></li>",
+          "<li><p>استخدام IndexedDB للتخزين على جانب العميل</p></li>",
+          "<li><p>بنية عميل تعتمد على نهج العمل دون اتصال بالإنترنت أولًا</p></li>",
+          "</ul>",
+        ].join("\n"),
+
+        contributions: [
+          "<ul>",
+          "<li><p>تصميم وتنفيذ بنية الواجهة الأمامية</p></li>",
+          "<li><p>تصميم وتنفيذ واجهة برمجة التطبيقات الخلفية</p></li>",
+          "<li><p>تنفيذ طبقة تخزين البيانات باستخدام PostgreSQL</p></li>",
+          "<li><p>تنفيذ تجربة العميل الجاهزة للعمل دون اتصال بالإنترنت</p></li>",
+          "<li><p>تصميم استراتيجية التخزين باستخدام IndexedDB</p></li>",
+          "</ul>",
+        ].join("\n"),
+
+        challengesAndSolutions: [
+          "<ul>",
+          "<li><p>كان التطبيق بحاجة إلى الحفاظ على فائدته حتى عند عدم توفر اتصال بالشبكة.</p></li>",
+          "<li><p>يسمح التخزين على جانب العميل باستخدام IndexedDB للمستخدمين بالاستمرار في العمل على مقتطفاتهم محليًا، مع توفير أساس للمزامنة عند استعادة الاتصال بالشبكة.</p></li>",
+          "</ul>",
+        ].join("\n"),
+
+        techStack: [
+          "<ul>",
+          "<li><p><strong>الواجهة الأمامية: </strong> React وTypeScript وIndexedDB</p></li>",
+          "<li><p><strong>الخلفية: </strong> Node.js وExpress</p></li>",
+          "<li><p><strong>قاعدة البيانات: </strong> PostgreSQL</p></li>",
+          "<li><p><strong>ORM: </strong> Drizzle ORM</p></li>",
+          "</ul>",
+        ].join("\n"),
+      },
       {
         languageCode: LanguageCode["en-US "],
         name: "Snippetly",
