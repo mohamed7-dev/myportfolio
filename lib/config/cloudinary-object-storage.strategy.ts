@@ -1,11 +1,12 @@
 import { v2 as cloudinary } from "cloudinary";
-import type {
-  CreateUploadRequestInput,
-  ObjectLocation,
-  ObjectMetadata,
-  ObjectStorage,
-  ObjectStorageResourceType,
-  UploadRequest,
+import {
+  type CreateUploadRequestInput,
+  type ObjectLocation,
+  type ObjectMetadata,
+  type ObjectStorage,
+  type ObjectStorageResourceType,
+  toObjectKey,
+  type UploadRequest,
 } from "./object-storage-strategy.interface";
 
 export class CloudinaryObjectStorage implements ObjectStorage {
@@ -53,7 +54,7 @@ export class CloudinaryObjectStorage implements ObjectStorage {
     resourceType: ObjectStorageResourceType,
   ): Promise<ObjectMetadata | null> {
     try {
-      const key = this.toCloudinaryPublicId(location);
+      const key = toObjectKey(location);
       const resource = await cloudinary.api.resource(key, {
         resource_type: resourceType,
       });
@@ -80,7 +81,7 @@ export class CloudinaryObjectStorage implements ObjectStorage {
     location: ObjectLocation,
     resourceType: ObjectStorageResourceType,
   ): Promise<void> {
-    await cloudinary.uploader.destroy(this.toCloudinaryPublicId(location), {
+    await cloudinary.uploader.destroy(toObjectKey(location), {
       resource_type: resourceType,
       invalidate: true,
     });
@@ -89,17 +90,13 @@ export class CloudinaryObjectStorage implements ObjectStorage {
   async createDownloadUrl(
     location: ObjectLocation,
     resourceType: ObjectStorageResourceType,
-    expiresInSeconds = 900,
+    _expiresInSeconds = 900,
   ): Promise<string> {
-    return cloudinary.url(this.toCloudinaryPublicId(location), {
+    return cloudinary.url(toObjectKey(location), {
       resource_type: resourceType,
       secure: true,
       sign_url: true,
     });
-  }
-
-  private toCloudinaryPublicId(location: ObjectLocation): string {
-    return [...location.folder, location.key].join("/");
   }
 
   private formatToMimeType(format: string, resourceType: string) {

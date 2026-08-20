@@ -6,11 +6,12 @@ import {
   baseTranslationEntityInput,
   deletionResponseSchema,
   inputIdsSchema,
+  stringFilterOperators,
 } from "./common";
 import { languageCodeSchema } from "./language-code";
 import {
+  createPaginatedListInputSchema,
   createPaginatedListOutputSchema,
-  paginatedListInputSchema,
 } from "./paginated-list";
 
 const assetTranslationSchema = baseTranslationEntity.extend({
@@ -74,14 +75,15 @@ export type UpdateAssetOutputSchema = z.infer<typeof updateAssetOutputSchema>;
 export const assetListOutputSchema = createPaginatedListOutputSchema(asset);
 export type AssetListOutputSchema = z.infer<typeof assetListOutputSchema>;
 
-export const assetListInputSchema = paginatedListInputSchema.extend({
-  filter: z
+export const assetListInputSchema = createPaginatedListInputSchema(
+  z
     .object({
-      name: z.object({ contains: z.string() }).optional(),
-      type: z.object({ equals: objectStorageResourceTypeSchema }).optional(),
+      name: stringFilterOperators,
+      type: stringFilterOperators,
     })
-    .optional(),
-});
+    .partial(),
+);
+
 export type AssetListInputSchema = z.infer<typeof assetListInputSchema>;
 
 // ################## Delete ####################
@@ -101,3 +103,18 @@ export const entityAssetSchema = baseSchema.extend({
 });
 
 export type EntityAsset = z.infer<typeof entityAssetSchema>;
+
+//############################ Entity Asset ##########################
+export const downloadAssetInputSchema = z.object({
+  assetId: z.string(),
+});
+
+export type DownloadAssetInputSchema = z.infer<typeof downloadAssetInputSchema>;
+
+export const downloadAssetOutputSchema = z.object({
+  downloadUrl: z.string(),
+});
+
+export type DownloadAssetOutputSchema = z.infer<
+  typeof downloadAssetOutputSchema
+>;

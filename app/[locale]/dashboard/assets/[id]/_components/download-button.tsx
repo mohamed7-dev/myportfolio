@@ -9,7 +9,7 @@ export function DownloadButton({ asset }: { asset: Asset }) {
   return (
     <Button
       variant={"neutral"}
-      onClick={() => downloadAsset(asset.sourceIdentifier, asset.name)}
+      onClick={() => downloadAsset(asset.id, asset.name)}
       disabled={isDownloading}
     >
       {isDownloading ? <Loader2Icon /> : <DownloadIcon />}

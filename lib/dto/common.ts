@@ -42,10 +42,72 @@ export const baseTranslationEntityInput = z.object({
   languageCode: languageCodeSchema,
 });
 
-//############################ Api Error ##########################
+//############################ Filter Operators ##########################
+export const stringFilterOperators = z
+  .object({
+    equals: z.string(),
+    notEquals: z.string(),
+    contains: z.string(),
+    doesNotContain: z.string(),
+    includedIn: z.array(z.string()),
+    excludedFrom: z.array(z.string()),
+    matchesRegex: z.string(),
+    isNull: z.boolean(),
+  })
+  .partial();
 
-export const apiErrorSchema = z.object({
-  statusCode: z.number(),
-  code: z.string(),
-  message: z.string(),
+export type StringFilterOperators = z.infer<typeof stringFilterOperators>;
+
+const numericRangeInput = z.object({
+  min: z.number(),
+  max: z.number(),
 });
+export type NumericRangeInput = z.infer<typeof numericRangeInput>;
+
+export const numericFilterOperators = z
+  .object({
+    equals: z.number(),
+    lessThan: z.number(),
+    lessThanOrEqual: z.number(),
+    greaterThan: z.number(),
+    greaterThanOrEqual: z.number(),
+    withinRange: numericRangeInput,
+    isNull: z.boolean(),
+  })
+  .partial();
+
+export type NumericFilterOperators = z.infer<typeof numericFilterOperators>;
+
+export const booleanFilterOperators = z
+  .object({
+    equals: z.boolean(),
+    isNull: z.boolean(),
+  })
+  .partial();
+
+export type BooleanFilterOperators = z.infer<typeof booleanFilterOperators>;
+
+const dateTimeRangeInput = z.object({
+  from: z.coerce.date(),
+  to: z.coerce.date(),
+});
+export type DateTimeRangeInput = z.infer<typeof dateTimeRangeInput>;
+
+export const dateTimeFilterOperators = z
+  .object({
+    equals: z.coerce.date(),
+    before: z.coerce.date(),
+    after: z.coerce.date(),
+    withinRange: dateTimeRangeInput,
+    isNull: z.boolean(),
+  })
+  .partial();
+
+export type DateTimeFilterOperators = z.infer<typeof dateTimeFilterOperators>;
+
+export enum FilterGroupOperator {
+  OR = "OR",
+  AND = "AND",
+}
+
+export const filterGroupOperator = z.nativeEnum(FilterGroupOperator);

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { wrapService } from "@/api/common/create-router";
 import {
@@ -9,8 +8,6 @@ import {
 } from "@/components/page-layout/page";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
-import { AppImage } from "@/components/shared/app-image";
-import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
 import { type Asset, asset as assetSchema } from "@/lib/dto/asset";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/domain/asset.service";

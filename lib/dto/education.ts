@@ -4,13 +4,16 @@ import {
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
+  booleanFilterOperators,
+  dateTimeFilterOperators,
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  stringFilterOperators,
 } from "./common";
 import {
+  createPaginatedListInputSchema,
   createPaginatedListOutputSchema,
-  paginatedListInputSchema,
 } from "./paginated-list";
 
 const educationTranslationSchema = baseTranslationEntity.extend({
@@ -101,18 +104,19 @@ export type UpdateEducationOutputSchema = z.infer<
 >;
 
 //###################### List #######################
-export const educationListInputSchema = paginatedListInputSchema.extend({
-  filter: z
+export const educationListInputSchema = createPaginatedListInputSchema(
+  z
     .object({
-      school: z.object({ contains: z.string() }).optional(),
-      degree: z.object({ contains: z.string() }).optional(),
-      location: z.object({ contains: z.string() }).optional(),
-      startDate: z.object({ equals: z.coerce.date() }).optional(),
-      endDate: z.object({ equals: z.coerce.date() }).optional(),
-      isPresent: z.object({ equals: z.boolean() }).optional(),
+      school: stringFilterOperators,
+      degree: stringFilterOperators,
+      location: stringFilterOperators,
+      startDate: dateTimeFilterOperators,
+      endDate: dateTimeFilterOperators,
+      isPresent: booleanFilterOperators,
     })
-    .optional(),
-});
+    .partial(),
+);
+
 export type EducationListInputSchema = z.infer<typeof educationListInputSchema>;
 
 export const educationListOutputSchema =

@@ -11,7 +11,7 @@ export function I18nProvider({
   messages: AbstractIntlMessages;
 }) {
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
       {children}
     </NextIntlClientProvider>
   );

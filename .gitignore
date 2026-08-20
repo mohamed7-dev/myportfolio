@@ -10,7 +10,7 @@
 !.yarn/releases
 !.yarn/versions
 .dev
-
+/public/object-storage
 # testing
 /coverage
 

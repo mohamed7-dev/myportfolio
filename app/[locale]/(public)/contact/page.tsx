@@ -1,12 +1,6 @@
-import {
-  ContactIcon,
-  CopyIcon,
-  MessageSquareIcon,
-  SendIcon,
-} from "lucide-react";
+import { ContactIcon, SendIcon } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import React from "react";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -20,7 +14,6 @@ import { CardWrapper } from "@/components/shared/card-wrapper";
 import { IconTile } from "@/components/shared/icon-tile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { visitorService } from "@/services/domain/visitor.service";
 import { DirectMessageForm } from "./_components/direct-message-form";
 import { PrimaryContactMethodCopy } from "./_components/primary-contact-method-copy";
@@ -72,6 +65,7 @@ export default async function ContactPage() {
               <AppImage
                 asset={primaryContactMethod.featuredAsset}
                 transform={{ preset: "tiny", mode: "resize" }}
+                className="size-40 object-contain"
               />
               <p>{i18n("contactMethods.primaryDescription")}</p>
               {primaryContactMethod.copyableText && (
@@ -104,6 +98,7 @@ export default async function ContactPage() {
                 <AppImage
                   asset={contactMethod.featuredAsset}
                   transform={{ preset: "tiny", mode: "resize" }}
+                  className="size-20 object-contain"
                 />
                 <Button size={"sm"} variant={"neutral"} asChild>
                   <Link href={contactMethod.url} target="_blank">

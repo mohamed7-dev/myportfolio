@@ -15,7 +15,7 @@ import { SkillTranslation } from "@/orm/entities/skill/skill-translation.entity"
 import { ormService } from "@/orm/orm.service";
 import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
 import { skillsSeed } from "@/orm/seed/skills";
-import { listQueryBuilder } from "../helpers/list-query-builder.service";
+import { listQueryBuilder } from "../helpers/list-query-builder/list-query-builder.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { translator } from "../helpers/translator.service";
@@ -94,29 +94,6 @@ export class SkillService {
         ...relations,
       },
     });
-
-    if (options?.filter?.category) {
-      const category = options.filter.category.equals;
-      if (category) {
-        qb.andWhere("skill.category = :category", {
-          category: category,
-        });
-      }
-    }
-    if (options?.filter?.isFeatured !== undefined) {
-      const isFeatured = options.filter.isFeatured.equals;
-      qb.andWhere("skill.isFeatured = :isFeatured", {
-        isFeatured: isFeatured,
-      });
-    }
-    if (options?.filter?.name) {
-      const name = options.filter.name.contains;
-      if (name) {
-        qb.andWhere("skill__translations.name LIKE :name", {
-          name: `%${typeof name === "string" ? name.trim() : name}%`,
-        });
-      }
-    }
 
     return await qb.getManyAndCount().then((result) => {
       return {

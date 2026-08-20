@@ -44,7 +44,9 @@ export function AppImage({
 }: AppImageProps) {
   const { quality, preset = null, mode = null, format = null } = transform;
 
-  const size = resolveSize(preset, width, height);
+  const size = isDevelopmentMode()
+    ? { width: asset?.width, height: asset?.height }
+    : resolveSize(preset, width, height);
 
   if (!asset) {
     return (
@@ -63,7 +65,7 @@ export function AppImage({
     return (
       <Image
         ref={ref}
-        src={asset.previewIdentifier}
+        src={`/object-storage/${asset.previewIdentifier}`}
         alt={alt ?? asset.name ?? ""}
         width={size.width === undefined ? asset.width : size.width}
         height={size.height === undefined ? asset.height : size.height}

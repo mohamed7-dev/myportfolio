@@ -7,12 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
 
 export const AssetType = {
-  ALL: "ALL",
-  IMAGE: "IMAGE",
-  VIDEO: "VIDEO",
-  BINARY: "BINARY",
+  ...ObjectStorageResourceType,
+  all: "all",
 } as const;
 
 export type AssetTypeUnion = keyof typeof AssetType;
@@ -51,10 +50,10 @@ export function ActionsBar({
           <SelectValue placeholder={"Asset Type"} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={AssetType.ALL}>All types</SelectItem>
-          <SelectItem value={AssetType.IMAGE}>Images</SelectItem>
-          <SelectItem value={AssetType.VIDEO}>Videos</SelectItem>
-          <SelectItem value={AssetType.BINARY}>Binary</SelectItem>
+          <SelectItem value={AssetType.all}>All types</SelectItem>
+          <SelectItem value={AssetType.image}>Images</SelectItem>
+          <SelectItem value={AssetType.video}>Videos</SelectItem>
+          <SelectItem value={AssetType.raw}>Binary</SelectItem>
         </SelectContent>
       </Select>
     </div>

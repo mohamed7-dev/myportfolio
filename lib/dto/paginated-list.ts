@@ -1,20 +1,18 @@
 import { type ZodSchema, z } from "@/lib/helpers/zod";
 
-export const paginatedListInputSchema = z.object({
-  take: z.coerce.number().optional(),
-  skip: z.coerce.number().optional(),
+const paginatedListInputSchema = z.object({
+  take: z.coerce.number(),
+  skip: z.coerce.number(),
 });
 
-export type PaginatedListInputSchema = z.infer<typeof paginatedListInputSchema>;
-
-export const paginatedSoftDeletableListInputSchema =
-  paginatedListInputSchema.extend({
-    includeSoftDeleted: z.boolean().optional(),
-  });
-
-export type PaginatedSoftDeletableListInputSchema = z.infer<
-  typeof paginatedSoftDeletableListInputSchema
->;
+export function createPaginatedListInputSchema<Filter = any>(
+  filterSchema: ZodSchema<Filter>,
+) {
+  return paginatedListInputSchema
+    .extend({ filter: filterSchema })
+    .partial()
+    .optional();
+}
 
 export function createPaginatedListOutputSchema<Item = any>(
   schema: ZodSchema<Item>,

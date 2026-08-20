@@ -4,14 +4,16 @@ import {
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
+  booleanFilterOperators,
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  stringFilterOperators,
 } from "./common";
 import { languageCodeSchema } from "./language-code";
 import {
+  createPaginatedListInputSchema,
   createPaginatedListOutputSchema,
-  paginatedListInputSchema,
 } from "./paginated-list";
 
 export enum SkillCategory {
@@ -89,15 +91,16 @@ export const updateSkillOutputSchema = skill;
 export type UpdateSkillOutputSchema = z.infer<typeof updateSkillOutputSchema>;
 
 //###################### List #######################
-export const skillListInputSchema = paginatedListInputSchema.extend({
-  filter: z
+export const skillListInputSchema = createPaginatedListInputSchema(
+  z
     .object({
-      name: z.object({ contains: z.string() }).optional(),
-      category: z.object({ equals: skillCategorySchema }).optional(),
-      isFeatured: z.object({ equals: z.boolean() }).optional(),
+      name: stringFilterOperators,
+      category: stringFilterOperators,
+      isFeatured: booleanFilterOperators,
     })
-    .optional(),
-});
+    .partial(),
+);
+
 export type SkillListInputSchema = z.infer<typeof skillListInputSchema>;
 
 export const skillListOutputSchema = createPaginatedListOutputSchema(skill);

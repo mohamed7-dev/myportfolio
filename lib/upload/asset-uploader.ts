@@ -4,14 +4,15 @@ import type {
   CreateAssetUploadOutputSchema,
 } from "../dto/asset-upload";
 import { apiUrl } from "../helpers/router";
-import { uploadFile } from "./upload";
+import type { UploadFileOptions } from "./upload";
 
 export type UploadAssetInput = {
-  source: File;
-  preview: File;
+  source: { data: File | Blob; name: string };
+  preview: { data: File | Blob; name: string };
   signal?: AbortSignal;
   onSourceProgress?: (progress: number) => void;
   onPreviewProgress?: (progress: number) => void;
+  uploadHandler: (options: UploadFileOptions) => Promise<void>;
 };
 
 export type UploadAssetResult = {
@@ -24,26 +25,26 @@ export class AssetUploader {
     const session = await this.createAssetUploadSession({
       source: {
         name: input.source.name,
-        mimeType: input.source.type,
-        size: input.source.size,
+        mimeType: input.source.data.type,
+        size: input.source.data.size,
       },
       preview: {
         name: input.preview.name,
-        mimeType: input.preview.type,
-        size: input.preview.size,
+        mimeType: input.preview.data.type,
+        size: input.preview.data.size,
       },
     });
     try {
       return await Promise.all([
         // 2. upload source
-        uploadFile({
+        input.uploadHandler({
           file: input.source,
           request: session.source.upload,
           signal: input.signal,
           onProgress: input.onSourceProgress,
         }),
         // 3. upload preview
-        uploadFile({
+        input.uploadHandler({
           file: input.preview,
           request: session.preview.upload,
           signal: input.signal,

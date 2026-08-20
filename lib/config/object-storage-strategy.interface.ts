@@ -49,3 +49,7 @@ export interface ObjectStorage {
     expiresInSeconds?: number,
   ): Promise<string>;
 }
+
+export function toObjectKey(location: ObjectLocation) {
+  return location.folder.concat(location.key).join("/");
+}

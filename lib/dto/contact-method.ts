@@ -4,13 +4,15 @@ import {
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
+  booleanFilterOperators,
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  stringFilterOperators,
 } from "./common";
 import {
+  createPaginatedListInputSchema,
   createPaginatedListOutputSchema,
-  paginatedListInputSchema,
 } from "./paginated-list";
 
 const contactMethodTranslationSchema = baseTranslationEntity.extend({
@@ -107,14 +109,15 @@ export type DeleteContactMethodsOutputSchema = z.infer<
 >;
 
 //###################### List #######################
-export const contactMethodListInputSchema = paginatedListInputSchema.extend({
-  filter: z
+export const contactMethodListInputSchema = createPaginatedListInputSchema(
+  z
     .object({
-      name: z.object({ contains: z.string() }).optional(),
-      enabled: z.object({ equals: z.boolean() }).optional(),
+      name: stringFilterOperators,
+      enabled: booleanFilterOperators,
     })
-    .optional(),
-});
+    .partial(),
+);
+
 export type ContactMethodListInputSchema = z.infer<
   typeof contactMethodListInputSchema
 >;

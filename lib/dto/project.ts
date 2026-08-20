@@ -6,15 +6,17 @@ import {
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
+  booleanFilterOperators,
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  stringFilterOperators,
 } from "./common";
 import { education } from "./education";
 import { languageCodeSchema } from "./language-code";
 import {
+  createPaginatedListInputSchema,
   createPaginatedListOutputSchema,
-  paginatedSoftDeletableListInputSchema,
 } from "./paginated-list";
 import { skill } from "./skill";
 
@@ -167,20 +169,26 @@ export type DeleteProjectOutputSchema = z.infer<
 >;
 
 //###################### List #######################
-export const projectListInputSchema =
-  paginatedSoftDeletableListInputSchema.extend({
-    filter: z
-      .object({
-        name: z.object({ contains: z.string() }).optional(),
-        slug: z.object({ equals: z.string() }).optional(),
-        enabled: z.object({ equals: z.boolean() }).optional(),
-        featured: z.object({ equals: z.boolean() }).optional(),
-        finished: z.object({ equals: z.boolean() }).optional(),
-        liveDemoUrl: z.object({ contains: z.string() }).optional(),
-        repoUrl: z.object({ contains: z.string() }).optional(),
-      })
-      .optional(),
-  });
+
+const projectListInputSchema = createPaginatedListInputSchema(
+  z
+    .object({
+      name: stringFilterOperators,
+      slug: stringFilterOperators,
+      enabled: booleanFilterOperators,
+      featured: booleanFilterOperators,
+      finished: booleanFilterOperators,
+      liveDemoUrl: stringFilterOperators,
+      repoUrl: stringFilterOperators,
+    })
+    .partial(),
+)
+  .unwrap()
+  .extend({
+    includeSoftDeleted: z.boolean(),
+  })
+  .partial();
+
 export type ProjectListInputSchema = z.infer<typeof projectListInputSchema>;
 
 export const projectListOutputSchema = createPaginatedListOutputSchema(

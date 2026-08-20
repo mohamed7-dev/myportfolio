@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
       {
         hostname: "m48vtebflu.ufs.sh",
       },
+      {
+        hostname: "localhost",
+      },
     ],
   },
 

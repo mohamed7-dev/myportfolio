@@ -7,10 +7,11 @@ import {
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  stringFilterOperators,
 } from "./common";
 import {
+  createPaginatedListInputSchema,
   createPaginatedListOutputSchema,
-  paginatedListInputSchema,
 } from "./paginated-list";
 
 export enum AchievementType {
@@ -117,13 +118,13 @@ export type DeleteAchievementsOutputSchema = z.infer<
 >;
 
 //###################### List #######################
-export const achievementListInputSchema = paginatedListInputSchema.extend({
-  filter: z
+export const achievementListInputSchema = createPaginatedListInputSchema(
+  z
     .object({
-      name: z.object({ contains: z.string() }).optional(),
+      name: stringFilterOperators,
     })
-    .optional(),
-});
+    .partial(),
+);
 export type AchievementListInputSchema = z.infer<
   typeof achievementListInputSchema
 >;

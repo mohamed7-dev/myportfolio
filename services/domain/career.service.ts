@@ -15,10 +15,7 @@ import { CareerTranslation } from "@/orm/entities/career/career.translation";
 import { ormService } from "@/orm/orm.service";
 import { careersSeed } from "@/orm/seed/careers";
 import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
-import {
-  convertDate,
-  listQueryBuilder,
-} from "../helpers/list-query-builder.service";
+import { listQueryBuilder } from "../helpers/list-query-builder/list-query-builder.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { translator } from "../helpers/translator.service";
@@ -87,7 +84,7 @@ class CareerService {
     options: CareerListInputSchema,
     relations?: FindOptionsRelations<Career>,
   ) {
-    const qb = await listQueryBuilder.build(Career, options, {
+    const qb = await listQueryBuilder.build(Career, options as any, {
       ctx,
       alias: "career",
       relations: {
@@ -98,60 +95,6 @@ class CareerService {
         ...relations,
       },
     });
-
-    if (options?.filter?.name) {
-      const name = options.filter.name.contains;
-      if (name) {
-        qb.andWhere("career__translations.name LIKE :name", {
-          name: `%${typeof name === "string" ? name.trim() : name}%`,
-        });
-      }
-    }
-
-    if (options?.filter?.location) {
-      const location = options.filter.location.contains;
-      if (location) {
-        qb.andWhere("career__translations.location LIKE :location", {
-          location: `%${typeof location === "string" ? location.trim() : location}%`,
-        });
-      }
-    }
-
-    if (options?.filter?.organization) {
-      const organization = options.filter.organization.contains;
-      if (organization) {
-        qb.andWhere("career__translations.organization LIKE :organization", {
-          organization: `%${typeof organization === "string" ? organization.trim() : organization}%`,
-        });
-      }
-    }
-
-    if (options?.filter?.isPresent) {
-      const isPresent = options.filter.isPresent.equals;
-      if (isPresent !== undefined) {
-        qb.andWhere("career.isPresent = :isPresent", {
-          isPresent,
-        });
-      }
-    }
-
-    if (options?.filter?.startDate) {
-      const startDate = options.filter.startDate.equals;
-      if (startDate) {
-        qb.andWhere("career.startDate = :startDate", {
-          startDate: convertDate(startDate),
-        });
-      }
-    }
-
-    if (options?.filter?.endDate) {
-      const endDate = options.filter.endDate.equals;
-      if (endDate) {
-        qb.andWhere("career.endDate = :endDate", {
-          endDate: convertDate(endDate),
-        });
-      }
-    }
 
     return await qb.getManyAndCount().then((result) => {
       return {

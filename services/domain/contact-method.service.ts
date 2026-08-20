@@ -14,7 +14,7 @@ import { ContactMethodTranslation } from "@/orm/entities/contact-method/contact-
 import { ormService } from "@/orm/orm.service";
 import { contactMethodsSeed } from "@/orm/seed/contact-methods";
 import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
-import { listQueryBuilder } from "../helpers/list-query-builder.service";
+import { listQueryBuilder } from "../helpers/list-query-builder/list-query-builder.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { translator } from "../helpers/translator.service";
 import { assetService } from "./asset.service";
@@ -84,15 +84,6 @@ class ContactMethodService {
         ...relations,
       },
     });
-
-    if (options?.filter?.name) {
-      const name = options.filter.name.contains;
-      if (name) {
-        qb.andWhere("cm__translations.name LIKE :name", {
-          name: `%${typeof name === "string" ? name.trim() : name}%`,
-        });
-      }
-    }
 
     return await qb.getManyAndCount().then((result) => {
       return {

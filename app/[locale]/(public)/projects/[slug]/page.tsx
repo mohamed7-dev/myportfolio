@@ -80,6 +80,7 @@ export default async function ProjectPage({
                         key={skill.id}
                         asset={skill.featuredAsset}
                         transform={{ preset: "tiny", mode: "resize" }}
+                        className="size-14 object-contain"
                       />
                     );
                   }

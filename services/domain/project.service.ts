@@ -20,7 +20,7 @@ import type { Skill } from "@/orm/entities/skill/skill.entity";
 import { ormService } from "@/orm/orm.service";
 import { projectsSeed } from "@/orm/seed/projects";
 import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
-import { listQueryBuilder } from "../helpers/list-query-builder.service";
+import { listQueryBuilder } from "../helpers/list-query-builder/list-query-builder.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { translator } from "../helpers/translator.service";
@@ -118,60 +118,6 @@ class ProjectService {
         ...relations,
       },
     });
-
-    if (!input.includeSoftDeleted) {
-      qb.andWhere("project.deletedAt IS NULL");
-    }
-
-    if (input?.filter?.name) {
-      const name = input.filter.name.contains;
-      if (name) {
-        qb.andWhere("project__translations.name LIKE :name", {
-          name: `%${typeof name === "string" ? name.trim() : name}%`,
-        });
-      }
-    }
-
-    if (input?.filter?.slug) {
-      const slug = input.filter.slug.equals;
-      if (slug) {
-        qb.andWhere("project__translations.slug = :slug", {
-          slug: `${typeof slug === "string" ? slug.trim() : slug}`,
-        });
-      }
-    }
-
-    if (input?.filter?.enabled !== undefined) {
-      const enabled = input.filter.enabled.equals;
-      qb.andWhere("project.enabled = :enabled", {
-        enabled: enabled,
-      });
-    }
-
-    if (input?.filter?.featured !== undefined) {
-      const featured = input.filter.featured.equals;
-      qb.andWhere("project.featured = :featured", {
-        featured: featured,
-      });
-    }
-
-    if (input?.filter?.liveDemoUrl) {
-      const liveDemoUrl = input.filter.liveDemoUrl.contains;
-      if (liveDemoUrl) {
-        qb.andWhere("project.liveDemoUrl LIKE :liveDemoUrl", {
-          liveDemoUrl: `%${typeof liveDemoUrl === "string" ? liveDemoUrl.trim() : liveDemoUrl}%`,
-        });
-      }
-    }
-
-    if (input?.filter?.repoUrl) {
-      const repoUrl = input.filter.repoUrl.contains;
-      if (repoUrl) {
-        qb.andWhere("project.repoUrl LIKE :repoUrl", {
-          repoUrl: `%${typeof repoUrl === "string" ? repoUrl.trim() : repoUrl}%`,
-        });
-      }
-    }
 
     return await qb.getManyAndCount().then((result) => {
       return {

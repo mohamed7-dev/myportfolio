@@ -15,10 +15,7 @@ import { EducationTranslation } from "@/orm/entities/education/education-transla
 import { ormService } from "@/orm/orm.service";
 import { educationSeed } from "@/orm/seed/education";
 import type { SeededAssetGroup } from "@/orm/seed/seed-asset";
-import {
-  convertDate,
-  listQueryBuilder,
-} from "../helpers/list-query-builder.service";
+import { listQueryBuilder } from "../helpers/list-query-builder/list-query-builder.service";
 import { slugValidator } from "../helpers/slug-validator.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { translator } from "../helpers/translator.service";
@@ -86,7 +83,7 @@ class EducationService {
     options: EducationListInputSchema,
     relations?: FindOptionsRelations<Education>,
   ) {
-    const qb = await listQueryBuilder.build(Education, options, {
+    const qb = await listQueryBuilder.build(Education, options as any, {
       ctx,
       alias: "edu",
       relations: {
@@ -97,60 +94,6 @@ class EducationService {
         ...relations,
       },
     });
-
-    if (options?.filter?.school) {
-      const school = options.filter.school.contains;
-      if (school) {
-        qb.andWhere("edu__translations.school LIKE :school", {
-          school: `%${typeof school === "string" ? school.trim() : school}%`,
-        });
-      }
-    }
-
-    if (options?.filter?.location) {
-      const location = options.filter.location.contains;
-      if (location) {
-        qb.andWhere("edu__translations.location LIKE :location", {
-          location: `%${typeof location === "string" ? location.trim() : location}%`,
-        });
-      }
-    }
-
-    if (options?.filter?.degree) {
-      const degree = options.filter.degree.contains;
-      if (degree) {
-        qb.andWhere("edu__translations.organization LIKE :degree", {
-          degree: `%${typeof degree === "string" ? degree.trim() : degree}%`,
-        });
-      }
-    }
-
-    if (options?.filter?.isPresent) {
-      const isPresent = options.filter.isPresent.equals;
-      if (isPresent !== undefined) {
-        qb.andWhere("edu.isPresent = :isPresent", {
-          isPresent,
-        });
-      }
-    }
-
-    if (options?.filter?.startDate) {
-      const startDate = options.filter.startDate.equals;
-      if (startDate) {
-        qb.andWhere("edu.startDate = :startDate", {
-          startDate: convertDate(startDate),
-        });
-      }
-    }
-
-    if (options?.filter?.endDate) {
-      const endDate = options.filter.endDate.equals;
-      if (endDate) {
-        qb.andWhere("edu.endDate = :endDate", {
-          endDate: convertDate(endDate),
-        });
-      }
-    }
 
     return await qb.getManyAndCount().then((result) => {
       return {

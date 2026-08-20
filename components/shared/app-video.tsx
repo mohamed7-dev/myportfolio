@@ -36,7 +36,9 @@ export function AppVideo({
 }: AppVideoProps) {
   const { quality, preset = null, mode = null } = transform;
 
-  const size = resolveSize(preset, width, height);
+  const size = isDevelopmentMode()
+    ? { width: asset?.width, height: asset?.height }
+    : resolveSize(preset, width, height);
 
   if (!asset) {
     return (
@@ -60,16 +62,18 @@ export function AppVideo({
       preload="metadata"
       poster={
         isDevelopmentMode()
-          ? asset.previewIdentifier
+          ? `/object-storage/${asset.previewIdentifier}`
           : getCldImageUrl({ src: asset.previewIdentifier })
       }
+      width={videoWidth}
+      height={videoHeight}
       {...props}
-      className={cn("size-full object-cover", className)}
+      className={cn("size-full object-contain", className)}
     >
       <source
         src={
           isDevelopmentMode()
-            ? asset.sourceIdentifier
+            ? `/object-storage/${asset.sourceIdentifier}`
             : getCldVideoUrl({
                 src: asset.sourceIdentifier,
                 crop: mode === "resize" ? "fit" : "fill",

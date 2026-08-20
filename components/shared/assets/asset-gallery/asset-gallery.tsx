@@ -15,6 +15,7 @@ import type {
   AssetListOutputSchema,
 } from "@/lib/dto/asset";
 import { AssetUploader } from "@/lib/upload/asset-uploader";
+import { uploadFile } from "@/lib/upload/upload";
 import { UploadDropZone } from "../../upload-drop-zone";
 import { AssetBulkActions } from "../asset-bulk-actions";
 import { DeleteAssetsBulkAction } from "../delete-assets-bulk-action";
@@ -48,7 +49,7 @@ export function AssetGallery({
   const [previewProgress, setPreviewProgress] = React.useState(0);
 
   const [assetType, setAssetType] = React.useState<AssetTypeUnion>(
-    AssetType.ALL,
+    AssetType.all,
   );
   const [searchInput, setSearchInput] = React.useState("");
   const debouncedSearch = useDebounce(searchInput, 500);
@@ -70,11 +71,12 @@ export function AssetGallery({
       const assetUploader = new AssetUploader();
       const ac = new AbortController();
       const data = await assetUploader.upload({
-        source: input.source,
-        preview: input.preview,
+        source: { data: input.source, name: input.source.name },
+        preview: { data: input.preview, name: input.preview.name },
         signal: ac.signal,
         onSourceProgress: (progress) => setSourceProgress(progress),
         onPreviewProgress: (progress) => setPreviewProgress(progress),
+        uploadHandler: uploadFile,
       });
       return data;
     },
@@ -102,7 +104,7 @@ export function AssetGallery({
         };
       }
 
-      if (assetType !== AssetType.ALL) {
+      if (assetType !== AssetType.all) {
         filter.type = {
           equals: assetType,
         };

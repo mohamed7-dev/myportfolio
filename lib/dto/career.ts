@@ -4,13 +4,16 @@ import {
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
+  booleanFilterOperators,
+  dateTimeFilterOperators,
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  stringFilterOperators,
 } from "./common";
 import {
+  createPaginatedListInputSchema,
   createPaginatedListOutputSchema,
-  paginatedListInputSchema,
 } from "./paginated-list";
 
 export enum CareerType {
@@ -137,18 +140,19 @@ export type DeleteCareersOutputSchema = z.infer<
 >;
 
 //###################### List #######################
-export const careerListInputSchema = paginatedListInputSchema.extend({
-  filter: z
+export const careerListInputSchema = createPaginatedListInputSchema(
+  z
     .object({
-      name: z.object({ contains: z.string() }).optional(),
-      organization: z.object({ contains: z.string() }).optional(),
-      location: z.object({ contains: z.string() }).optional(),
-      startDate: z.object({ equals: z.coerce.date() }).optional(),
-      endDate: z.object({ equals: z.coerce.date() }).optional(),
-      isPresent: z.object({ equals: z.boolean() }).optional(),
+      name: stringFilterOperators,
+      organization: stringFilterOperators,
+      location: stringFilterOperators,
+      startDate: dateTimeFilterOperators,
+      endDate: dateTimeFilterOperators,
+      isPresent: booleanFilterOperators,
     })
-    .optional(),
-});
+    .partial(),
+);
+
 export type CareerListInputSchema = z.infer<typeof careerListInputSchema>;
 
 export const careerListOutputSchema = createPaginatedListOutputSchema(career);

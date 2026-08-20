@@ -9,6 +9,7 @@ import type {
   AssetListInputSchema,
   CreateAssetInputSchema,
   DeleteAssetsInputSchema,
+  DownloadAssetInputSchema,
   UpdateAssetInputSchema,
 } from "@/lib/dto/asset";
 import {
@@ -46,7 +47,7 @@ import { ProjectAsset } from "@/orm/entities/project/project-asset.entity";
 import { SkillAsset } from "@/orm/entities/skill/skill-asset.entity";
 import { ormService } from "@/orm/orm.service";
 import { patchEntity } from "@/orm/utils/patch-entity";
-import { listQueryBuilder } from "../helpers/list-query-builder.service";
+import { listQueryBuilder } from "../helpers/list-query-builder/list-query-builder.service";
 import { translatableSaver } from "../helpers/translatable-saver/translatable-saver.service";
 import { translator } from "../helpers/translator.service";
 import { tagService } from "./tag.service";
@@ -70,17 +71,6 @@ class AssetService {
         translations: true,
       },
     });
-    if (options?.filter?.type) {
-      qb.andWhere("asset.type = :type", { type: options.filter.type.equals });
-    }
-    if (options?.filter?.name) {
-      const name = options.filter.name.contains;
-      if (name) {
-        qb.andWhere("asset__translations.name LIKE :name", {
-          name: `%${typeof name === "string" ? name.trim() : name}%`,
-        });
-      }
-    }
     return await qb.getManyAndCount().then((result) => {
       return {
         items: result[0].flatMap((asset) =>
@@ -320,9 +310,19 @@ class AssetService {
 
     const previewFileKey = "preview";
 
+    const sourceObjectLocation = this.getObjectLocation(
+      uploadId,
+      `source_${input.source.name}`,
+    );
+
+    const previewObjectLocation = this.getObjectLocation(
+      uploadId,
+      `preview_${input.preview.name}`,
+    );
+
     const [sourceUploadUrl, previewUploadUrl] = await Promise.all([
       serverConfig.asset.objectStorageStrategy.createUploadRequest({
-        location: this.getObjectLocation(uploadId, "source"),
+        location: sourceObjectLocation,
         contentType: input.source.mimeType,
         contentLength: input.source.size,
         expiresInSeconds: 15 * 60,
@@ -330,7 +330,7 @@ class AssetService {
       }),
 
       serverConfig.asset.objectStorageStrategy.createUploadRequest({
-        location: this.getObjectLocation(uploadId, "preview"),
+        location: previewObjectLocation,
         contentType: input.preview.mimeType,
         contentLength: input.preview.size,
         expiresInSeconds: 15 * 60,
@@ -342,8 +342,8 @@ class AssetService {
 
     const upload = new AssetUpload({
       id: uploadId,
-      sourceFileLocation: this.getObjectLocation(uploadId, "source"),
-      previewFileLocation: this.getObjectLocation(uploadId, "preview"),
+      sourceFileLocation: sourceObjectLocation,
+      previewFileLocation: previewObjectLocation,
       sourceFileName: input.source.name,
       sourceMimeType: input.source.mimeType,
       sourceSize: input.source.size,
@@ -474,15 +474,17 @@ class AssetService {
       throw new ConflictError("Upload session has expired.");
     }
 
+    const { objectStorageStrategy } = serverConfig.asset;
+
     /*
      * Verify the actual objects in storage.
      */
     const [sourceObject, previewObject] = await Promise.allSettled([
-      serverConfig.asset.objectStorageStrategy.headObject(
+      objectStorageStrategy.headObject(
         this.getObjectLocation(upload.id, upload.sourceFileLocation.key),
         upload.sourceResourceType,
       ),
-      serverConfig.asset.objectStorageStrategy.headObject(
+      objectStorageStrategy.headObject(
         this.getObjectLocation(upload.id, upload.previewFileLocation.key),
         upload.previewResourceType,
       ),
@@ -496,12 +498,15 @@ class AssetService {
       throw new UserInputError("Preview file was not uploaded.");
     }
 
-    const sourceIdentifier = upload.sourceFileLocation.folder
-      .concat(upload.sourceFileLocation.key)
-      .join("/");
-    const previewIdentifier = upload.previewFileLocation.folder
-      .concat(upload.previewFileLocation.key)
-      .join("/");
+    const sourceIdentifier = [
+      ...upload.sourceFileLocation.folder,
+      upload.sourceFileLocation.key,
+    ].join("/");
+
+    const previewIdentifier = [
+      ...upload.previewFileLocation.folder,
+      upload.previewFileLocation.key,
+    ].join("/");
 
     const asset = await this.create(ctx, {
       sourceIdentifier,
@@ -510,8 +515,14 @@ class AssetService {
       sourceFileMimetype: upload.sourceMimeType,
       sourceFileSize: upload.sourceSize,
       type: upload.sourceResourceType,
-      width: sourceObject.value?.metadata["width"] as number,
-      height: sourceObject.value?.metadata["height"] as number,
+      width:
+        upload.sourceResourceType === ObjectStorageResourceType.image
+          ? (sourceObject.value?.metadata["width"] as number)
+          : (previewObject.value?.metadata["width"] as number),
+      height:
+        upload.sourceResourceType === ObjectStorageResourceType.image
+          ? (sourceObject.value?.metadata["height"] as number)
+          : (previewObject.value?.metadata["height"] as number),
     });
 
     upload.status = AssetUploadStatus.COMMITTED;
@@ -523,6 +534,43 @@ class AssetService {
     return {
       assetId: asset.id,
     };
+  }
+
+  public async getAssetDownloadUrl(
+    ctx: RequestContext,
+    input: DownloadAssetInputSchema,
+  ) {
+    const assetRepo = await ormService.getRepository(ctx, Asset);
+    const asset = await assetRepo.findOne({
+      where: {
+        id: input.assetId,
+      },
+    });
+
+    if (!asset) {
+      throw new EntityNotFoundError("Asset not found");
+    }
+
+    const assetUploadRepo = await ormService.getRepository(ctx, AssetUpload);
+    const assetUpload = await assetUploadRepo.findOne({
+      where: {
+        asset: {
+          id: asset.id,
+        },
+      },
+    });
+
+    if (!assetUpload || assetUpload.status !== AssetUploadStatus.COMMITTED) {
+      throw new UserInputError("Asset has not been uploaded");
+    }
+
+    const url =
+      await serverConfig.asset.objectStorageStrategy.createDownloadUrl(
+        assetUpload.sourceFileLocation,
+        asset.type,
+      );
+
+    return url;
   }
 
   private getStorageResourceType(mimeType: string): ObjectStorageResourceType {

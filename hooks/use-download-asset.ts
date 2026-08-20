@@ -1,19 +1,32 @@
 import React from "react";
+import type { DownloadAssetOutputSchema } from "@/lib/dto/asset";
+import { apiUrl } from "@/lib/helpers/router";
 
 export function useDownloadAsset() {
   const [isDownloading, setIsDownloading] = React.useState(false);
 
-  async function downloadAsset(url: string, filename: string) {
+  async function downloadAsset(id: string, filename: string) {
     try {
       setIsDownloading(true);
 
-      const response = await fetch(url);
+      const getDownloadUrlResponse = await fetch(
+        apiUrl(`assets/${id}/download`),
+      );
 
-      if (!response.ok) {
+      if (!getDownloadUrlResponse.ok) {
+        throw new Error("Failed to get download url");
+      }
+
+      const downloadUrlData =
+        (await getDownloadUrlResponse.json()) as DownloadAssetOutputSchema;
+
+      const downloadRes = await fetch(downloadUrlData.downloadUrl);
+
+      if (!downloadRes.ok) {
         throw new Error("Failed to download file");
       }
 
-      const blob = await response.blob();
+      const blob = await downloadRes.blob();
 
       const blobUrl = URL.createObjectURL(blob);
 
