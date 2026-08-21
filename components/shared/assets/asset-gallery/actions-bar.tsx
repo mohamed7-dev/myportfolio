@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRouterUtils } from "@/hooks/use-router-utils";
 import type { Tag } from "@/lib/dto/tag";
 import { AssetType, type AssetTypeUnion } from "./asset-gallery";
 
@@ -19,6 +18,8 @@ interface ActionsBarProps {
   assetType: AssetTypeUnion;
   onAssetTypeChange: (type: AssetTypeUnion) => void;
   tags: Tag[];
+  onSelectingTag: (value: string) => void;
+  currentTag?: string;
 }
 
 export function ActionsBar({
@@ -27,10 +28,10 @@ export function ActionsBar({
   assetType,
   onAssetTypeChange,
   tags,
+  onSelectingTag,
+  currentTag,
 }: ActionsBarProps) {
   const [open, setOpen] = React.useState(false);
-  const { searchParams, updateSearchParams } = useRouterUtils();
-  const currentTag = searchParams.get("tag") ?? "";
 
   return (
     <div className="flex flex-col md:flex-row gap-2">
@@ -48,11 +49,7 @@ export function ActionsBar({
         open={open}
         onOpenChange={setOpen}
         onSelectChange={(tag) => {
-          if (tag !== currentTag) {
-            updateSearchParams({ tag: tag });
-          } else {
-            updateSearchParams({ tag: null });
-          }
+          onSelectingTag(tag);
         }}
         selectedIds={[tags.find((t) => t.id === currentTag)?.id ?? ""]}
         data={tags.map((t) => ({ id: t.id, label: t.value }))}

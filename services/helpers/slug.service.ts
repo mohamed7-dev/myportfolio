@@ -64,7 +64,7 @@ class SlugService {
     fieldName: string,
   ): Promise<EntityFieldInfo> {
     const metadata = (await ormService.getDataSource()).entityMetadatas.find(
-      (m) => m.name === entityName,
+      (m) => m.tableName === entityName.toLowerCase(),
     );
     if (!metadata) {
       throw new UserInputError("Entity not found", { entityName });

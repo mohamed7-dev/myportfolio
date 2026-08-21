@@ -1,10 +1,10 @@
 "use client";
 import { CopyIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useScopedI18n } from "@/i18n/client";
 import type { GetPublicContactMethodsOutputSchema } from "@/lib/dto/visitor";
 
 export function PrimaryContactMethodCopy({
@@ -12,7 +12,7 @@ export function PrimaryContactMethodCopy({
 }: {
   primaryContactMethod: GetPublicContactMethodsOutputSchema["items"][number];
 }) {
-  const i18n = useTranslations("contact");
+  const i18n = useScopedI18n("contact");
   const copy = React.useCallback(async () => {
     if (primaryContactMethod.copyableText) {
       await navigator.clipboard

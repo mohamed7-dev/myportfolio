@@ -6,6 +6,12 @@ export const apiUrl = (path: string) => {
 
 export const apiRoutes = {
   assets: {
+    list: {
+      url: (searchParams: URLSearchParams) =>
+        apiUrl(`assets?${searchParams.toString()}`),
+      method: "GET",
+      contentType: null,
+    },
     update: {
       url: apiUrl("assets"),
       method: "PATCH",
@@ -179,8 +185,10 @@ export const apiRoutes = {
       contentType: "multipart/form-data",
     },
     download: {
-      url: (searchParams: URLSearchParams) =>
-        apiUrl(`object-storage/download?${searchParams.toString()}`),
+      url: (searchParams?: URLSearchParams) =>
+        apiUrl(
+          `object-storage/download${searchParams ? "?" + searchParams.toString() : ""}`,
+        ),
       method: "POST",
       contentType: null,
     },

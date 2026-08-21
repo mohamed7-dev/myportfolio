@@ -5,7 +5,7 @@ import {
   TerminalSquareIcon,
   WrenchIcon,
 } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { setStaticParamsLocale } from "next-international/server";
 import { wrapService } from "@/api/common/create-router";
 import { Page, PageTitle } from "@/components/page-layout/page";
 import { PageBlock } from "@/components/page-layout/page-block";
@@ -15,12 +15,18 @@ import { CardWrapper } from "@/components/shared/card-wrapper";
 import { IconTile } from "@/components/shared/icon-tile";
 import { MediaGallery } from "@/components/shared/media-gallery";
 import { Badge } from "@/components/ui/badge";
+import { getScopedI18n } from "@/i18n/server";
 import { SkillCategory } from "@/lib/dto/skill";
 import { visitorService } from "@/services/domain/visitor.service";
 import { SummaryCard } from "./_components/summary-card";
 
-export default async function AboutPage() {
-  const i18n = await getTranslations("about");
+export default async function AboutPage({
+  params,
+}: PageProps<"/[locale]/about">) {
+  const { locale } = await params;
+  setStaticParamsLocale(locale);
+
+  const i18n = await getScopedI18n("about");
 
   const getSuperAdminProfile = wrapService({
     authenticatedOnly: false,

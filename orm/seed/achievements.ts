@@ -18,13 +18,13 @@ export const achievementsSeed: SeedAchievement[] = [
 
     translations: [
       {
-        languageCode: LanguageCode["en-US "],
+        languageCode: LanguageCode["en"],
         name: "Professional Certificate",
         slug: "professional-certificate",
         organization: "Organization Name",
       },
       {
-        languageCode: LanguageCode["ar-EG"],
+        languageCode: LanguageCode["ar"],
         name: "شهادة مهنية",
         slug: "شهادة-مهنية",
         organization: "اسم المؤسسة",

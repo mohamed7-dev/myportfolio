@@ -1,18 +1,12 @@
 "use client";
-import { type AbstractIntlMessages, NextIntlClientProvider } from "next-intl";
+import { I18nProviderClient } from "@/i18n/client";
 
 export function I18nProvider({
   children,
   locale,
-  messages,
 }: {
   children: React.ReactNode;
   locale: string;
-  messages: AbstractIntlMessages;
 }) {
-  return (
-    <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
-      {children}
-    </NextIntlClientProvider>
-  );
+  return <I18nProviderClient locale={locale}>{children}</I18nProviderClient>;
 }

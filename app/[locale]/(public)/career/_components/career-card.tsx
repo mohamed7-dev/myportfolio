@@ -1,11 +1,11 @@
 "use client";
 import { BrainCircuitIcon, MapPinIcon, ZapIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { AppImage } from "@/components/shared/app-image";
 import { IconTile } from "@/components/shared/icon-tile";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
+import { useI18n } from "@/i18n/client";
 import { CareerMode, CareerType } from "@/lib/dto/career";
 import type { GetPublicCareerOutputSchema } from "@/lib/dto/visitor";
 
@@ -15,7 +15,7 @@ export function CareerCard({
   careerItem: GetPublicCareerOutputSchema["items"][number];
 }) {
   const { formatDate } = useLocalFormatter();
-  const i18n = useTranslations();
+  const i18n = useI18n();
 
   const resolveCareerType = (type: CareerType) => {
     switch (type) {

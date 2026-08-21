@@ -3,7 +3,7 @@ import { LanguageCode } from "@/lib/dto/language-code";
 export const profileSeed = {
   translations: [
     {
-      languageCode: LanguageCode["en-US "],
+      languageCode: LanguageCode["en"],
       summary:
         "Software engineer focused on building reliable, accessible, and high-performance web applications. I work across frontend, backend, databases, and infrastructure to turn complex requirements into maintainable production systems.",
       displayName: "Mohamed Shaban",
@@ -19,7 +19,7 @@ export const profileSeed = {
     },
 
     {
-      languageCode: LanguageCode["ar-EG"],
+      languageCode: LanguageCode["ar"],
       summary:
         "مهندس برمجيات أركز على بناء تطبيقات ويب موثوقة، سهلة الوصول، وعالية الأداء. أعمل على الواجهات الأمامية والخلفية وقواعد البيانات والبنية التحتية لتحويل المتطلبات المعقدة إلى أنظمة إنتاجية قابلة للصيانة.",
       displayName: "محمد شعبان",

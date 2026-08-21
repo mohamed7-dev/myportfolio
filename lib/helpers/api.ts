@@ -1,3 +1,6 @@
+import { LOCALE_HEADER } from "@/lib/constants";
+import type { LanguageCode } from "@/lib/dto/language-code";
+
 type BaseRouteConfig = {
   url: string;
   method: string;
@@ -19,24 +22,28 @@ export function api(
   routeConfig: EmptyRouteConfig,
   body?: undefined,
   isProtected?: boolean,
+  locale?: LanguageCode,
 ): Promise<Response>;
 
 export function api(
   routeConfig: JsonRouteConfig,
   body: object,
   isProtected?: boolean,
+  locale?: LanguageCode,
 ): Promise<Response>;
 
 export function api(
   routeConfig: MultipartRouteConfig,
   body: FormData,
   isProtected?: boolean,
+  locale?: LanguageCode,
 ): Promise<Response>;
 
 export function api(
   routeConfig: EmptyRouteConfig | JsonRouteConfig | MultipartRouteConfig,
   body?: object | FormData,
   isProtected = false,
+  locale?: LanguageCode,
 ) {
   let requestBody: BodyInit | undefined;
 
@@ -48,7 +55,7 @@ export function api(
 
   return fetch(routeConfig.url, {
     method: routeConfig.method,
-    credentials: isProtected ? "include" : "omit",
+    credentials: isProtected ? "include" : "same-origin",
 
     ...(requestBody !== undefined && {
       body: requestBody,
@@ -57,7 +64,13 @@ export function api(
     ...(routeConfig.contentType === "application/json" && {
       headers: {
         "Content-Type": "application/json",
+        ...(locale && { [LOCALE_HEADER]: locale }),
       },
     }),
+
+    ...(locale &&
+      routeConfig.contentType !== "application/json" && {
+        headers: { [LOCALE_HEADER]: locale },
+      }),
   });
 }

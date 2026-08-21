@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { setStaticParamsLocale } from "next-international/server";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -7,11 +7,17 @@ import {
 } from "@/components/page-layout/page";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { getScopedI18n } from "@/i18n/server";
 import { visitorService } from "@/services/domain/visitor.service";
 import { AchievementCard } from "./_components/achievement-card";
 
-export default async function AchievementsPage() {
-  const i18n = await getTranslations("achievements");
+export default async function AchievementsPage({
+  params,
+}: PageProps<"/[locale]/achievements">) {
+  const { locale } = await params;
+  setStaticParamsLocale(locale);
+
+  const i18n = await getScopedI18n("achievements");
 
   const getAchievements = wrapService({
     authenticatedOnly: false,

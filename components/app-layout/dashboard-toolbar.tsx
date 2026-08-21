@@ -1,4 +1,4 @@
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { Button } from "../ui/button";
 import { SidebarTrigger } from "../ui/sidebar";
 

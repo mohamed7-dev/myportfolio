@@ -1,10 +1,10 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useRouter } from "@/i18n/navigation";
 import {
   type AuthenticateAdminUserInputSchema,
   type AuthenticateAdminUserOutputSchema,
@@ -46,11 +46,9 @@ export function LoginForm() {
         if (isAppError(data)) {
           throw data;
         }
-        if (data.username) {
-          setUserInfoToLS(data);
-          toast.success("Authenticated successfully");
-          router.replace({ pathname: "/dashboard" });
-        }
+        setUserInfoToLS(data);
+        toast.success("Authenticated successfully");
+        router.replace("/dashboard");
       })
       .catch((e) => {
         toast.error(`Failure: ${(e as Error).message}`);

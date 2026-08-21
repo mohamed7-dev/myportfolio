@@ -1,19 +1,17 @@
 import type { NextRequest } from "next/server";
 import { ContactEmail } from "@/components/email-templates/contact-email";
-import type { routing } from "@/i18n/routing";
+import { LOCALE_HEADER } from "@/lib/constants";
 import { sendContactEmailInputSchema } from "@/lib/dto/email";
+import { languageCodeSchema } from "@/lib/dto/language-code";
 import { handleApiErrors } from "@/lib/helpers/handle-api-errors";
 import { resend } from "@/lib/helpers/resend";
 import { validateInput } from "@/lib/helpers/validate-input";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ locale: (typeof routing.locales)[number] }> },
-) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const parsedBody = validateInput(body, sendContactEmailInputSchema);
-    const { locale } = await params;
+    const locale = languageCodeSchema.parse(req.headers.get(LOCALE_HEADER));
     const { data, error } = await resend.emails.send({
       from: "Acme <onboarding@resend.dev>",
       to: ["mo.job3830@gmail.com"],

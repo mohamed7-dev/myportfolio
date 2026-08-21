@@ -1,4 +1,4 @@
-import { useLocale } from "next-intl";
+import { useCurrentLocale } from "@/i18n/client";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import {
   getBcp47LanguageTag,
@@ -7,7 +7,7 @@ import {
 } from "@/lib/helpers/locale-utils";
 
 export function useLocaleUtils() {
-  const displayLocale = useLocale() as LanguageCode;
+  const displayLocale = useCurrentLocale() as LanguageCode;
 
   return {
     bcp47LanguageTag: getBcp47LanguageTag(displayLocale),

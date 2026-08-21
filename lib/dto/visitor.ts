@@ -103,6 +103,7 @@ const publicProjectInList = project
     featuredAsset: true,
     career: true,
     education: true,
+    translations: true,
   })
   .extend({
     skills: z.array(skill.pick({ id: true, name: true, slug: true })),

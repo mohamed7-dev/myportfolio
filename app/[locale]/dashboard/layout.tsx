@@ -1,12 +1,10 @@
+import { redirect } from "next/navigation";
 import { DashboardLayout as DashboardLayoutImpl } from "@/components/app-layout/dashboard-layout";
-import { redirect } from "@/i18n/navigation";
 import { requestContextService } from "@/services/helpers/request-context.service";
 
 export default async function DashboardLayout({
   children,
-  params,
 }: LayoutProps<"/[locale]/dashboard">) {
-  const { locale } = await params;
   const requestContext = await requestContextService.create(
     undefined,
     undefined,
@@ -14,7 +12,7 @@ export default async function DashboardLayout({
   );
 
   if (!requestContext.isAuthenticated) {
-    redirect({ href: "/login", locale });
+    redirect("/login", "replace");
   }
 
   return <DashboardLayoutImpl>{children} </DashboardLayoutImpl>;

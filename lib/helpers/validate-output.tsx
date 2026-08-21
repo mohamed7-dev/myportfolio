@@ -6,7 +6,6 @@ export function validateOutput<Output = any>(
   schema: ZodSchema<Output>,
 ): Output {
   const r = schema.safeParse(input);
-  console.log(r.error);
   if (!r.success) {
     throw new InternalServerError("Internal Server Error");
   }

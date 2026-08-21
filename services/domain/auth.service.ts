@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import type { RequestContext } from "@/api/request-context/request-context";
+import { serverConfig } from "@/lib/config/server-config";
 import type {
   AuthenticateAdminUserInputSchema,
   LogoutInputSchema,
@@ -83,7 +84,7 @@ class AuthService {
   }
 
   public async getSession(ctx: RequestContext) {
-    const sessionToken = (await cookies()).get("session");
+    const sessionToken = (await cookies()).get(serverConfig.sessionKey);
     if (!sessionToken?.value) {
       return undefined;
     }

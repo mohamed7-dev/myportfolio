@@ -4,13 +4,12 @@ import "./globals.css";
 import "reflect-metadata";
 import { Analytics } from "@vercel/analytics/next";
 import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { getMessages } from "next-intl/server";
 import { I18nProvider } from "@/components/providers/i18n-provider";
 import { QueryClientProvider } from "@/components/providers/query-client-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { routing } from "@/i18n/routing";
+import { sharedConfig } from "@/lib/config/shared-config";
+import type { LanguageCode } from "@/lib/dto/language-code";
 import { isRtl } from "@/lib/helpers/locale-utils";
 import { cn } from "@/lib/utils";
 
@@ -36,19 +35,19 @@ export default async function RootLayout({
 }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
 
-  if (!hasLocale(routing.locales, locale)) {
-    return notFound();
-  }
+  const typedLocale = locale as LanguageCode;
 
-  const messages = await getMessages();
+  // if (!sharedConfig.i18n.locales.some((l) => l.key === locale)) {
+  //   return notFound();
+  // }
 
   return (
     <html
-      lang={locale}
-      dir={isRtl(locale) ? "rtl" : "ltr"}
+      lang={typedLocale}
+      dir={isRtl(typedLocale) ? "rtl" : "ltr"}
       className={cn(
         "h-full antialiased",
-        isRtl(locale) ? ibmPlexSansAr.variable : ibmPlexSans.variable,
+        isRtl(typedLocale) ? ibmPlexSansAr.variable : ibmPlexSans.variable,
       )}
       suppressHydrationWarning
     >
@@ -71,7 +70,7 @@ export default async function RootLayout({
         />
         <Toaster />
         <QueryClientProvider>
-          <I18nProvider locale={locale} messages={messages}>
+          <I18nProvider locale={locale}>
             <TooltipProvider>{children}</TooltipProvider>
           </I18nProvider>
         </QueryClientProvider>

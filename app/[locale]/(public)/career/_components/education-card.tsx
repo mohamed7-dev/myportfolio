@@ -1,10 +1,10 @@
 "use client";
-import { useTranslations } from "next-intl";
 import { AppImage } from "@/components/shared/app-image";
 import { CardWrapper } from "@/components/shared/card-wrapper";
 import { IconTile } from "@/components/shared/icon-tile";
 import { Badge } from "@/components/ui/badge";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
+import { useI18n } from "@/i18n/client";
 import type { GetPublicEducationOutputSchema } from "@/lib/dto/visitor";
 
 export function EducationCard({
@@ -13,17 +13,17 @@ export function EducationCard({
   educationItem: GetPublicEducationOutputSchema["items"][number];
 }) {
   const { formatDate } = useLocalFormatter();
-  const i18n = useTranslations();
+  const i18n = useI18n();
 
   return (
     <CardWrapper>
       <div className="flex items-center justify-between">
         <div className="group flex items-center gap-4">
-          <IconTile className="border-2 border-border rounded-base">
+          <IconTile className="shrink-0 border-2 border-border rounded-base">
             <AppImage
               asset={educationItem.featuredAsset}
               transform={{ preset: "icon", mode: "resize" }}
-              className="size-14 object-contain rounded-base"
+              className="size-20 object-contain rounded-base"
             />
           </IconTile>
           <div>

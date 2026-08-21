@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
 import {
+  type AssetListInputSchema,
+  assetListInputSchema,
+  assetListOutputSchema,
   deleteAssetsInputSchema,
   deleteAssetsOutputSchema,
   updateAssetInputSchema,
@@ -10,7 +13,7 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/domain/asset.service";
 
-export const { PATCH, DELETE } = createRouter({
+export const { PATCH, DELETE, GET } = createRouter({
   PATCH: {
     authenticatedOnly: true,
     handler: async (req, _, ctx) => {
@@ -37,6 +40,28 @@ export const { PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, deleteAssetsOutputSchema);
 
       return NextResponse.json(parsedResult, { status: 200 });
+    },
+  },
+  GET: {
+    authenticatedOnly: true,
+    handler: async (req, _, ctx) => {
+      const searchParams = req.nextUrl.searchParams;
+      const input = Object.fromEntries(
+        searchParams.entries(),
+      ) as AssetListInputSchema;
+      const parsedInput = validateInput(
+        {
+          ...input,
+          filter:
+            input.filter && typeof input.filter === "object"
+              ? JSON.parse(input.filter as string)
+              : undefined,
+        },
+        assetListInputSchema,
+      );
+      const result = await assetService.find(ctx, parsedInput, { tags: true });
+      const assets = validateOutput(result, assetListOutputSchema);
+      return NextResponse.json(assets, { status: 200 });
     },
   },
 });

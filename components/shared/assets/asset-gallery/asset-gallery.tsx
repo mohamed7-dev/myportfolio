@@ -1,12 +1,18 @@
 "use client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 import { useRouterUtils } from "@/hooks/use-router-utils";
-import { useRouter } from "@/i18n/navigation";
 import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
-import type { Asset as AssetEntity } from "@/lib/dto/asset";
+import type {
+  Asset as AssetEntity,
+  AssetListOutputSchema,
+} from "@/lib/dto/asset";
+import { isAppError } from "@/lib/errors/app-error";
+import { api } from "@/lib/helpers/api";
+import { apiRoutes } from "@/lib/helpers/router";
 import { AssetUploader } from "@/lib/upload/asset-uploader";
 import { uploadFile } from "@/lib/upload/upload";
 import { filterUnique } from "@/lib/utils/filter-unique";
@@ -28,8 +34,8 @@ export type AssetTypeUnion = keyof typeof AssetType;
 export type Asset = AssetEntity;
 
 interface AssetGalleryProps {
-  assets: Asset[];
-  itemsCount: number;
+  initialAssets?: Asset[];
+  initialItemsCount?: number;
   multiSelect?: "manual" | "auto";
   displayBulkActions?: boolean;
   onSelectAsset?: (assets: Asset[]) => void;
@@ -37,20 +43,23 @@ interface AssetGalleryProps {
 }
 
 export function AssetGallery({
-  assets,
-  itemsCount,
+  initialAssets,
+  initialItemsCount,
   multiSelect = undefined,
   onSelectAsset,
   displayBulkActions = true,
   initialSelectedAssets = [],
 }: AssetGalleryProps) {
+  const shouldFetchInternally = !initialAssets;
   const router = useRouter();
   const [source, setSource] = React.useState<File | null>(null);
   const [preview, setPreview] = React.useState<File | null>(null);
   const [sourceProgress, setSourceProgress] = React.useState(0);
   const [previewProgress, setPreviewProgress] = React.useState(0);
-
   const { searchParams, updateSearchParams } = useRouterUtils();
+  const qClient = useQueryClient();
+
+  // External States
   const pageSizeString = searchParams.get("pageSize");
   const pageSize = pageSizeString ? Number(pageSizeString) : 24;
   const pageString = searchParams.get("page");
@@ -59,11 +68,91 @@ export function AssetGallery({
   const assetType = (
     assetTypeString ? assetTypeString : AssetType.all
   ) as AssetTypeUnion;
+  const tag = searchParams.get("tag");
+
+  // Internal States
+  const [_tag, setTag] = React.useState("");
+  const [_page, setPage] = React.useState(1);
+  const [_pageSize, setPageSize] = React.useState(24);
+  const [_assetType, setAssetType] = React.useState<AssetTypeUnion>(
+    AssetType.all,
+  );
   const [searchInput, setSearchInput] = React.useState("");
   const debouncedSearch = useDebounce(searchInput, 500);
   const [selectedAssets, setSelectedAssets] = React.useState<Asset[]>(
     initialSelectedAssets || [],
   );
+
+  const queryKey = [
+    "asset-gallery",
+    assetType,
+    debouncedSearch,
+    page,
+    pageSize,
+    tag,
+  ];
+
+  const {
+    data,
+    isLoading: isLoadingAssets,
+    refetch,
+  } = useQuery({
+    enabled: shouldFetchInternally,
+    queryKey,
+    queryFn: async () => {
+      const filter: Record<string, any> = {};
+
+      if (debouncedSearch) {
+        filter.name = {
+          contains: debouncedSearch,
+        };
+      }
+
+      if (_assetType !== AssetType.all) {
+        filter.type = {
+          equals: _assetType,
+        };
+      }
+
+      const options: any = {
+        skip: (_page - 1) * _pageSize,
+        take: _pageSize,
+        filter: Object.keys(filter).length > 0 ? filter : undefined,
+      };
+
+      if (_tag && _tag.length > 0) {
+        options.tag = _tag;
+      }
+
+      const searchParams = new URLSearchParams();
+
+      Object.entries(options).forEach(([key, value]) => {
+        key === "filter"
+          ? searchParams.set("filter", JSON.stringify(value))
+          : searchParams.set(
+              key,
+              typeof value === "string" ? value : `${value}`,
+            );
+      });
+
+      const res = await api(
+        {
+          ...apiRoutes.assets.list,
+          url: apiRoutes.assets.list.url(searchParams),
+        },
+        undefined,
+        true,
+      );
+
+      const data = await res.json();
+      if (isAppError(data)) {
+        // we should display the error to the UI, not throwing it
+        throw data;
+      } else {
+        return data as AssetListOutputSchema;
+      }
+    },
+  });
 
   const { mutate, isPending: isUploadingAsset } = useMutation({
     mutationFn: async (input: { source: File; preview: File }) => {
@@ -80,7 +169,13 @@ export function AssetGallery({
       return data;
     },
     onSuccess: async () => {
-      router.refresh();
+      if (shouldFetchInternally) {
+        qClient.invalidateQueries({
+          queryKey,
+        });
+      } else {
+        router.refresh();
+      }
     },
     onError: (error) => {
       toast.error(error.message);
@@ -90,9 +185,6 @@ export function AssetGallery({
       setPreview(null);
     },
   });
-
-  const totalItemsCount = itemsCount || 0;
-  const totalPagesCount = Math.ceil(totalItemsCount / Number(pageSize));
 
   // Selection
   const isAssetSelected = (asset: Asset) =>
@@ -131,6 +223,60 @@ export function AssetGallery({
     }
   };
 
+  const handleSelectingTag = (tag: string) => {
+    if (shouldFetchInternally) {
+      tag === currentTag ? setTag("") : setTag(tag);
+    } else {
+      tag === currentTag
+        ? updateSearchParams({ tag: null })
+        : updateSearchParams({ tag: tag });
+    }
+  };
+
+  const resetPage = () => {
+    if (shouldFetchInternally) {
+      setPage(1);
+    } else {
+      updateSearchParams({ page: `${1}` });
+    }
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    if (shouldFetchInternally) {
+      setPageSize(pageSize);
+    } else {
+      updateSearchParams({ pageSize: `${pageSize}` });
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (shouldFetchInternally) {
+      setPage(page);
+    } else {
+      updateSearchParams({ page: `${page}` });
+    }
+  };
+
+  const onAssetTypeChange = (assetType: AssetTypeUnion) => {
+    if (shouldFetchInternally) {
+      setAssetType(assetType);
+    } else {
+      if (assetType === AssetType.all) {
+        updateSearchParams({ type: null });
+      } else {
+        updateSearchParams({ type: assetType });
+      }
+    }
+  };
+
+  const handleRefetching = () => {
+    if (shouldFetchInternally) {
+      refetch();
+    } else {
+      router.refresh();
+    }
+  };
+
   React.useEffect(() => {
     if (source && preview) {
       mutate({ source, preview });
@@ -143,29 +289,36 @@ export function AssetGallery({
     }
   }, [debouncedSearch, updateSearchParams]);
 
+  const assets = shouldFetchInternally ? data?.items : initialAssets;
+
   const tags = filterUnique(
-    assets.flatMap((asset) => asset.tags).filter(notNullOrUndefined),
+    assets?.flatMap((asset) => asset.tags).filter(notNullOrUndefined) ?? [],
   );
+
+  const currentTag = shouldFetchInternally ? _tag : tag;
+  const currentAssetType = shouldFetchInternally ? _assetType : assetType;
+  const currentPageSize = shouldFetchInternally ? _pageSize : pageSize;
+  const currentPage = shouldFetchInternally ? _page : page;
+  const totalItemsCount =
+    (shouldFetchInternally ? data?.itemsCount : initialItemsCount) || 0;
+  const totalPagesCount = Math.ceil(totalItemsCount / Number(currentPageSize));
+
   return (
     <div className="flex flex-col gap-4">
       <ActionsBar
         tags={tags}
+        currentTag={currentTag ?? undefined}
+        onSelectingTag={handleSelectingTag}
         searchInput={searchInput}
         onSearchInputChange={(value) => setSearchInput(value)}
-        assetType={assetType}
-        onAssetTypeChange={(value) => {
-          if (value === AssetType.all) {
-            updateSearchParams({ type: null });
-          } else {
-            updateSearchParams({ type: value });
-          }
-        }}
+        assetType={currentAssetType}
+        onAssetTypeChange={onAssetTypeChange}
       />
       {displayBulkActions && !!selectedAssets.length && (
         <AssetBulkActions
           selection={selectedAssets}
           bulkActions={[{ component: DeleteAssetsBulkAction }]}
-          refetch={() => router.refresh()}
+          refetch={handleRefetching}
         />
       )}
       <article className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -195,7 +348,7 @@ export function AssetGallery({
 
       <AssetGridView
         assets={assets ?? []}
-        isLoading={false}
+        isLoading={shouldFetchInternally ? isLoadingAssets : false}
         isAssetSelected={isAssetSelected}
         toggleSelection={toggleAssetSelection}
         onAssetClick={handleSelect}
@@ -210,14 +363,12 @@ export function AssetGallery({
         </div>
         <div className="flex-1"></div>
         <PaginationBar
-          pageSize={pageSize}
+          pageSize={currentPageSize}
           totalPagesCount={totalPagesCount}
-          page={page}
-          goToPage={(page) => updateSearchParams({ page: `${page}` })}
-          onPageSizeChange={(pageSize) =>
-            updateSearchParams({ pageSize: `${pageSize}` })
-          }
-          resetPage={() => updateSearchParams({ page: `${1}` })}
+          page={currentPage}
+          goToPage={goToPage}
+          onPageSizeChange={onPageSizeChange}
+          resetPage={resetPage}
         />
       </div>
     </div>

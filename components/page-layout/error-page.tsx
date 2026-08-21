@@ -1,8 +1,8 @@
 "use client";
 
 import { RefreshCcw } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { useScopedI18n } from "@/i18n/client";
 import { Card, CardContent } from "../ui/card";
 
 interface ErrorPageProps {
@@ -12,7 +12,7 @@ interface ErrorPageProps {
 }
 
 export function ErrorPage({ title, description, reset }: ErrorPageProps) {
-  const i18n = useTranslations("defaultErrorPage");
+  const i18n = useScopedI18n("defaultErrorPage");
   return (
     <main className="flex min-h-[50vh] flex-col items-center justify-center px-6 text-center">
       <Card className="max-w-105">

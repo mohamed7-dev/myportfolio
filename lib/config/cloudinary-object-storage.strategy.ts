@@ -4,7 +4,7 @@ import {
   type ObjectLocation,
   type ObjectMetadata,
   type ObjectStorage,
-  type ObjectStorageResourceType,
+  ObjectStorageResourceType,
   toObjectKey,
   type UploadRequest,
 } from "./object-storage-strategy.interface";
@@ -56,7 +56,9 @@ export class CloudinaryObjectStorage implements ObjectStorage {
     try {
       const key = toObjectKey(location);
       const resource = await cloudinary.api.resource(key, {
-        resource_type: resourceType,
+        ...(resourceType !== ObjectStorageResourceType.raw
+          ? { resource_type: resourceType }
+          : {}),
       });
 
       return {

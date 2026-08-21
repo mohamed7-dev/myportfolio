@@ -1,6 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -8,18 +7,21 @@ import { FormField } from "@/components/shared/form-field";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useCurrentLocale, useScopedI18n } from "@/i18n/client";
 import {
   type SendContactEmailInputSchema,
   type SendContactEmailOutputSchema,
   sendContactEmailInputSchema,
 } from "@/lib/dto/email";
+import type { LanguageCode } from "@/lib/dto/language-code";
 import { isAppError } from "@/lib/errors/app-error";
 import { api } from "@/lib/helpers/api";
 import { Form } from "@/lib/helpers/form";
 import { apiRoutes } from "@/lib/helpers/router";
 
 export function DirectMessageForm() {
-  const i18n = useTranslations("contact.directMessage.form");
+  const i18n = useScopedI18n("contact.directMessage.form");
+  const locale = useCurrentLocale();
   const form = useForm<SendContactEmailInputSchema>({
     defaultValues: {
       fullName: "",
@@ -33,7 +35,12 @@ export function DirectMessageForm() {
 
   const onSubmit = async (values: SendContactEmailInputSchema) => {
     startTransition(async () => {
-      const res = await api(apiRoutes.contact.sendEmail, values, false);
+      const res = await api(
+        apiRoutes.contact.sendEmail,
+        values,
+        false,
+        locale as LanguageCode,
+      );
 
       const data = (await res.json()) as SendContactEmailOutputSchema;
 
@@ -41,6 +48,7 @@ export function DirectMessageForm() {
         toast.error(i18n("submit.emailError"));
       } else {
         toast.success(i18n("submit.emailSuccess"));
+        form.reset();
       }
     });
   };

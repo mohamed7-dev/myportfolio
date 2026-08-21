@@ -67,8 +67,8 @@ export default async function AssetsPage({
       <PageLayout>
         <PageBlock id="asset-gallery" column="full">
           <AssetGallery
-            assets={assets.items}
-            itemsCount={assets.itemsCount}
+            initialAssets={assets.items}
+            initialItemsCount={assets.itemsCount}
             multiSelect="auto"
           />
         </PageBlock>

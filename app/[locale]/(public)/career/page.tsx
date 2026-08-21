@@ -1,5 +1,5 @@
 import { GraduationCapIcon } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { setStaticParamsLocale } from "next-international/server";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -9,12 +9,18 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { IconTile } from "@/components/shared/icon-tile";
+import { getScopedI18n } from "@/i18n/server";
 import { visitorService } from "@/services/domain/visitor.service";
 import { CareerCard } from "./_components/career-card";
 import { EducationCard } from "./_components/education-card";
 
-export default async function CareerPage() {
-  const i18n = await getTranslations("career");
+export default async function CareerPage({
+  params,
+}: PageProps<"/[locale]/career">) {
+  const { locale } = await params;
+  setStaticParamsLocale(locale);
+
+  const i18n = await getScopedI18n("career");
 
   const getCareer = wrapService({
     authenticatedOnly: false,

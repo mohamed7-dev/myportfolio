@@ -1,9 +1,9 @@
 import { StarIcon } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { AppImage } from "@/components/shared/app-image";
 import { CardWrapper } from "@/components/shared/card-wrapper";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "@/i18n/navigation";
+import { getI18n } from "@/i18n/server";
 import type { GetPublicProjectsOutputSchema } from "@/lib/dto/visitor";
 
 export async function ProjectCard({
@@ -11,7 +11,7 @@ export async function ProjectCard({
 }: {
   project: GetPublicProjectsOutputSchema["items"][number];
 }) {
-  const i18n = await getTranslations();
+  const i18n = await getI18n();
   return (
     <Link href={`/projects/${project.slug}`}>
       <CardWrapper interactive={true} className="p-0">

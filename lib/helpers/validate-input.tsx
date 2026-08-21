@@ -17,7 +17,6 @@ export function validateInput<Output = any>(
   schema: ZodSchema<Output>,
 ): Output {
   const r = schema.safeParse(input);
-  console.log(r.error);
   if (!r.success)
     throw new UserInputError("Invalid input", mapZodError(r.error));
 

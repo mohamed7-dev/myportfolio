@@ -25,6 +25,7 @@ export default async function AboutPage() {
   const result = await me();
 
   let profile: ClientSafeProfile | undefined;
+
   if (result) {
     profile = validateOutput(result, clientSafeSchema);
   }

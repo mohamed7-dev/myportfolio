@@ -17,7 +17,7 @@ export const projectsSeed: SeedProject[] = [
     key: "vidora",
     translations: [
       {
-        languageCode: LanguageCode["ar-EG"],
+        languageCode: LanguageCode["ar"],
         name: "فيدورا",
         slug: "فيدورا",
         description:
@@ -69,7 +69,7 @@ export const projectsSeed: SeedProject[] = [
         ].join("\n"),
       },
       {
-        languageCode: LanguageCode["en-US "],
+        languageCode: LanguageCode["en"],
         name: "Vidora",
         slug: "vidora",
         description:
@@ -138,7 +138,7 @@ export const projectsSeed: SeedProject[] = [
     key: "snippetly",
     translations: [
       {
-        languageCode: LanguageCode["ar-EG"],
+        languageCode: LanguageCode["ar"],
         name: "سنيبتلي",
         slug: "سنيبتلي",
 
@@ -198,7 +198,7 @@ export const projectsSeed: SeedProject[] = [
         ].join("\n"),
       },
       {
-        languageCode: LanguageCode["en-US "],
+        languageCode: LanguageCode["en"],
         name: "Snippetly",
         slug: "snippetly",
 

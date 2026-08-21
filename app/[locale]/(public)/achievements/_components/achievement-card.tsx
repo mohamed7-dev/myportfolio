@@ -1,7 +1,6 @@
 "use client";
 import { AwardIcon, BriefcaseIcon, SchoolIcon } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import React from "react";
 import { CardWrapper } from "@/components/shared/card-wrapper";
 import { IconTile } from "@/components/shared/icon-tile";
@@ -9,6 +8,7 @@ import { MediaGallery } from "@/components/shared/media-gallery";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
+import { useScopedI18n } from "@/i18n/client";
 import { AchievementType } from "@/lib/dto/achievement";
 import type { GetPublicAchievementsOutputSchema } from "@/lib/dto/visitor";
 
@@ -17,7 +17,7 @@ export function AchievementCard({
 }: {
   achievement: GetPublicAchievementsOutputSchema["items"][number];
 }) {
-  const i18n = useTranslations("achievements");
+  const i18n = useScopedI18n("achievements");
   const { formatDate } = useLocalFormatter();
   const resolveCardTitle = React.useCallback(() => {
     switch (achievement.type) {

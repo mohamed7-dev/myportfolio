@@ -64,22 +64,31 @@ function wrapRoute<TCtx extends NextCtx>({
         ctx,
       });
     } catch (error) {
+      // TODO: remove
+      console.log(error);
       return handleApiErrors(error);
     }
   };
 }
 
-export function wrapService<TArgs extends unknown[], TResult>({
+export function wrapService<
+  TArgs extends unknown[],
+  TResult,
+  TCtx extends NextCtx,
+>({
   handler,
   authenticatedOnly = true,
+  ctx,
 }: {
   handler: ServiceHandler<TArgs, TResult>;
   authenticatedOnly?: boolean;
+  ctx?: TCtx;
 }) {
   return async (...args: TArgs): Promise<TResult> => {
     return executeWithRequestContext({
       authenticatedOnly,
       work: (requestContext) => handler(requestContext, ...args),
+      ctx,
     });
   };
 }

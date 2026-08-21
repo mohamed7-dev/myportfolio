@@ -1,4 +1,10 @@
 import "reflect-metadata";
+import { LanguageCode } from "@/lib/dto/language-code";
+import {
+  isDevelopmentMode,
+  isProductionMode,
+  registerEnv,
+} from "@/lib/helpers/env";
 import { achievementService } from "@/services/domain/achievement.service";
 import { careerService } from "@/services/domain/career.service";
 import { contactMethodService } from "@/services/domain/contact-method.service";
@@ -10,10 +16,21 @@ import { wrapService } from "../../api/common/create-router";
 import { ormService } from "../orm.service";
 import { seedAllAssets as _seedAllAssets } from "./seed-asset";
 
+registerEnv();
+
+function getParams() {
+  return new Promise<{ locale: LanguageCode }>((resolve) =>
+    resolve({ locale: LanguageCode.en }),
+  );
+}
+
 async function seedAdmin() {
   const ensureAdmin = wrapService({
     authenticatedOnly: false,
     handler: profileService.initAdmin,
+    ctx: {
+      params: getParams(),
+    },
   });
 
   const result = await ensureAdmin();
@@ -23,7 +40,7 @@ async function seedAdmin() {
 }
 
 async function main() {
-  if (process.env.NODE_ENV === "development") {
+  if (isDevelopmentMode()) {
     const ds = await ormService.getDataSource();
     await ds.dropDatabase();
     // Recreate the schema
@@ -41,9 +58,13 @@ async function main() {
      * The returned map remains in memory and is used by all subsequent
      * entity seeders.
      */
+    console.log("[Uploading Assets]: Please wait!");
     const seedAllAssets = wrapService({
       authenticatedOnly: false,
       handler: _seedAllAssets,
+      ctx: {
+        params: getParams(),
+      },
     });
     const assets = await seedAllAssets();
 
@@ -55,6 +76,9 @@ async function main() {
     const updateProfile = wrapService({
       authenticatedOnly: false,
       handler: profileService.update.bind(profileService),
+      ctx: {
+        params: getParams(),
+      },
     });
 
     if (profile.id) {
@@ -73,6 +97,9 @@ async function main() {
     const seedSkills = wrapService({
       authenticatedOnly: false,
       handler: skillService.seedSkills,
+      ctx: {
+        params: getParams(),
+      },
     });
 
     const skills = await seedSkills(assets.skills);
@@ -85,6 +112,9 @@ async function main() {
     const seedCareers = wrapService({
       authenticatedOnly: false,
       handler: careerService.seedCareers,
+      ctx: {
+        params: getParams(),
+      },
     });
 
     const careers = await seedCareers(assets.careers);
@@ -97,6 +127,9 @@ async function main() {
     const seedEducation = wrapService({
       authenticatedOnly: false,
       handler: educationService.seedEducation,
+      ctx: {
+        params: getParams(),
+      },
     });
 
     const education = await seedEducation(assets.education);
@@ -110,6 +143,9 @@ async function main() {
     const seedAchievements = wrapService({
       authenticatedOnly: false,
       handler: achievementService.seedAchievements,
+      ctx: {
+        params: getParams(),
+      },
     });
     const achievements = await seedAchievements(assets.achievements);
 
@@ -122,6 +158,9 @@ async function main() {
     const seedProjects = wrapService({
       authenticatedOnly: false,
       handler: projectService.seedProjects,
+      ctx: {
+        params: getParams(),
+      },
     });
     const projects = await seedProjects(
       assets.projects,
@@ -140,11 +179,14 @@ async function main() {
     const seedContactMethods = wrapService({
       authenticatedOnly: false,
       handler: contactMethodService.seedContactMethods,
+      ctx: {
+        params: getParams(),
+      },
     });
     const contactMethods = await seedContactMethods(assets.contactMethods);
 
     console.log("[Contact Methods]: ", contactMethods);
-  } else if (process.env.NODE_ENV === "production") {
+  } else if (isProductionMode()) {
     // -----------------------------------------------------------------------
     // SuperAdmin
     // -----------------------------------------------------------------------

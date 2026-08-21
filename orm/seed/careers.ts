@@ -18,7 +18,7 @@ export const careersSeed: SeedCareer[] = [
 
     translations: [
       {
-        languageCode: LanguageCode["ar-EG"],
+        languageCode: LanguageCode["ar"],
         name: "مهندس برمجيات",
         slug: "مهندس-برمجيات",
         location: "القاهرة، مصر",
@@ -51,7 +51,7 @@ export const careersSeed: SeedCareer[] = [
         ].join("\n"),
       },
       {
-        languageCode: LanguageCode["en-US "],
+        languageCode: LanguageCode["en"],
         name: "Software Engineer",
         slug: "software-engineer",
         location: "Cairo, Egypt",

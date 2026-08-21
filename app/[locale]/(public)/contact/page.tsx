@@ -1,6 +1,6 @@
 import { ContactIcon, SendIcon } from "lucide-react";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { setStaticParamsLocale } from "next-international/server";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -14,12 +14,18 @@ import { CardWrapper } from "@/components/shared/card-wrapper";
 import { IconTile } from "@/components/shared/icon-tile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getScopedI18n } from "@/i18n/server";
 import { visitorService } from "@/services/domain/visitor.service";
 import { DirectMessageForm } from "./_components/direct-message-form";
 import { PrimaryContactMethodCopy } from "./_components/primary-contact-method-copy";
 
-export default async function ContactPage() {
-  const i18n = await getTranslations("contact");
+export default async function ContactPage({
+  params,
+}: PageProps<"/[locale]/contact">) {
+  const { locale } = await params;
+  setStaticParamsLocale(locale);
+
+  const i18n = await getScopedI18n("contact");
   const getContactMethods = wrapService({
     authenticatedOnly: false,
     handler: visitorService.getContactMethods,
@@ -65,6 +71,7 @@ export default async function ContactPage() {
               <AppImage
                 asset={primaryContactMethod.featuredAsset}
                 transform={{ preset: "tiny", mode: "resize" }}
+                loading="eager"
                 className="size-40 object-contain"
               />
               <p>{i18n("contactMethods.primaryDescription")}</p>

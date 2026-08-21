@@ -1,13 +1,19 @@
-import { getTranslations } from "next-intl/server";
+import { setStaticParamsLocale } from "next-international/server";
 import { wrapService } from "@/api/common/create-router";
 import { Page, PageTitle } from "@/components/page-layout/page";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { getScopedI18n } from "@/i18n/server";
 import { visitorService } from "@/services/domain/visitor.service";
 import { ProjectCard } from "./_components/project-card";
 
-export default async function ProjectsPage() {
-  const i18n = await getTranslations("projects");
+export default async function ProjectsPage({
+  params,
+}: PageProps<"/[locale]/projects">) {
+  const { locale } = await params;
+  setStaticParamsLocale(locale);
+
+  const i18n = await getScopedI18n("projects");
 
   const getPublicProjects = wrapService({
     authenticatedOnly: false,

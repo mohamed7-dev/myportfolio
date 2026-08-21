@@ -33,6 +33,7 @@ class VisitorService {
     );
     return result;
   }
+
   public async getFeaturedSkills(ctx: RequestContext) {
     const skills = await skillService.find(ctx, {
       take: 5,

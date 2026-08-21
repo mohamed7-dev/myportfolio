@@ -1,12 +1,8 @@
+import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/login-form/login-form";
-import { redirect } from "@/i18n/navigation";
 import { requestContextService } from "@/services/helpers/request-context.service";
 
-export default async function LoginPage({
-  params,
-}: PageProps<"/[locale]/login">) {
-  const { locale } = await params;
-
+export default async function LoginPage() {
   const requestContext = await requestContextService.create(
     undefined,
     undefined,
@@ -14,7 +10,7 @@ export default async function LoginPage({
   );
 
   if (requestContext.isAuthenticated) {
-    redirect({ href: "/dashboard", locale });
+    redirect("/dashboard", "replace");
   }
 
   return (

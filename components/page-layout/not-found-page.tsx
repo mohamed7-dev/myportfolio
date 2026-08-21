@@ -1,7 +1,7 @@
 import { ArrowLeftIcon } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { getScopedI18n } from "@/i18n/server";
 import { Card, CardContent } from "../ui/card";
 
 interface NotFoundPageProps {
@@ -17,7 +17,7 @@ export async function NotFoundPage({
   href = "/",
   linkLabel,
 }: NotFoundPageProps) {
-  const i18n = await getTranslations("defaultNotFoundPage");
+  const i18n = await getScopedI18n("defaultNotFoundPage");
   return (
     <main className="flex min-h-[50vh] flex-col items-center justify-center px-6 text-center">
       <Card className="max-w-105">

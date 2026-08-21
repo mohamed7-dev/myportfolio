@@ -12,7 +12,7 @@ import {
 import { LanguageCode } from "@/lib/dto/language-code";
 
 const translations = {
-  "en-US": {
+  en: {
     preview: (name: string) =>
       `New message from ${name} — portfolio contact form`,
     label: "PORTFOLIO / CONTACT",
@@ -23,7 +23,7 @@ const translations = {
       `Reply directly to this email to respond to ${name}.`,
     footer: "MUHAMMED SHABAN — PORTFOLIO",
   },
-  "ar-EG": {
+  ar: {
     preview: (name: string) => `رسالة جديدة من ${name} — نموذج التواصل`,
     label: "الموقع الشخصي / تواصل",
     title: "رسالة جديدة",
@@ -49,7 +49,7 @@ export function ContactEmail({
   locale,
 }: ContactEmailProps) {
   const t = translations[locale];
-  const isArabic = locale === LanguageCode["ar-EG"];
+  const isArabic = locale === LanguageCode["ar"];
 
   return (
     <Html lang={locale} dir={isArabic ? "rtl" : "ltr"}>

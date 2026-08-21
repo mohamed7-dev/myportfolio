@@ -8,7 +8,8 @@ import {
   HomeIcon,
   UserRoundIcon,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AppImage } from "@/components/shared/app-image";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +23,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
-import { Link, usePathname } from "@/i18n/navigation";
+import { useScopedI18n } from "@/i18n/client";
 import { cn, isRouteActive } from "@/lib/utils";
 import { AccentSwitcher } from "../accent-switcher";
 import { LanguageSwitcher } from "../language-switcher";
@@ -39,7 +40,7 @@ const navLinks = [
 
 export function PublicSidebar() {
   const ctx = usePublicLayout("Sidebar");
-  const i18n = useTranslations("publicLayout");
+  const i18n = useScopedI18n("publicLayout");
   const { formatNumber } = useLocalFormatter();
   const { isMobile } = useSidebar();
 

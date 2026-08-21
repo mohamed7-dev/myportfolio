@@ -24,7 +24,6 @@ class ProfileService {
     const existing = await profileRepo.find();
 
     const { username, password } = serverConfig.adminCredentials;
-
     const existingProfile = existing[0];
 
     if (existingProfile) {
@@ -53,12 +52,11 @@ class ProfileService {
 
     const newProfile = new Profile({
       ...profile,
-
       username,
       password: await bcrypt.hash(password, 10),
     });
 
-    await profileRepo.save(newProfile);
+    const savedProfile = await profileRepo.save(newProfile);
 
     const translationEntities = translations.map(
       (translation) =>
@@ -70,7 +68,7 @@ class ProfileService {
 
     await translationRepo.save(translationEntities);
 
-    return newProfile;
+    return savedProfile;
   }
   public async findOne(
     ctx: RequestContext,

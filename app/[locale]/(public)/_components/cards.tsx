@@ -1,21 +1,15 @@
 "use client";
-import {
-  BriefcaseIcon,
-  FolderIcon,
-  TargetIcon,
-  TrendingUpIcon,
-} from "lucide-react";
-import { useTranslations } from "next-intl";
+import { TargetIcon, TrendingUpIcon } from "lucide-react";
 import type React from "react";
 import { usePublicLayout } from "@/components/app-layout/public-layout/public-layout-provider";
 import { CardWrapper } from "@/components/shared/card-wrapper";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
+import { useScopedI18n } from "@/i18n/client";
 import { IconTile } from "../../../../components/shared/icon-tile";
-import { BentoLink } from "./bento-link";
 
 export function Cards({ children }: { children: React.ReactNode }) {
   const ctx = usePublicLayout("Cards");
-  const i18n = useTranslations("home.cards");
+  const i18n = useScopedI18n("home.cards");
   const { formatNumber } = useLocalFormatter();
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-4 ">

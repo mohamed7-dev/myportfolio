@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
+import { serverConfig } from "@/lib/config/server-config";
 import { authenticateAdminUserInputSchema } from "@/lib/dto/auth";
 import { clientSafeSchema } from "@/lib/dto/profile";
 import { validateInput } from "@/lib/helpers/validate-input";
@@ -17,7 +18,10 @@ export const { POST, PUT } = createRouter({
 
       const result = await authService.authenticateAdminUser(ctx, parsedBody);
 
-      (await cookies()).set("session", result.token, { httpOnly: true });
+      (await cookies()).set(serverConfig.sessionKey, result.token, {
+        httpOnly: true,
+        path: "/",
+      });
 
       const parsedOutput = validateOutput(result.profile, clientSafeSchema);
 

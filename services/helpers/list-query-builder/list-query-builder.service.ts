@@ -195,7 +195,7 @@ class ListQueryBuilder {
     filterParams: Record<string, any>,
     ctx?: RequestContext,
   ): Promise<void> {
-    const languageCode = ctx?.languageCode ?? LanguageCode["en-US "];
+    const languageCode = ctx?.languageCode ?? LanguageCode["en"];
 
     const dataSource = await ormService.getDataSource();
     const { translationColumns } = getEntityMetadata(dataSource, entityType);

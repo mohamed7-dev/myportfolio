@@ -14,11 +14,11 @@ export const contactMethodsSeed: SeedContactMethod[] = [
 
     translations: [
       {
-        languageCode: LanguageCode["ar-EG"],
+        languageCode: LanguageCode["ar"],
         name: "جيت هب",
       },
       {
-        languageCode: LanguageCode["en-US "],
+        languageCode: LanguageCode["en"],
         name: "GitHub",
       },
     ],
@@ -35,11 +35,11 @@ export const contactMethodsSeed: SeedContactMethod[] = [
 
     translations: [
       {
-        languageCode: LanguageCode["ar-EG"],
+        languageCode: LanguageCode["ar"],
         name: "لينكد إن",
       },
       {
-        languageCode: LanguageCode["en-US "],
+        languageCode: LanguageCode["en"],
         name: "LinkedIn",
       },
     ],
@@ -56,11 +56,11 @@ export const contactMethodsSeed: SeedContactMethod[] = [
 
     translations: [
       {
-        languageCode: LanguageCode["ar-EG"],
+        languageCode: LanguageCode["ar"],
         name: "البريد الإلكتروني",
       },
       {
-        languageCode: LanguageCode["en-US "],
+        languageCode: LanguageCode["en"],
         name: "Email",
       },
     ],

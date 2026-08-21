@@ -20,7 +20,7 @@ export class RequestContext {
   private _isAuthenticated: boolean;
 
   constructor(options?: RequestContextOptions) {
-    this._languageCode = options?.languageCode ?? LanguageCode["en-US "];
+    this._languageCode = options?.languageCode ?? LanguageCode["en"];
     this._req = options?.req;
     this._session = options?.session;
     this._isAuthenticated = options?.isAuthenticated ?? false;

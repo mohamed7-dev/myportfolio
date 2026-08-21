@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { LanguageCode } from "@/lib/dto/language-code";
 import { useLocaleUtils } from "./use-locale-utils";
 
 export function useLocalFormatter() {
@@ -6,7 +7,10 @@ export function useLocalFormatter() {
 
   const formatDate = useCallback(
     (value: string | Date, options?: Intl.DateTimeFormatOptions) => {
-      return new Intl.DateTimeFormat(locale, options).format(new Date(value));
+      return new Intl.DateTimeFormat(locale, {
+        ...options,
+        ...(locale === LanguageCode.ar ? { numberingSystem: "arab" } : {}),
+      }).format(new Date(value));
     },
     [locale],
   );
@@ -15,6 +19,7 @@ export function useLocalFormatter() {
     (value: number, options?: Intl.NumberFormatOptions) => {
       return new Intl.NumberFormat(locale, {
         ...options,
+        ...(locale === LanguageCode.ar ? { numberingSystem: "arab" } : {}),
       }).format(value);
     },
     [locale],

@@ -1,4 +1,3 @@
-import { useLocale } from "next-intl";
 import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -7,22 +6,16 @@ import {
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { useChangeLocale, useCurrentLocale } from "@/i18n/client";
 import { sharedConfig } from "@/lib/config/shared-config";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 
 export function LanguageSwitcher({ mode }: { mode: "public" | "dashboard" }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const currentLocale = useLocale();
-  const changeLocale = (newLocale: LanguageCode) => {
-    if (newLocale !== currentLocale) {
-      router.replace(pathname, { locale: newLocale });
-      router.refresh();
-    }
-  };
+  const currentLocale = useCurrentLocale();
+  const changeLocale = useChangeLocale({ preserveSearchParams: true });
+
   const { formatLanguageName } = useLocalFormatter();
   if (mode === "dashboard") {
     return (

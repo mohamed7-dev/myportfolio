@@ -1,6 +1,5 @@
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
-import { usePathname, useRouter } from "@/i18n/navigation";
 import { apiUrl } from "@/lib/helpers/router";
 
 export function useRouterUtils() {

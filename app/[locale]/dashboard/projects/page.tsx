@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -8,7 +9,6 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
 import { projectListOutputSchema } from "@/lib/dto/project";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { projectService } from "@/services/domain/project.service";
@@ -46,19 +46,17 @@ export default async function ProjectsPage({
     skip: (Number(page) - 1) * Number(pageSize),
     includeSoftDeleted: includeSoftDeleted === "true" ? true : false,
     filter: {
-      name: {
-        contains: name,
-      },
-      enabled: {
-        equals: enabled !== undefined ? Boolean(enabled) : true,
-      },
-      liveDemoUrl: { contains: liveDemoUrl },
-      repoUrl: { contains: repoUrl },
+      ...(name && { name: { contains: name } }),
+      ...(enabled !== undefined && {
+        enabled: {
+          equals: enabled !== undefined ? Boolean(enabled) : true,
+        },
+      }),
+      ...(liveDemoUrl && { liveDemoUrl: { contains: liveDemoUrl } }),
+      ...(repoUrl && { repoUrl: { contains: repoUrl } }),
     },
   });
-
   const projects = validateOutput(result, projectListOutputSchema);
-
   return (
     <Page pageId="project-list-page">
       <PageTitle pageTitleBlockId="project-list-page-title">Projects</PageTitle>

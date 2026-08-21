@@ -1,8 +1,16 @@
-import createI18nMiddleware from "next-intl/middleware";
-import { routing } from "./i18n/routing";
+import type { NextRequest } from "next/server";
+import { createI18nMiddleware } from "next-international/middleware";
+import { sharedConfig } from "./lib/config/shared-config";
 
-export default createI18nMiddleware(routing);
+const I18nMiddleware = createI18nMiddleware({
+  locales: sharedConfig.i18n.locales.map((l) => l.key),
+  defaultLocale: sharedConfig.i18n.defaultLocale,
+});
+
+export function proxy(request: NextRequest) {
+  return I18nMiddleware(request);
+}
 
 export const config = {
-  matcher: ["/((?!static|.*\\..*|_next|favicon.ico|robots.txt).*)"],
+  matcher: ["/((?!api|static|.*\\..*|_next|favicon.ico|robots.txt).*)"],
 };

@@ -1,12 +1,12 @@
 "use client";
 import { BriefcaseIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
 import type React from "react";
 import { IconTile } from "@/components/shared/icon-tile";
+import { useScopedI18n } from "@/i18n/client";
 import { BentoLink } from "./bento-link";
 
 export function CareerCard({ children }: { children: React.ReactNode }) {
-  const i18n = useTranslations("home.cards.career");
+  const i18n = useScopedI18n("home.cards.career");
 
   return (
     <BentoLink href="/career" className="md:col-span-2">

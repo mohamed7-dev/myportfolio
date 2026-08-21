@@ -1,10 +1,10 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { EditIcon, LockIcon, RefreshCwIcon } from "lucide-react";
-import { useLocale } from "next-intl";
 import React from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouterUtils } from "@/hooks/use-router-utils";
+import { useCurrentLocale } from "@/i18n/client";
 import type {
   SlugForEntityInputSchema,
   SlugForEntityOutputSchema,
@@ -106,7 +106,7 @@ export function SlugInput({
   ...props
 }: SlugInputProps & { placeholder?: string }) {
   const form = useFormContext();
-  const currentLanguageCode = useLocale();
+  const currentLanguageCode = useCurrentLocale();
   const { getApiHandlerUrl } = useRouterUtils();
 
   const [manualReadonly, setManualReadonly] = React.useState(defaultReadonly);

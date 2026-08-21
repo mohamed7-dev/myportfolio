@@ -1,6 +1,7 @@
 import { ChevronLeftIcon, CodeIcon, LinkIcon } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { setStaticParamsLocale } from "next-international/server";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -15,14 +16,40 @@ import { AppImage } from "@/components/shared/app-image";
 import { MediaGallery } from "@/components/shared/media-gallery";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { getScopedI18n } from "@/i18n/server";
+import { LanguageCode } from "@/lib/dto/language-code";
 import { visitorService } from "@/services/domain/visitor.service";
+
+export async function generateStaticParams() {
+  const getPublicProjects = wrapService({
+    authenticatedOnly: false,
+    handler: visitorService.getProjects,
+  });
+
+  const result = await getPublicProjects();
+
+  return result.items.flatMap((project) => [
+    {
+      locale: LanguageCode.en,
+      slug: project.translations.find((t) => t.languageCode === LanguageCode.en)
+        ?.slug,
+    },
+    {
+      locale: LanguageCode.ar,
+      slug: project.translations.find((t) => t.languageCode === LanguageCode.ar)
+        ?.slug,
+    },
+  ]);
+}
 
 export default async function ProjectPage({
   params,
 }: PageProps<"/[locale]/projects/[slug]">) {
-  const i18n = await getTranslations("project");
-  const { slug } = await params;
+  const i18n = await getScopedI18n("project");
+  const { slug, locale } = await params;
+
+  setStaticParamsLocale(locale);
+
   const getProject = wrapService({
     authenticatedOnly: false,
     handler: visitorService.getProject,

@@ -31,13 +31,13 @@ export const sharedConfig: SharedAppConfig = {
   i18n: {
     locales: [
       {
-        key: LanguageCode["en-US "],
+        key: LanguageCode["en"],
       },
       {
-        key: LanguageCode["ar-EG"],
+        key: LanguageCode["ar"],
       },
     ],
-    defaultLocale: LanguageCode["en-US "],
+    defaultLocale: LanguageCode["en"],
   },
   asset: {
     sourceFileTypes: {

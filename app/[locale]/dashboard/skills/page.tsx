@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -8,7 +9,6 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
 import { skillListOutputSchema } from "@/lib/dto/skill";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { skillService } from "@/services/domain/skill.service";
@@ -34,12 +34,8 @@ export default async function SkillsListPage({
     take: Number(pageSize),
     skip: (Number(page) - 1) * Number(pageSize),
     filter: {
-      name: {
-        contains: name,
-      },
-      category: {
-        equals: category,
-      },
+      ...(name && { name: { contains: name } }),
+      ...(category && { category: { equals: category } }),
     },
   });
 

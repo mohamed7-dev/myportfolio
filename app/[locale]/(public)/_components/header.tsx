@@ -1,10 +1,10 @@
 "use client";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { usePublicLayout } from "@/components/app-layout/public-layout/public-layout-provider";
 import { AppImage } from "@/components/shared/app-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
+import { useScopedI18n } from "@/i18n/client";
 import type { GetFeaturedSkillsOutputSchema } from "@/lib/dto/visitor";
 
 export function HomePageHeader({
@@ -12,7 +12,7 @@ export function HomePageHeader({
 }: {
   skills: GetFeaturedSkillsOutputSchema["items"];
 }) {
-  const i18n = useTranslations("home");
+  const i18n = useScopedI18n("home");
   const ctx = usePublicLayout("HomePageHeader");
 
   const filteredAssets = ctx.profile.assets?.filter(
