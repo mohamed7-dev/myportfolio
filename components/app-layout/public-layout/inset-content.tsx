@@ -15,7 +15,7 @@ export function InsetContent({ children }: { children: React.ReactNode }) {
     >
       <main
         id="main-content"
-        className="w-full h-full transition-all duration-300 px-4 overflow-y-auto lg:px-8 py-4"
+        className="w-full h-full transition-all duration-300 px-0 overflow-y-auto lg:px-8 py-4"
       >
         {children}
       </main>

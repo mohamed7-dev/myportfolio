@@ -1,5 +1,7 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
+import { cacheKeys } from "@/lib/constants";
 import { clientSafeSchema, updateProfileInputSchema } from "@/lib/dto/profile";
 import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
@@ -16,6 +18,10 @@ export const { PATCH } = createRouter({
       const result = await profileService.update(ctx, parsedData);
 
       const parsedOutput = validateOutput(result, clientSafeSchema);
+
+      revalidatePath("/about", "page");
+      revalidatePath("/", "layout");
+      revalidateTag(cacheKeys.publicSuperAdminProfile[0], "");
 
       return NextResponse.json(parsedOutput, { status: 200 });
     },

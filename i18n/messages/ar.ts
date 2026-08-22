@@ -40,6 +40,7 @@ export default {
   },
   about: {
     title: "عني",
+    description: "تعرّف على منهجيتي الهندسية ومهاراتي التقنية وخبرتي المهنية.",
     summary: {
       title: "عقلية المهندس المعماري",
     },
@@ -58,6 +59,7 @@ export default {
   },
   projects: {
     title: "عرض المشاريع الهندسية",
+    description: "استكشف التطبيقات والأنظمة التي قمت ببنائها.",
   },
   project: {
     backToProjects: "العودة إلى المشاريع",

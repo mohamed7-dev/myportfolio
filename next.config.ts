@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
       mssql: "./mock-empty.js",
     },
   },
+  experimental: {
+    serverMinification: false,
+  },
 };
 
 export default nextConfig;

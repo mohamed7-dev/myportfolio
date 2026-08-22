@@ -1,7 +1,7 @@
 import { ChevronLeftIcon, CodeIcon, LinkIcon } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { setStaticParamsLocale } from "next-international/server";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -16,46 +16,52 @@ import { AppImage } from "@/components/shared/app-image";
 import { MediaGallery } from "@/components/shared/media-gallery";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getScopedI18n } from "@/i18n/server";
-import { LanguageCode } from "@/lib/dto/language-code";
+import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
+import { cacheKeys } from "@/lib/constants";
+import { localizedCache } from "@/lib/helpers/localized-cache";
 import { visitorService } from "@/services/domain/visitor.service";
+import { PublicSidebarTrigger } from "../../_components/public-sidebar-trigger";
 
-export async function generateStaticParams() {
-  const getPublicProjects = wrapService({
-    authenticatedOnly: false,
-    handler: visitorService.getProjects,
-  });
+export const revalidate = 3600;
 
-  const result = await getPublicProjects();
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/projects/[slug]">): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const project = await getProject(locale, slug);
 
-  return result.items.flatMap((project) => [
-    {
-      locale: LanguageCode.en,
-      slug: project.translations.find((t) => t.languageCode === LanguageCode.en)
-        ?.slug,
-    },
-    {
-      locale: LanguageCode.ar,
-      slug: project.translations.find((t) => t.languageCode === LanguageCode.ar)
-        ?.slug,
-    },
-  ]);
+  if (!project) {
+    return {};
+  }
+
+  return {
+    title: project.name,
+    description: project.description,
+  };
 }
+
+const getProject = localizedCache(
+  async (locale, slug: string) => {
+    const getProject = wrapService({
+      authenticatedOnly: false,
+      handler: visitorService.getProject,
+      ctx: { params: Promise.resolve({ locale }) },
+    });
+
+    const project = await getProject({ slug });
+    return project;
+  },
+  cacheKeys.publicProjects,
+  { revalidate: 3600, tags: cacheKeys.publicProjects },
+);
 
 export default async function ProjectPage({
   params,
 }: PageProps<"/[locale]/projects/[slug]">) {
   const i18n = await getScopedI18n("project");
-  const { slug, locale } = await params;
+  const { slug } = await params;
+  const project = await getProject(await getCurrentLocale(), slug);
 
-  setStaticParamsLocale(locale);
-
-  const getProject = wrapService({
-    authenticatedOnly: false,
-    handler: visitorService.getProject,
-  });
-
-  const project = await getProject({ slug });
   if (!project) {
     return notFound();
   }
@@ -63,6 +69,7 @@ export default async function ProjectPage({
   return (
     <Page pageId="project">
       <PageTitle pageTitleBlockId="project-title">{project.name}</PageTitle>
+
       <PageDescription pageDescriptionBlockId="project-description">
         {project.description}
       </PageDescription>
@@ -90,6 +97,9 @@ export default async function ProjectPage({
               {i18n("liveDemo")}
             </Link>
           </Button>
+        </PageActionBarItem>
+        <PageActionBarItem actionBarItemBlockId="sidebar-trigger">
+          <PublicSidebarTrigger />
         </PageActionBarItem>
       </PageActionBar>
       <PageLayout>

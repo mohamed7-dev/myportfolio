@@ -3,6 +3,6 @@
   direction: inherit;
 }
 
-:root[dir="rtl"] {
+html[dir="rtl"] {
   --font-sans-variable: var(--font-ibm-plex-sans-ar);
 }

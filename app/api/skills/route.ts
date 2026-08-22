@@ -1,5 +1,7 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
+import { cacheKeys } from "@/lib/constants";
 import {
   createSkillInputSchema,
   createSkillOutputSchema,
@@ -24,6 +26,11 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, createSkillOutputSchema);
 
+      revalidatePath("/", "page");
+      revalidateTag(cacheKeys.publicFeaturedSkills[0], "");
+      revalidatePath("/about", "page");
+      revalidateTag(cacheKeys.publicSkills[0], "");
+
       return NextResponse.json(parsedResult, { status: 201 });
     },
   },
@@ -38,6 +45,11 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, updateSkillOutputSchema);
 
+      revalidatePath("/", "page");
+      revalidateTag(cacheKeys.publicFeaturedSkills[0], "");
+      revalidatePath("/about", "page");
+      revalidateTag(cacheKeys.publicSkills[0], "");
+
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },
@@ -51,6 +63,11 @@ export const { POST, PATCH, DELETE } = createRouter({
       const result = await skillService.delete(ctx, parsedData);
 
       const parsedResult = validateOutput(result, deleteSkillsOutputSchema);
+
+      revalidatePath("/", "page");
+      revalidateTag(cacheKeys.publicFeaturedSkills[0], "");
+      revalidatePath("/about", "page");
+      revalidateTag(cacheKeys.publicSkills[0], "");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },

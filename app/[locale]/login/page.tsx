@@ -14,7 +14,10 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="h-screen w-full flex items-center justify-center">
+    <main
+      className="ltr h-screen w-full flex items-center justify-center"
+      dir="ltr"
+    >
       <div className="w-full max-w-105">
         <LoginForm />
       </div>

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { basename, extname } from "node:path";
 import { type FindOptionsRelations, In } from "typeorm";
-import { camelCase } from "typeorm/util/StringUtils.js";
 import type { RequestContext } from "@/api/request-context/request-context";
 import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
 import { serverConfig } from "@/lib/config/server-config";
@@ -33,18 +33,11 @@ import { normalizeFileTypes } from "@/lib/utils/normalize-file-types";
 import { notNullOrUndefined } from "@/lib/utils/not-null-or-undefined";
 import { omit } from "@/lib/utils/omit";
 import { validateMimeType } from "@/lib/utils/validate-mimetype";
-import { AchievementAsset } from "@/orm/entities/achievement/achievement-asset.entity";
 import type { AppEntity } from "@/orm/entities/app-entity";
 import { Asset } from "@/orm/entities/asset/asset.entity";
 import { AssetTranslation } from "@/orm/entities/asset/asset-translation.entity";
 import type { OrderableAsset } from "@/orm/entities/asset/orderable-asset.entity";
 import { AssetUpload } from "@/orm/entities/asset-upload/asset-upload.entity";
-import { CareerAsset } from "@/orm/entities/career/career-asset.entity";
-import { ContactMethodAsset } from "@/orm/entities/contact-method/contact-method-asset.entity";
-import { EducationAsset } from "@/orm/entities/education/education-asset.entity";
-import { ProfileAsset } from "@/orm/entities/profile/profile-asset.entity";
-import { ProjectAsset } from "@/orm/entities/project/project-asset.entity";
-import { SkillAsset } from "@/orm/entities/skill/skill-asset.entity";
 import { ormService } from "@/orm/orm.service";
 import { patchEntity } from "@/orm/utils/patch-entity";
 import { listQueryBuilder } from "../helpers/list-query-builder/list-query-builder.service";
@@ -325,18 +318,32 @@ class AssetService {
 
     const uploadId = randomUUID();
 
-    const sourceFileKey = "source";
+    const sourceResourceType = this.getStorageResourceType(
+      input.source.mimeType,
+    );
+    const previewResourceType = this.getStorageResourceType(
+      input.preview.mimeType,
+    );
 
-    const previewFileKey = "preview";
+    const sourceFileKey = this.getUploadFileKey(
+      "source",
+      input.source.name,
+      sourceResourceType,
+    );
+    const previewFileKey = this.getUploadFileKey(
+      "preview",
+      input.preview.name,
+      previewResourceType,
+    );
 
     const sourceObjectLocation = this.getObjectLocation(
       uploadId,
-      `source_${input.source.name}`,
+      sourceFileKey,
     );
 
     const previewObjectLocation = this.getObjectLocation(
       uploadId,
-      `preview_${input.preview.name}`,
+      previewFileKey,
     );
 
     const [sourceUploadUrl, previewUploadUrl] = await Promise.all([
@@ -345,7 +352,7 @@ class AssetService {
         contentType: input.source.mimeType,
         contentLength: input.source.size,
         expiresInSeconds: 15 * 60,
-        resourceType: this.getStorageResourceType(input.source.mimeType),
+        resourceType: sourceResourceType,
       }),
 
       serverConfig.asset.objectStorageStrategy.createUploadRequest({
@@ -353,7 +360,7 @@ class AssetService {
         contentType: input.preview.mimeType,
         contentLength: input.preview.size,
         expiresInSeconds: 15 * 60,
-        resourceType: this.getStorageResourceType(input.preview.mimeType),
+        resourceType: previewResourceType,
       }),
     ]);
 
@@ -366,10 +373,10 @@ class AssetService {
       sourceFileName: input.source.name,
       sourceMimeType: input.source.mimeType,
       sourceSize: input.source.size,
-      sourceResourceType: this.getStorageResourceType(input.source.mimeType),
+      sourceResourceType,
       previewMimeType: input.preview.mimeType,
       previewSize: input.preview.size,
-      previewResourceType: this.getStorageResourceType(input.preview.mimeType),
+      previewResourceType,
       status: AssetUploadStatus.PENDING,
       expiresAt: new Date(Date.now() + 30 * 60 * 1000),
     });
@@ -604,6 +611,24 @@ class AssetService {
     return ObjectStorageResourceType.raw;
   }
 
+  private getUploadFileKey(
+    prefix: string,
+    filename: string,
+    resourceType: ObjectStorageResourceType,
+  ) {
+    const safeFilename = basename(filename);
+    const filenameWithoutExtension = basename(
+      safeFilename,
+      extname(safeFilename),
+    );
+    const keyFilename =
+      resourceType === ObjectStorageResourceType.raw
+        ? safeFilename
+        : filenameWithoutExtension;
+
+    return `${prefix}_${keyFilename}`;
+  }
+
   private validateUploadSessionInput(input: CreateAssetUploadInputSchema) {
     const errors: {
       message: string;
@@ -708,8 +733,8 @@ class AssetService {
     ctx: RequestContext,
     entity: EntityWithAssets,
   ) {
-    const relationProperty = this.getHostEntityRelationProperty(entity);
-    const orderableAssetType = await this.getOrderableAssetType(ctx, entity);
+    const { relationProperty, orderableAssetType } =
+      await this.getOrderableAssetMetadata(ctx, entity);
     const repo = await ormService.getRepository(ctx, orderableAssetType);
 
     await repo.delete({
@@ -725,8 +750,8 @@ class AssetService {
     asset: Asset,
     index: number,
   ): Promise<OrderableAsset> {
-    const relationProperty = this.getHostEntityRelationProperty(entity);
-    const orderableAssetType = await this.getOrderableAssetType(ctx, entity);
+    const { relationProperty, orderableAssetType } =
+      await this.getOrderableAssetMetadata(ctx, entity);
     return new orderableAssetType({
       asset: {
         id: asset.id,
@@ -738,14 +763,13 @@ class AssetService {
     });
   }
 
-  private getHostEntityRelationProperty(entity: EntityWithAssets): string {
-    return camelCase(entity.constructor.name);
-  }
-
-  private async getOrderableAssetType(
+  private async getOrderableAssetMetadata(
     ctx: RequestContext,
     entity: EntityWithAssets,
-  ): Promise<ClassType<OrderableAsset>> {
+  ): Promise<{
+    relationProperty: string;
+    orderableAssetType: ClassType<OrderableAsset>;
+  }> {
     const repo = await ormService.getRepository(ctx, entity.constructor);
     const assetRelation = repo.metadata.relations.find(
       (r) => r.propertyName === "assets",
@@ -754,29 +778,22 @@ class AssetService {
       throw new InternalServerError("Couldn't find matching orderable asset");
     }
 
-    if (typeof assetRelation.type === "string") {
-      switch (assetRelation.type) {
-        case "ProjectAsset":
-          return ProjectAsset;
-        case "ProfileAsset":
-          return ProfileAsset;
-        case "SkillAsset":
-          return SkillAsset;
-        case "CareerAsset":
-          return CareerAsset;
-        case "EducationAsset":
-          return EducationAsset;
-        case "ContactMethodAsset":
-          return ContactMethodAsset;
-        case "AchievementAsset":
-          return AchievementAsset;
-        default:
-          throw new InternalServerError(
-            "Couldn't find matching orderable asset",
-          );
-      }
+    const orderableAssetType = assetRelation.inverseEntityMetadata.target;
+    if (typeof orderableAssetType === "string") {
+      throw new InternalServerError("Couldn't find matching orderable asset");
     }
-    return assetRelation.type as ClassType<OrderableAsset>;
+
+    const hostRelation = assetRelation.inverseEntityMetadata.relations.find(
+      (relation) => relation.inverseEntityMetadata === repo.metadata,
+    );
+    if (!hostRelation) {
+      throw new InternalServerError("Couldn't find matching entity relation");
+    }
+
+    return {
+      relationProperty: hostRelation.propertyName,
+      orderableAssetType: orderableAssetType as ClassType<OrderableAsset>,
+    };
   }
 
   private getObjectLocation(uploadId: string, key: string) {

@@ -5,9 +5,15 @@ import {
   TerminalSquareIcon,
   WrenchIcon,
 } from "lucide-react";
-import { setStaticParamsLocale } from "next-international/server";
+import type { Metadata } from "next";
 import { wrapService } from "@/api/common/create-router";
-import { Page, PageTitle } from "@/components/page-layout/page";
+import {
+  Page,
+  PageActionBar,
+  PageActionBarItem,
+  PageDescription,
+  PageTitle,
+} from "@/components/page-layout/page";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { AppImage } from "@/components/shared/app-image";
@@ -15,30 +21,60 @@ import { CardWrapper } from "@/components/shared/card-wrapper";
 import { IconTile } from "@/components/shared/icon-tile";
 import { MediaGallery } from "@/components/shared/media-gallery";
 import { Badge } from "@/components/ui/badge";
-import { getScopedI18n } from "@/i18n/server";
+import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
+import { cacheKeys } from "@/lib/constants";
 import { SkillCategory } from "@/lib/dto/skill";
+import { localizedCache } from "@/lib/helpers/localized-cache";
 import { visitorService } from "@/services/domain/visitor.service";
+import { PublicSidebarTrigger } from "../_components/public-sidebar-trigger";
 import { SummaryCard } from "./_components/summary-card";
 
-export default async function AboutPage({
-  params,
-}: PageProps<"/[locale]/about">) {
-  const { locale } = await params;
-  setStaticParamsLocale(locale);
+export const revalidate = 3600;
 
+export async function generateMetadata(): Promise<Metadata> {
+  const i18n = await getScopedI18n("about");
+  return {
+    title: i18n("title"),
+    description: i18n("description"),
+  };
+}
+
+const getSuperAdminProfile = localizedCache(
+  async (locale) => {
+    const getSuperAdminProfile = wrapService({
+      authenticatedOnly: false,
+      handler: visitorService.getSuperAdminProfileInfo,
+      ctx: { params: Promise.resolve({ locale }) },
+    });
+    const profile = await getSuperAdminProfile();
+
+    return profile;
+  },
+  cacheKeys.publicSuperAdminProfile,
+  { revalidate: 3600, tags: cacheKeys.publicSuperAdminProfile },
+);
+
+const getSkills = localizedCache(
+  async (locale) => {
+    const getSkills = wrapService({
+      authenticatedOnly: false,
+      handler: visitorService.getSkills,
+      ctx: { params: Promise.resolve({ locale }) },
+    });
+    const skills = await getSkills();
+    return skills;
+  },
+  cacheKeys.publicFeaturedSkills,
+  { revalidate: 3600, tags: cacheKeys.publicFeaturedSkills },
+);
+
+export default async function AboutPage() {
   const i18n = await getScopedI18n("about");
 
-  const getSuperAdminProfile = wrapService({
-    authenticatedOnly: false,
-    handler: visitorService.getSuperAdminProfileInfo,
-  });
-  const profile = await getSuperAdminProfile();
+  const locale = await getCurrentLocale();
+  const profile = await getSuperAdminProfile(locale);
 
-  const getSkills = wrapService({
-    authenticatedOnly: false,
-    handler: visitorService.getSkills,
-  });
-  const skills = await getSkills();
+  const skills = await getSkills(locale);
 
   const skillsByCategory: Record<SkillCategory, (typeof skills)["items"]> =
     {} as any;
@@ -96,6 +132,14 @@ export default async function AboutPage({
   return (
     <Page pageId="about">
       <PageTitle pageTitleBlockId="about-title">{i18n("title")}</PageTitle>
+      <PageActionBar pageActionBarBlockId="about-action-bar">
+        <PageActionBarItem actionBarItemBlockId="sidebar-trigger">
+          <PublicSidebarTrigger />
+        </PageActionBarItem>
+      </PageActionBar>
+      <PageDescription pageDescriptionBlockId="about-description">
+        {i18n("description")}
+      </PageDescription>
       <PageLayout>
         <PageBlock
           id="summary"

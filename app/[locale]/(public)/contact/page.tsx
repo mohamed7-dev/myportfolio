@@ -1,9 +1,11 @@
 import { ContactIcon, SendIcon } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { setStaticParamsLocale } from "next-international/server";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
+  PageActionBar,
+  PageActionBarItem,
   PageDescription,
   PageTitle,
 } from "@/components/page-layout/page";
@@ -14,28 +16,52 @@ import { CardWrapper } from "@/components/shared/card-wrapper";
 import { IconTile } from "@/components/shared/icon-tile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getScopedI18n } from "@/i18n/server";
+import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
+import { cacheKeys } from "@/lib/constants";
+import { localizedCache } from "@/lib/helpers/localized-cache";
 import { visitorService } from "@/services/domain/visitor.service";
+import { PublicSidebarTrigger } from "../_components/public-sidebar-trigger";
 import { DirectMessageForm } from "./_components/direct-message-form";
 import { PrimaryContactMethodCopy } from "./_components/primary-contact-method-copy";
 
-export default async function ContactPage({
-  params,
-}: PageProps<"/[locale]/contact">) {
-  const { locale } = await params;
-  setStaticParamsLocale(locale);
+export const revalidate = 3600;
 
+export async function generateMetadata(): Promise<Metadata> {
   const i18n = await getScopedI18n("contact");
-  const getContactMethods = wrapService({
-    authenticatedOnly: false,
-    handler: visitorService.getContactMethods,
-  });
-  const result = await getContactMethods();
+  return {
+    title: i18n("title"),
+    description: i18n("description"),
+  };
+}
+
+const getContactMethods = localizedCache(
+  async (locale) => {
+    const getContactMethods = wrapService({
+      authenticatedOnly: false,
+      handler: visitorService.getContactMethods,
+      ctx: { params: Promise.resolve({ locale }) },
+    });
+    const result = await getContactMethods();
+    return result;
+  },
+  cacheKeys.publicContactMethods,
+  { revalidate: 3600, tags: cacheKeys.publicContactMethods },
+);
+
+export default async function ContactPage() {
+  const i18n = await getScopedI18n("contact");
+  const result = await getContactMethods(await getCurrentLocale());
+
   const primaryContactMethod = result.items.find((cm) => cm.primary);
   const contactMethods = result.items.filter((cm) => !cm.primary);
   return (
     <Page pageId="contact">
       <PageTitle pageTitleBlockId="contact-title">{i18n("title")}</PageTitle>
+      <PageActionBar pageActionBarBlockId="public-contact-action-bar">
+        <PageActionBarItem actionBarItemBlockId="sidebar-trigger">
+          <PublicSidebarTrigger />
+        </PageActionBarItem>
+      </PageActionBar>
       <PageDescription pageDescriptionBlockId="contact-description">
         {i18n("description")}
       </PageDescription>

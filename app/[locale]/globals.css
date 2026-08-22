@@ -40,7 +40,6 @@
   --color-border: var(--border);
   --color-ring: var(--ring);
   --font-sans: var(--font-sans-variable);
-  /* --font-mono: var(--font-geist-mono); */
   --spacing-box-shadow-x: var(--box-shadow-x);
   --spacing-box-shadow-y: var(--box-shadow-y);
   --spacing-reverse-box-shadow-x: var(--reverse-box-shadow-x);

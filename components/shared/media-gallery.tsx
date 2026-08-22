@@ -6,7 +6,7 @@ import {
   ExpandIcon,
   XIcon,
 } from "lucide-react";
-import { useState } from "react";
+import React from "react";
 import { AppImage } from "@/components/shared/app-image";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,8 +39,8 @@ export function MediaGallery({
   overlayImageProps,
 }: MediaGalleryProps) {
   const mediaItems = entityAssets.filter((entry) => !!entry.asset) ?? [];
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const { downloadAsset, isDownloading } = useDownloadAsset();
 

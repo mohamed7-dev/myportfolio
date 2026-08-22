@@ -23,6 +23,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
+import { useLocaleUtils } from "@/hooks/use-locale-utils";
 import { useScopedI18n } from "@/i18n/client";
 import { cn, isRouteActive } from "@/lib/utils";
 import { AccentSwitcher } from "../accent-switcher";
@@ -44,6 +45,8 @@ export function PublicSidebar() {
   const { formatNumber } = useLocalFormatter();
   const { isMobile } = useSidebar();
 
+  const { isRTL } = useLocaleUtils();
+
   const pathname = usePathname();
 
   const isActive = (href: string) => isRouteActive(pathname, href);
@@ -55,6 +58,7 @@ export function PublicSidebar() {
         variant="sidebar"
         className="h-auto my-8 absolute border-none"
         innerSidebarClassName="bg-transparent"
+        side={isRTL ? "right" : "left"}
       >
         <SidebarHeader className="py-4">
           <Identity />

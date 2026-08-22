@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useTransition } from "react";
+import { setAccentColor } from "@/api/actions/set-accent-color.action";
 import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -6,15 +7,15 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-import { setAccentColor } from "@/lib/helpers/accent-color-storage";
+import { ACCENT_COLOR_CLASSNAME_KEY } from "@/lib/constants";
 import { themes } from "@/lib/theme";
 
 export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
   const [accentClassName, setAccentClassName] = React.useState("");
 
+  const [_, startTransition] = useTransition();
+
   const onChange = (value: string) => {
-    setAccentClassName(value);
-    setAccentColor(value);
     const allAccentClassNames = Object.values(themes).map(
       (theme) => theme.className,
     );
@@ -27,7 +28,22 @@ export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
     if (value) {
       document.documentElement.classList.add(value);
     }
+
+    startTransition(async () => {
+      setAccentClassName(value);
+      await setAccentColor(value);
+    });
   };
+
+  React.useEffect(() => {
+    const getAccentColor = async () => {
+      const accent = await window.cookieStore.get(ACCENT_COLOR_CLASSNAME_KEY);
+      if (accent?.value) {
+        setAccentClassName(accent.value);
+      }
+    };
+    getAccentColor();
+  }, []);
 
   if (mode === "dashboard") {
     return (

@@ -41,6 +41,8 @@ export default {
   },
   about: {
     title: "about me",
+    description:
+      "Learn about my engineering mindset, technical skills, and professional background.",
     summary: {
       title: "The Architect Mindset",
     },
@@ -59,6 +61,7 @@ export default {
   },
   projects: {
     title: "engineering showcase",
+    description: "Explore the applications and systems I have built.",
   },
   project: {
     backToProjects: "Back To Projects",

@@ -1,5 +1,7 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
+import { cacheKeys } from "@/lib/constants";
 import {
   createProjectInputSchema,
   createProjectOutputSchema,
@@ -24,6 +26,11 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, createProjectOutputSchema);
 
+      revalidatePath("/", "page");
+      revalidateTag(cacheKeys.publicFeaturedProjects[0], "");
+      revalidatePath("/projects", "page");
+      revalidateTag(cacheKeys.publicProjects[0], "");
+
       return NextResponse.json(parsedResult, { status: 201 });
     },
   },
@@ -37,6 +44,11 @@ export const { POST, PATCH, DELETE } = createRouter({
       const result = await projectService.update(ctx, parsedData);
 
       const parsedResult = validateOutput(result, updateProjectOutputSchema);
+
+      revalidatePath("/", "page");
+      revalidateTag(cacheKeys.publicFeaturedProjects[0], "");
+      revalidatePath("/projects", "page");
+      revalidateTag(cacheKeys.publicProjects[0], "");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },
@@ -54,6 +66,11 @@ export const { POST, PATCH, DELETE } = createRouter({
         result,
         softDeleteProjectsOutputSchema,
       );
+
+      revalidatePath("/", "page");
+      revalidateTag(cacheKeys.publicFeaturedProjects[0], "");
+      revalidatePath("/projects", "page");
+      revalidateTag(cacheKeys.publicProjects[0], "");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },

@@ -1,5 +1,7 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
+import { cacheKeys } from "@/lib/constants";
 import {
   createAchievementInputSchema,
   createAchievementOutputSchema,
@@ -26,6 +28,9 @@ export const { POST, PATCH, DELETE } = createRouter({
         createAchievementOutputSchema,
       );
 
+      revalidatePath("/achievements", "page");
+      revalidateTag(cacheKeys.publicAchievements[0], "");
+
       return NextResponse.json(parsedResult, { status: 201 });
     },
   },
@@ -43,6 +48,9 @@ export const { POST, PATCH, DELETE } = createRouter({
         updateAchievementOutputSchema,
       );
 
+      revalidatePath("/achievements", "page");
+      revalidateTag(cacheKeys.publicAchievements[0], "");
+
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },
@@ -59,6 +67,9 @@ export const { POST, PATCH, DELETE } = createRouter({
         result,
         deleteAchievementsOutputSchema,
       );
+
+      revalidatePath("/achievements", "page");
+      revalidateTag(cacheKeys.publicAchievements[0], "");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },

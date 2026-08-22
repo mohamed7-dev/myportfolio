@@ -1,5 +1,7 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
+import { cacheKeys } from "@/lib/constants";
 import {
   createEducationInputSchema,
   createEducationOutputSchema,
@@ -23,6 +25,9 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, createEducationOutputSchema);
 
+      revalidatePath("/career", "page");
+      revalidateTag(cacheKeys.publicEducation[0], "");
+
       return NextResponse.json(parsedResult, { status: 201 });
     },
   },
@@ -36,7 +41,8 @@ export const { POST, PATCH, DELETE } = createRouter({
       const result = await educationService.update(ctx, parsedData);
 
       const parsedResult = validateOutput(result, updateEducationOutputSchema);
-
+      revalidatePath("/career", "page");
+      revalidateTag(cacheKeys.publicEducation[0], "");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },
@@ -50,7 +56,8 @@ export const { POST, PATCH, DELETE } = createRouter({
       const result = await educationService.delete(ctx, parsedData);
 
       const parsedResult = validateOutput(result, deleteEducationsOutputSchema);
-
+      revalidatePath("/career", "page");
+      revalidateTag(cacheKeys.publicEducation[0], "");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },

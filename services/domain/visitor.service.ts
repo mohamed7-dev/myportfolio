@@ -47,6 +47,7 @@ class VisitorService {
     const projects = await projectService.find(ctx, {
       take: 5,
       filter: { featured: { equals: true }, enabled: { equals: true } },
+      includeSoftDeleted: false,
     });
 
     const result = validateOutput(projects, getFeaturedProjectsOutputSchema);

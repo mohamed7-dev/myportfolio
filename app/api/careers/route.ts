@@ -1,8 +1,8 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
+import { cacheKeys } from "@/lib/constants";
 import {
-  careerListInputSchema,
-  careerListOutputSchema,
   createCareerInputSchema,
   createCareerOutputSchema,
   deleteCareersInputSchema,
@@ -25,6 +25,10 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, createCareerOutputSchema);
 
+      revalidatePath("/", "page");
+      revalidateTag(cacheKeys.publicFeaturedCareers[0], "");
+      revalidatePath("/career", "page");
+      revalidateTag(cacheKeys.publicCareers[0], "");
       return NextResponse.json(parsedResult, { status: 201 });
     },
   },
@@ -39,6 +43,10 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, updateCareerOutputSchema);
 
+      revalidatePath("/", "page");
+      revalidateTag(cacheKeys.publicFeaturedCareers[0], "");
+      revalidatePath("/career", "page");
+      revalidateTag(cacheKeys.publicCareers[0], "");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },
@@ -53,6 +61,10 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, deleteCareersOutputSchema);
 
+      revalidatePath("/", "page");
+      revalidateTag(cacheKeys.publicFeaturedCareers[0], "");
+      revalidatePath("/career", "page");
+      revalidateTag(cacheKeys.publicCareers[0], "");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },

@@ -1,32 +1,64 @@
-import { setStaticParamsLocale } from "next-international/server";
+import type { Metadata } from "next";
 import { wrapService } from "@/api/common/create-router";
-import { Page, PageTitle } from "@/components/page-layout/page";
+import {
+  Page,
+  PageActionBar,
+  PageActionBarItem,
+  PageDescription,
+  PageTitle,
+} from "@/components/page-layout/page";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
-import { getScopedI18n } from "@/i18n/server";
+import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
+import { cacheKeys } from "@/lib/constants";
+import { localizedCache } from "@/lib/helpers/localized-cache";
 import { visitorService } from "@/services/domain/visitor.service";
+import { PublicSidebarTrigger } from "../_components/public-sidebar-trigger";
 import { ProjectCard } from "./_components/project-card";
 
-export default async function ProjectsPage({
-  params,
-}: PageProps<"/[locale]/projects">) {
-  const { locale } = await params;
-  setStaticParamsLocale(locale);
+export const revalidate = 3600;
 
+export async function generateMetadata(): Promise<Metadata> {
   const i18n = await getScopedI18n("projects");
+  return {
+    title: i18n("title"),
+    description: i18n("description"),
+  };
+}
 
-  const getPublicProjects = wrapService({
-    authenticatedOnly: false,
-    handler: visitorService.getProjects,
-  });
+const getPublicProjects = localizedCache(
+  async (locale) => {
+    const getPublicProjects = wrapService({
+      authenticatedOnly: false,
+      handler: visitorService.getProjects,
+      ctx: { params: Promise.resolve({ locale }) },
+    });
 
-  const result = await getPublicProjects();
+    const result = await getPublicProjects();
+
+    return result;
+  },
+  cacheKeys.publicProjects,
+  { revalidate: 3600, tags: cacheKeys.publicProjects },
+);
+
+export default async function ProjectsPage() {
+  const i18n = await getScopedI18n("projects");
+  const result = await getPublicProjects(await getCurrentLocale());
 
   return (
     <Page pageId="public-projects">
       <PageTitle pageTitleBlockId="public-projects-title">
         {i18n("title")}
       </PageTitle>
+      <PageActionBar pageActionBarBlockId="public-projects-action-bar">
+        <PageActionBarItem actionBarItemBlockId="sidebar-trigger">
+          <PublicSidebarTrigger />
+        </PageActionBarItem>
+      </PageActionBar>
+      <PageDescription pageDescriptionBlockId="projects-description">
+        {i18n("description")}
+      </PageDescription>
       <PageLayout>
         <PageBlock column="full" id="projects-cards">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

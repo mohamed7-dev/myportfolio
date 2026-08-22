@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/suspicious/noArrayIndexKey: no other unique identifier available when processing react children */
 "use client";
 
 import { EllipsisVerticalIcon } from "lucide-react";

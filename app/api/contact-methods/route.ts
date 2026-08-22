@@ -1,5 +1,7 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
+import { cacheKeys } from "@/lib/constants";
 import {
   createContactMethodInputSchema,
   createContactMethodOutputSchema,
@@ -26,6 +28,9 @@ export const { POST, PATCH, DELETE } = createRouter({
         createContactMethodOutputSchema,
       );
 
+      revalidatePath("/contact", "page");
+      revalidateTag(cacheKeys.publicContactMethods[0], "");
+
       return NextResponse.json(parsedResult, { status: 201 });
     },
   },
@@ -43,6 +48,8 @@ export const { POST, PATCH, DELETE } = createRouter({
         updateContactMethodOutputSchema,
       );
 
+      revalidatePath("/contact", "page");
+      revalidateTag(cacheKeys.publicContactMethods[0], "");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },
@@ -59,6 +66,9 @@ export const { POST, PATCH, DELETE } = createRouter({
         result,
         deleteContactMethodsOutputSchema,
       );
+
+      revalidatePath("/contact", "page");
+      revalidateTag(cacheKeys.publicContactMethods[0], "");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },

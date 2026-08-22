@@ -1,3 +1,4 @@
+"use client";
 import { ImageIcon } from "lucide-react";
 import Image, { type ImageProps } from "next/image";
 import { CldImage, type CldImageProps } from "next-cloudinary";
