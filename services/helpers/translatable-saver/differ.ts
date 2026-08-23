@@ -1,4 +1,5 @@
 import type { RequestContext } from "@/api/request-context/request-context";
+import { InternalServerError } from "@/lib/errors/errors";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import type {
   Translatable,
@@ -84,8 +85,7 @@ export class TranslationDiffer<
         try {
           newTranslation = await repo.save(translation as any);
         } catch (err: any) {
-          //   throw new InternalServerError(err.message);
-          throw new Error(err.message); // TODO: use error class
+          throw new InternalServerError(err.message);
         }
         entity.translations.push(newTranslation);
       }

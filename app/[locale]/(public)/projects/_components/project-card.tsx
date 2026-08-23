@@ -40,7 +40,7 @@ export async function ProjectCard({
             {project.description}
           </p>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 overflow-x-auto">
             {project.skills.map((skill) => (
               <Badge key={skill.id} variant={"neutral"}>
                 {skill.name}

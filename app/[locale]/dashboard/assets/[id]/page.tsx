@@ -18,6 +18,11 @@ import { SubmitButton } from "./_components/submit-button";
 import { TagsField } from "./_components/tags-field";
 import { UpdateAssetForm } from "./_components/update-asset-form";
 
+export const metadata = {
+  title: "Dashboard - Edit Asset",
+  description: "Edit a portfolio asset",
+};
+
 export default async function AssetDetailPage({
   params,
 }: {

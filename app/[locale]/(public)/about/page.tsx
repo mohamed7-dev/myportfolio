@@ -27,6 +27,7 @@ import { SkillCategory } from "@/lib/dto/skill";
 import { localizedCache } from "@/lib/helpers/localized-cache";
 import { visitorService } from "@/services/domain/visitor.service";
 import { PublicSidebarTrigger } from "../_components/public-sidebar-trigger";
+import { getSuperAdminProfile } from "../layout";
 import { SummaryCard } from "./_components/summary-card";
 
 export const revalidate = 3600;
@@ -38,21 +39,6 @@ export async function generateMetadata(): Promise<Metadata> {
     description: i18n("description"),
   };
 }
-
-const getSuperAdminProfile = localizedCache(
-  async (locale) => {
-    const getSuperAdminProfile = wrapService({
-      authenticatedOnly: false,
-      handler: visitorService.getSuperAdminProfileInfo,
-      ctx: { params: Promise.resolve({ locale }) },
-    });
-    const profile = await getSuperAdminProfile();
-
-    return profile;
-  },
-  cacheKeys.publicSuperAdminProfile,
-  { revalidate: 3600, tags: cacheKeys.publicSuperAdminProfile },
-);
 
 const getSkills = localizedCache(
   async (locale) => {
@@ -194,7 +180,7 @@ export default async function AboutPage() {
                           <AppImage
                             asset={skill.featuredAsset}
                             transform={{ preset: "icon", mode: "resize" }}
-                            className="size-10 object-contain"
+                            className="size-6 md:size-10 object-contain"
                           />
                         )}
                         {skill.name}

@@ -72,8 +72,6 @@ export function buildImageUrl(
 ): string {
   const url = new URL(asset.previewIdentifier);
 
-  // TODO: uncomment when cloudinary is used
-
   // if (options.preset) {
   //   url.searchParams.set("preset", options.preset);
   // } else {

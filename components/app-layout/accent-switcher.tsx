@@ -7,7 +7,10 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ACCENT_COLOR_CLASSNAME_KEY } from "@/lib/constants";
+import {
+  ACCENT_COLOR_CLASSNAME_KEY,
+  PREFERENCES_CONSENT_KEY,
+} from "@/lib/constants";
 import { themes } from "@/lib/theme";
 
 export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
@@ -16,22 +19,33 @@ export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
   const [_, startTransition] = useTransition();
 
   const onChange = (value: string) => {
-    const allAccentClassNames = Object.values(themes).map(
-      (theme) => theme.className,
-    );
-    const documentElAccentClassName = allAccentClassNames.find((c) =>
-      document.documentElement.classList.contains(c),
-    );
-    if (documentElAccentClassName) {
-      document.documentElement.classList.remove(documentElAccentClassName);
-    }
-    if (value) {
-      document.documentElement.classList.add(value);
+    const changeAccent = () => {
+      const allAccentClassNames = Object.values(themes)
+        .map((theme) => theme.className)
+        .filter(Boolean);
+      const documentElAccentClassName = allAccentClassNames.find((className) =>
+        document.documentElement.classList.contains(className),
+      );
+
+      if (documentElAccentClassName) {
+        document.documentElement.classList.remove(documentElAccentClassName);
+      }
+      if (value) {
+        document.documentElement.classList.add(value);
+      }
+    };
+
+    if ("startViewTransition" in document) {
+      document.startViewTransition(changeAccent);
+    } else {
+      changeAccent();
     }
 
     startTransition(async () => {
       setAccentClassName(value);
-      await setAccentColor(value);
+      if (window.localStorage.getItem(PREFERENCES_CONSENT_KEY) === "accepted") {
+        await setAccentColor(value);
+      }
     });
   };
 

@@ -47,9 +47,9 @@ export function CareerCard({
 
   return (
     <article className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="group flex items-center gap-4">
-          <IconTile className="border-2 border-border rounded-base">
+          <IconTile className="shrink-0 border-2 border-border rounded-base">
             <AppImage
               asset={careerItem.featuredAsset}
               transform={{ preset: "icon", mode: "resize" }}
@@ -63,7 +63,7 @@ export function CareerCard({
             <h3>@{careerItem.organization}</h3>
           </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 flex sm:block justify-between flex-wrap">
           <Badge>
             {formatDate(careerItem.startDate, { dateStyle: "long" })}
             {" - "}
@@ -71,15 +71,15 @@ export function CareerCard({
               ? formatDate(careerItem.endDate, { dateStyle: "long" })
               : i18n("present")}
           </Badge>
-          <p className="flex items-center gap-1 capitalize">
+          <p className="flex items-center sm:gap-1 capitalize">
             <MapPinIcon className="size-3.5" />
             <strong>{careerItem.location}</strong>
-            <span className="capitalize">
+            <strong className="capitalize font-semibold">
               ({resolveCareerType(careerItem.type)})
-            </span>
-            <span className="capitalize">
+            </strong>
+            <strong className="capitalize font-semibold">
               ({resolveCareerMode(careerItem.mode)})
-            </span>
+            </strong>
           </p>
         </div>
       </div>

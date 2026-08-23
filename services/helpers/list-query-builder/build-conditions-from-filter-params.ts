@@ -132,9 +132,7 @@ export function buildConditionFromFilterParams<Entity extends AppEntity>(
             filterProp === "_and"
               ? FilterGroupOperator.AND
               : FilterGroupOperator.OR,
-          conditions: operation.flatMap((op) =>
-            buildConditionForField(filterProp, op),
-          ),
+          conditions: operation.flatMap((op) => processFilterParams(op)),
         });
       } else if (operation && !Array.isArray(operation)) {
         result.push(...buildConditionForField(filterProp, operation));

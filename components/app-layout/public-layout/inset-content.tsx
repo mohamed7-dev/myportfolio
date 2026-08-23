@@ -13,12 +13,12 @@ export function InsetContent({ children }: { children: React.ReactNode }) {
         !isMobile && "col-span-9",
       )}
     >
-      <main
+      <div
         id="main-content"
         className="w-full h-full transition-all duration-300 px-0 overflow-y-auto lg:px-8 py-4"
       >
         {children}
-      </main>
+      </div>
     </SidebarInset>
   );
 }

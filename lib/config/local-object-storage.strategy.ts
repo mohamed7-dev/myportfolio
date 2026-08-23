@@ -106,7 +106,6 @@ export class LocalObjectStorage implements ObjectStorage {
       uploadedAt: new Date().toISOString(),
     };
 
-    // TODO: retrieve the width/height of the object
     if (contentType.startsWith("image")) {
       const { width, height } = this.calculateDimensions(data);
       meta.width = width;

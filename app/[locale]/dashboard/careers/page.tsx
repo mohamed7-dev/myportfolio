@@ -14,6 +14,11 @@ import { validateOutput } from "@/lib/helpers/validate-output";
 import { careerService } from "@/services/domain/career.service";
 import { CareerDataTable } from "./_components/careers-data-table";
 
+export const metadata = {
+  title: "Dashboard - Careers",
+  description: "Manage portfolio career entries",
+};
+
 export default async function CareersListPage({
   searchParams,
 }: {

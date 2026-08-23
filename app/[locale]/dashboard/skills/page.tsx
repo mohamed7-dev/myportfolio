@@ -14,6 +14,11 @@ import { validateOutput } from "@/lib/helpers/validate-output";
 import { skillService } from "@/services/domain/skill.service";
 import { SkillsDataTable } from "./_components/skills-data-table";
 
+export const metadata = {
+  title: "Dashboard - Skills",
+  description: "Manage portfolio skills",
+};
+
 export default async function SkillsListPage({
   searchParams,
 }: {

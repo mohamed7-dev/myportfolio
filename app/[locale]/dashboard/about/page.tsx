@@ -16,6 +16,11 @@ import { AssetField } from "./_components/asset-field";
 import { MainFields } from "./_components/main-fields";
 import { SubmitButton } from "./_components/submit-button";
 
+export const metadata = {
+  title: "Dashboard - About Me",
+  description: "Manage portfolio profile information",
+};
+
 export default async function AboutPage() {
   const me = wrapService({
     authenticatedOnly: true,

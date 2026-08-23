@@ -127,7 +127,7 @@ export function MediaGallery({
           <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent" />
         </div>
 
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-2 md:p-4">
           <Badge variant={"neutral"}>
             {currentIndex + 1}/{mediaItems.length}
           </Badge>
@@ -135,7 +135,7 @@ export function MediaGallery({
           <div className="flex items-center justify-center gap-2">
             <Button
               type="button"
-              size="icon"
+              size="icon-sm"
               variant="neutralNoShadow"
               className="pointer-events-auto"
               onClick={() => updateIndex(currentIndex - 1)}
@@ -145,7 +145,7 @@ export function MediaGallery({
             </Button>
             <Button
               type="button"
-              size="icon"
+              size="icon-sm"
               variant="neutralNoShadow"
               className="pointer-events-auto"
               onClick={() => updateIndex(currentIndex + 1)}

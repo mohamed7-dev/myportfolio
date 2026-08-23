@@ -21,7 +21,6 @@ async function seedAdmin() {
   });
 
   const result = await ensureAdmin();
-  console.log("[Profile]: ", result);
 
   return result;
 }

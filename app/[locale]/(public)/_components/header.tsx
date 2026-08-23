@@ -33,8 +33,8 @@ export function HomePageHeader({
           className="size-full object-cover"
         />
       </div>
-      <div className="px-8 flex justify-between items-end relative -mt-16 z-10">
-        <div className="p-1 bg-secondary-background">
+      <div className="px-0 sm:px-2 md:px-8 flex flex-col sm:flex-row sm:justify-between sm:items-end relative -mt-16 z-10">
+        <div className="shrink-0 w-fit p-1 bg-secondary-background">
           <AppImage
             asset={ctx.profile.avatar ?? undefined}
             transform={{ preset: "thumb", mode: "resize" }}
@@ -43,25 +43,25 @@ export function HomePageHeader({
           />
         </div>
         <div className="mb-4 flex gap-3">
-          <Button size="sm" asChild>
+          <Button size="xs" asChild>
             <Link href={"/contact"}>{i18n("connect")}</Link>
           </Button>
-          <Button size="sm" variant={"neutral"}>
+          <Button size="xs" variant={"neutral"}>
             {i18n("cv")}
           </Button>
         </div>
       </div>
-      <div className="px-8 mt-4">
-        <h1 className="text-2xl font-heading text-foreground">
+      <div className="px-0 sm:px-2 md:px-8 mt-4">
+        <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-heading text-foreground">
           {ctx.profile.intro}
         </h1>
-        <p className="text-base font-base text-foreground/80 mt-1">
+        <p className="text-sm sm:text-base font-base text-foreground/80 mt-1">
           {ctx.profile.jobTitle}
         </p>
-        <p className="text-sm font-base text-foreground mt-4 max-w-2xl">
+        <p className="text-xs sm:text-sm font-base text-foreground mt-4 max-w-2xl">
           {ctx.profile.subHeading}
         </p>
-        <div className="flex gap-2 mt-4 flex-wrap">
+        <div className="flex gap-2 mt-4 overflow-x-auto">
           {skills?.map((skill) => (
             <Badge variant="neutral" key={skill.id}>
               {skill.name}

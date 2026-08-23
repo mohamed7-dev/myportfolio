@@ -64,8 +64,7 @@ export function AchievementCard({
       </div>
       <div className="space-y-2 mt-4">
         <h4 className="capitalize text-sm font-heading">{achievement.name}</h4>
-        {/* <Separator /> */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Badge variant={"neutral"}>{achievement.organization}</Badge>
           <Badge variant={"neutral"}>
             <span>{i18n("issuedAt")}: </span>

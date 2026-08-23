@@ -276,7 +276,7 @@ describe("buildConditionsFromFilterParams()", () => {
       const firstWhereCondition = result[0];
       expect(
         isWhereCondition(firstWhereCondition) && firstWhereCondition.clause,
-      ).toBe("asset.mimetype LIKE :arg1");
+      ).toBe("asset.mimetype ILIKE :arg1");
       expect(
         isWhereCondition(firstWhereCondition) && firstWhereCondition.parameters,
       ).toEqual({

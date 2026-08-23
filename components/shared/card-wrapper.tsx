@@ -15,7 +15,7 @@ export function CardWrapper({
     <article
       {...props}
       className={cn(
-        "group p-4 bg-background rounded-base border-2 border-border overflow-hidden transition-all duration-300",
+        "group p-1.5 sm:p-1 md:p-4 bg-background rounded-base border-2 border-border overflow-hidden transition-all duration-300",
         interactive && "hover:-translate-y-1 hover:border-border/30 ",
         className,
       )}

@@ -7,6 +7,7 @@ import {
   Page,
   PageActionBar,
   PageActionBarItem,
+  PageActionBarMenuItem,
   PageDescription,
   PageTitle,
 } from "@/components/page-layout/page";
@@ -16,6 +17,7 @@ import { AppImage } from "@/components/shared/app-image";
 import { MediaGallery } from "@/components/shared/media-gallery";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
 import { cacheKeys } from "@/lib/constants";
 import { localizedCache } from "@/lib/helpers/localized-cache";
@@ -82,6 +84,11 @@ export default async function ProjectPage({
             </Link>
           </Button>
         </PageActionBarItem>
+        <PageActionBarMenuItem pageActionBarMenuItemBlockId="back-to-projects">
+          <DropdownMenuItem>
+            <Link href={"/projects"}>{i18n("backToProjects")}</Link>
+          </DropdownMenuItem>
+        </PageActionBarMenuItem>
         <PageActionBarItem actionBarItemBlockId="source-code-url">
           <Button size={"sm"} asChild>
             <Link href={project.repoUrl} target="_blank">
@@ -90,6 +97,13 @@ export default async function ProjectPage({
             </Link>
           </Button>
         </PageActionBarItem>
+        <PageActionBarMenuItem pageActionBarMenuItemBlockId="source-code-url">
+          <DropdownMenuItem>
+            <Link href={project.repoUrl} target="_blank">
+              {i18n("source")}
+            </Link>
+          </DropdownMenuItem>
+        </PageActionBarMenuItem>
         <PageActionBarItem actionBarItemBlockId="live-demo-url">
           <Button size={"sm"} asChild>
             <Link href={project.liveDemoUrl} target="_blank">
@@ -98,6 +112,13 @@ export default async function ProjectPage({
             </Link>
           </Button>
         </PageActionBarItem>
+        <PageActionBarMenuItem pageActionBarMenuItemBlockId="live-demo-url">
+          <DropdownMenuItem>
+            <Link href={project.liveDemoUrl} target="_blank">
+              {i18n("liveDemo")}
+            </Link>
+          </DropdownMenuItem>
+        </PageActionBarMenuItem>
         <PageActionBarItem actionBarItemBlockId="sidebar-trigger">
           <PublicSidebarTrigger />
         </PageActionBarItem>
@@ -105,11 +126,15 @@ export default async function ProjectPage({
       <PageLayout>
         <PageBlock id="relations" column="full" title={i18n("relations.title")}>
           <div className="space-y-4">
-            <section className={"flex items-center gap-6 flex-wrap"}>
+            <section
+              className={
+                "flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+              }
+            >
               <h3 className="font-base text-sm md:text-lg text-foreground mb-2 capitalize">
                 {i18n("relations.techStack")}:
               </h3>
-              <div className={"flex items-center gap-4 flex-wrap"}>
+              <div className={"flex items-center gap-4"}>
                 {project.skills?.map((skill) => {
                   if (skill.featuredAsset) {
                     return (
@@ -117,7 +142,7 @@ export default async function ProjectPage({
                         key={skill.id}
                         asset={skill.featuredAsset}
                         transform={{ preset: "tiny", mode: "resize" }}
-                        className="size-14 object-contain"
+                        className="size-8 sm:size-10 md:size-14 object-contain"
                       />
                     );
                   }
@@ -126,11 +151,15 @@ export default async function ProjectPage({
               </div>
             </section>
             {project.career && (
-              <section className={"flex items-center gap-6 flex-wrap"}>
-                <h3 className="font-base text-sm md:text-lg text-foreground mb-2 capitalize">
+              <section
+                className={
+                  "flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+                }
+              >
+                <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
                   {i18n("relations.career")}:
                 </h3>
-                <Button variant={"neutral"} size="sm" asChild>
+                <Button variant={"neutral"} size="xs" asChild>
                   <Link href={`/career#${project.career.slug}`}>
                     {project.career.featuredAsset && (
                       <AppImage
@@ -148,11 +177,15 @@ export default async function ProjectPage({
               </section>
             )}
             {project.education && (
-              <section className={"flex items-center gap-6 flex-wrap"}>
-                <h3 className="font-base text-sm md:text-lg text-foreground mb-2 capitalize">
+              <section
+                className={
+                  "flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+                }
+              >
+                <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
                   {i18n("relations.education")}:
                 </h3>
-                <Button variant={"neutral"} size="sm" asChild>
+                <Button variant={"neutral"} size="xs" asChild>
                   <Link href={`/career#${project.education.slug}`}>
                     {project.education.featuredAsset && (
                       <AppImage
@@ -170,8 +203,12 @@ export default async function ProjectPage({
               </section>
             )}
             {!!project.achievements?.length && (
-              <section className={"flex items-center gap-6 flex-wrap"}>
-                <h3 className="font-base text-sm md:text-lg text-foreground mb-2 capitalize">
+              <section
+                className={
+                  "flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+                }
+              >
+                <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
                   {i18n("relations.achievements")}:
                 </h3>
                 <div className="flex flex-wrap gap-2 items-center">
@@ -179,7 +216,7 @@ export default async function ProjectPage({
                     <Button
                       key={achievement.id}
                       variant={"neutral"}
-                      size="sm"
+                      size="xs"
                       asChild
                     >
                       <Link href={`/achievements#${achievement.slug}`}>
@@ -243,7 +280,7 @@ export default async function ProjectPage({
         >
           <div
             dangerouslySetInnerHTML={{ __html: project.challengesAndSolutions }}
-            className="space-y-4 [&>ul]:divide-x-2 [&>ul]:divide-border [&>ul]:grid [&>ul]:grid-cols-1 [&>ul]:md:grid-cols-2 [&>ul]:gap-4 [&>ul]:bg-background [&>ul]:p-2 [&>ul]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
+            className="space-y-4 [&>ul]:divide-y-2 md:[&>ul]:divide-x-2 md:[&>ul]:divide-y-0 [&>ul]:divide-border [&>ul]:grid [&>ul]:grid-cols-1 [&>ul]:md:grid-cols-2 [&>ul]:gap-4 [&>ul]:bg-background [&>ul]:p-2 [&>ul]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
           />
         </PageBlock>
         {project.technicalHighlights.length && (

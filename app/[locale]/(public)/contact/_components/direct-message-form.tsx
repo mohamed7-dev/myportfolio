@@ -57,7 +57,7 @@ export function DirectMessageForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup>
-          <FieldGroup className="flex-row">
+          <FieldGroup className="sm:flex-row">
             <FormField
               name="fullName"
               label={i18n("fullName.label")}

@@ -99,7 +99,7 @@ export function PublicSidebar() {
         </SidebarContent>
         <SidebarFooter className="py-4 flex flex-col items-center gap-4">
           <AccentSwitcher mode="public" />
-          <div className="text-center font-base">
+          <div className="text-center text-foreground text-sm font-base">
             <p>
               © {formatNumber(new Date().getFullYear(), { useGrouping: false })}
             </p>

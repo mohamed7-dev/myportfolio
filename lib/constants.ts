@@ -6,6 +6,7 @@ export const DEFAULT_ENTITY_TRANSLATION_LANGUAGE_CODE: LanguageCode =
 export const TRANSACTION_MANAGER_KEY = Symbol("TRANSACTION_MANAGER");
 export const LOCALE_HEADER = "X-Locale";
 export const ACCENT_COLOR_CLASSNAME_KEY = "accent-color";
+export const PREFERENCES_CONSENT_KEY = "preferences-consent";
 
 export const cacheKeys = {
   publicSuperAdminProfile: ["superadmin-profile"],

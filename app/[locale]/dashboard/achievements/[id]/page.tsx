@@ -22,6 +22,11 @@ import { AchievementFormMainFields } from "./_components/achievement-form-main-f
 import { AchievementFormSubmitButton } from "./_components/achievement-form-submit-button";
 import { AchievementFormTypeField } from "./_components/achievement-form-type-field";
 
+export const metadata = {
+  title: "Dashboard - Edit Achievement",
+  description: "Edit a portfolio achievement",
+};
+
 export default async function AchievementPage({
   params,
 }: {

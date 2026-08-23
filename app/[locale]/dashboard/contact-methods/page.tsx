@@ -14,6 +14,11 @@ import { validateOutput } from "@/lib/helpers/validate-output";
 import { contactMethodService } from "@/services/domain/contact-method.service";
 import { ContactMethodDataTable } from "./_components/contact-method-data-table";
 
+export const metadata = {
+  title: "Dashboard - Contact Methods",
+  description: "Manage portfolio contact methods",
+};
+
 export default async function ContactMethodListPage({
   searchParams,
 }: {

@@ -33,6 +33,11 @@ import { ProjectFormSkillsField } from "./_components/project-form-skills-form";
 import { ProjectFormStatusField } from "./_components/project-form-status-field";
 import { SubmitButton } from "./_components/submit-button";
 
+export const metadata = {
+  title: "Dashboard - Edit Project",
+  description: "Edit a portfolio project",
+};
+
 export default async function ProjectPage({
   params,
 }: {

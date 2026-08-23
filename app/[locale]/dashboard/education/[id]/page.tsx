@@ -21,6 +21,11 @@ import EducationFormDateFields from "./_components/education-form-date-fields";
 import { EducationFormMainFields } from "./_components/education-form-main-fields";
 import { EducationFormSubmitButton } from "./_components/education-form-submit-button";
 
+export const metadata = {
+  title: "Dashboard - Edit Education",
+  description: "Edit a portfolio education entry",
+};
+
 export default async function EducationPage({
   params,
 }: {

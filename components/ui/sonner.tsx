@@ -37,8 +37,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
         unstyled: true,
         classNames: {
           toast:
-            "flex items-center gap-2.5 p-4 w-[22rem] [&:has(button)]:justify-between bg-background shadow-default rounded-base border-border border-2 text-foreground text-sm font-heading",
-          description: "font-base text-foreground",
+            "flex flex-col gap-2.5 p-4 w-[22rem] [&:has(button)]:justify-between bg-background shadow-default rounded-base border-border border-2 text-foreground",
+          title: "text-base font-heading!",
+          description: "text-foreground! font-base!",
+          content: "space-y-2",
           actionButton:
             "shrink-0 h-6 px-2 bg-primary border-2 border-border rounded-base text-sm font-base text-primary-foreground ",
           cancelButton:

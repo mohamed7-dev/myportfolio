@@ -2,6 +2,13 @@ export default {
   loading: "جارٍ التحميل",
   present: "حاليًا",
   featured: "مميز",
+  cookieConsent: {
+    title: "السماح بملفات تعريف الارتباط الخاصة بالتفضيلات؟",
+    description:
+      "تُستخدم لتذكر لون الواجهة وتفضيلات المظهر الخاصة بك على هذا الجهاز.",
+    agree: "موافقة",
+    reject: "رفض",
+  },
   defaultNotFoundPage: {
     title: "الصفحة غير موجودة",
     description: "الصفحة التي تبحث عنها غير موجودة أو ربما تم نقلها.",

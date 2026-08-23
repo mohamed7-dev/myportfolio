@@ -62,7 +62,7 @@ export default async function AchievementsPage() {
       </PageDescription>
       <PageLayout>
         <PageBlock column="full" id="achievements-list">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {result.items.map((achievement) => (
               <AchievementCard key={achievement.id} achievement={achievement} />
             ))}

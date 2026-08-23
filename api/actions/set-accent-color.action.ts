@@ -8,3 +8,7 @@ export async function setAccentColor(accentColorClassName: string) {
     path: "/",
   });
 }
+
+export async function clearAccentColor() {
+  (await cookies()).delete(ACCENT_COLOR_CLASSNAME_KEY);
+}

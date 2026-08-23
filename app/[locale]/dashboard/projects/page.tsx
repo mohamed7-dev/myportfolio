@@ -14,6 +14,11 @@ import { validateOutput } from "@/lib/helpers/validate-output";
 import { projectService } from "@/services/domain/project.service";
 import { ProjectsDataTable } from "./_components/projects-data-table";
 
+export const metadata = {
+  title: "Dashboard - Projects",
+  description: "Manage portfolio projects",
+};
+
 export default async function ProjectsPage({
   searchParams,
 }: {

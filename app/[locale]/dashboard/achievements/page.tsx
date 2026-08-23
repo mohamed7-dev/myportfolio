@@ -14,6 +14,11 @@ import { validateOutput } from "@/lib/helpers/validate-output";
 import { achievementService } from "@/services/domain/achievement.service";
 import { AchievementsDataTable } from "./_components/achievements-data-table";
 
+export const metadata = {
+  title: "Dashboard - Achievements",
+  description: "Manage portfolio achievements",
+};
+
 export default async function AchievementListPage({
   searchParams,
 }: {

@@ -10,7 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { type PageContextProps, PageProvider, usePage } from "./page-provider";
+import { PageProvider } from "./page-provider";
 
 interface PageProps extends React.ComponentProps<"div"> {
   entity?: any;
@@ -72,19 +72,19 @@ export function PageDescription({
   return <p className="text-sm text-foreground/80 font-base">{children}</p>;
 }
 
-type InlineActionBarMenuItem = Omit<ActionBarMenuItem, "type" | "pageId">;
 interface PageActionBarProps {
   children: React.ReactNode;
-  menuItems?: InlineActionBarMenuItem[];
   pageActionBarBlockId: string;
 }
-export function PageActionBar({ children, menuItems }: PageActionBarProps) {
+export function PageActionBar({ children }: PageActionBarProps) {
   const isMobile = useIsMobile();
-  const pageContext = usePage("PageActionBar");
   const childArray = React.Children.toArray(children);
   const actionItems = childArray.filter((child) => isPageActionBarItem(child));
+  const menuItems = childArray.filter((child) =>
+    isPageActionBarMenuItem(child),
+  );
   const directChildren = childArray.filter(
-    (child) => !isPageActionBarItem(child),
+    (child) => !isPageActionBarItem(child) && !isPageActionBarMenuItem(child),
   );
   let actionsItemsToRender = actionItems;
 
@@ -92,15 +92,6 @@ export function PageActionBar({ children, menuItems }: PageActionBarProps) {
     // on mobile screens, render only the last action item
     actionsItemsToRender = [actionItems[actionItems.length - 1]];
   }
-
-  const actionBarMenuItems = menuItems?.map(
-    (item) =>
-      ({
-        ...item,
-        type: "dropdown",
-        pageId: pageContext.pageId,
-      }) satisfies ActionBarMenuItem,
-  );
 
   return (
     <div className="flex justify-end gap-2">
@@ -118,14 +109,7 @@ export function PageActionBar({ children, menuItems }: PageActionBarProps) {
       )}
 
       {/* Dropdown menu */}
-      {actionBarMenuItems && actionBarMenuItems.length > 0 && (
-        <PageActionBarDropdownMenu
-          items={actionBarMenuItems}
-          pageContext={pageContext}
-        />
-      )}
-
-      {/* // TODO: add entity info dropdown  */}
+      {menuItems.length > 0 && <PageActionBarDropdownMenu items={menuItems} />}
     </div>
   );
 }
@@ -139,25 +123,22 @@ export function PageActionBarItem({ children }: ActionBarItemProps) {
   return <>{children}</>;
 }
 
-export interface ActionBarMenuItem {
-  pageId: string;
-  component: React.FunctionComponent<{
-    pageContext: PageContextProps;
-  }>;
-  type?: "button" | "dropdown";
-  requiredPermissions?: string[];
-  id?: string;
+export interface PageActionBarMenuItemProps {
+  children: React.ReactNode;
+  pageActionBarMenuItemBlockId: string;
+}
+
+export function PageActionBarMenuItem({
+  children,
+}: PageActionBarMenuItemProps) {
+  return <>{children}</>;
 }
 
 interface PageActionBarDropdownMenuProps {
-  items: ActionBarMenuItem[];
-  pageContext: PageContextProps;
+  items: React.ReactNode[];
 }
 
-function PageActionBarDropdownMenu({
-  items,
-  pageContext,
-}: PageActionBarDropdownMenuProps) {
+function PageActionBarDropdownMenu({ items }: PageActionBarDropdownMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -167,7 +148,7 @@ function PageActionBarDropdownMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {items.map((item, index) => (
-          <item.component key={item.pageId + index} pageContext={pageContext} />
+          <React.Fragment key={`menu-item-${index}`}>{item}</React.Fragment>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -181,6 +162,18 @@ function isPageActionBarItem(child: unknown): boolean {
     React.isValidElement(child) &&
     "actionBarItemBlockId" in
       (child as React.ReactElement<{ actionBarItemBlockId: string }>).props
+  );
+}
+
+function isPageActionBarMenuItem(child: unknown): boolean {
+  return (
+    React.isValidElement(child) &&
+    "pageActionBarMenuItemBlockId" in
+      (
+        child as React.ReactElement<{
+          pageActionBarMenuItemBlockId: string;
+        }>
+      ).props
   );
 }
 

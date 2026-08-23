@@ -10,6 +10,11 @@ import { assetListOutputSchema } from "@/lib/dto/asset";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/domain/asset.service";
 
+export const metadata = {
+  title: "Dashboard - Assets",
+  description: "Manage portfolio assets",
+};
+
 export default async function AssetsPage({
   searchParams,
 }: {

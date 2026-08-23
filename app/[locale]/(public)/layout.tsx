@@ -1,4 +1,5 @@
 import { wrapService } from "@/api/common/create-router";
+import { CookieConsent } from "@/components/app-layout/public-layout/cookie-consent";
 import { PublicLayout as PublicLayoutImpl } from "@/components/app-layout/public-layout/public-layout";
 import { PublicLayoutProvider } from "@/components/app-layout/public-layout/public-layout-provider";
 import { getCurrentLocale } from "@/i18n/server";
@@ -9,7 +10,7 @@ import "./public.css";
 
 export const revalidate = 3600;
 
-const getSuperAdminProfile = localizedCache(
+export const getSuperAdminProfile = localizedCache(
   async (locale) => {
     const getSuperAdminProfile = wrapService({
       authenticatedOnly: false,
@@ -30,6 +31,7 @@ export default async function PublicLayout({
   const profile = await getSuperAdminProfile(await getCurrentLocale());
   return (
     <PublicLayoutProvider profile={profile}>
+      <CookieConsent />
       <div className="public-layout min-h-screen bg-background text-foreground overflow-hidden">
         <PublicLayoutImpl>{children}</PublicLayoutImpl>
       </div>

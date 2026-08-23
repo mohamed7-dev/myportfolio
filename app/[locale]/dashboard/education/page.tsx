@@ -14,6 +14,11 @@ import { validateOutput } from "@/lib/helpers/validate-output";
 import { educationService } from "@/services/domain/education.service";
 import { EducationDataTable } from "./_components/education-data-table";
 
+export const metadata = {
+  title: "Dashboard - Education",
+  description: "Manage portfolio education entries",
+};
+
 export default async function EducationListPage({
   searchParams,
 }: {

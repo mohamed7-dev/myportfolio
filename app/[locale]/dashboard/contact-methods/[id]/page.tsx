@@ -21,6 +21,11 @@ import { ContactMethodFormMainFields } from "./_components/contact-method-form-m
 import { ContactMethodFormStatusField } from "./_components/contact-method-form-status-field";
 import { ContactMethodFormSubmitButton } from "./_components/contact-method-form-submit-button";
 
+export const metadata = {
+  title: "Dashboard - Edit Contact Method",
+  description: "Edit a portfolio contact method",
+};
+
 export default async function ContactMethodPage({
   params,
 }: {

@@ -19,6 +19,11 @@ import { SkillFormMainFields } from "./_components/skill-form-main-fields";
 import { SkillFormStatusField } from "./_components/skill-form-status-field";
 import { SubmitButton } from "./_components/submit-button";
 
+export const metadata = {
+  title: "Dashboard - Edit Skill",
+  description: "Edit a portfolio skill",
+};
+
 export default async function SkillPage({
   params,
 }: {

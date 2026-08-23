@@ -64,8 +64,6 @@ function wrapRoute<TCtx extends NextCtx>({
         ctx,
       });
     } catch (error) {
-      // TODO: remove
-      console.log(error);
       return handleApiErrors(error);
     }
   };

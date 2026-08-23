@@ -30,6 +30,45 @@
   --primary: #5294ff;
 }
 
+@supports (view-transition-name: root) {
+  /* biome-ignore lint/correctness/noUnknownTypeSelector: View Transition pseudo-elements are browser-defined selectors. */
+  ::view-transition-old(root),
+  /* biome-ignore lint/correctness/noUnknownTypeSelector: View Transition pseudo-element. */
+    ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  /* biome-ignore lint/correctness/noUnknownTypeSelector: View Transition pseudo-element. */
+  ::view-transition-new(root) {
+    z-index: 1;
+    animation: accent-reveal 500ms ease-out both;
+  }
+
+  /* biome-ignore lint/correctness/noUnknownTypeSelector: View Transition pseudo-element. */
+  ::view-transition-old(root) {
+    z-index: 0;
+  }
+}
+
+@keyframes accent-reveal {
+  from {
+    clip-path: circle(0% at 50% 50%);
+  }
+  to {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* biome-ignore lint/correctness/noUnknownTypeSelector: View Transition pseudo-elements are browser-defined selectors. */
+  ::view-transition-old(root),
+  /* biome-ignore lint/correctness/noUnknownTypeSelector: View Transition pseudo-element. */
+    ::view-transition-new(root) {
+    animation-duration: 1ms;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

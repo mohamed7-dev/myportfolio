@@ -22,6 +22,11 @@ import { CareerFormMainFields } from "./_components/career-form-main-fields";
 import { CareerFormModeTypeFields } from "./_components/career-form-mode-type-fields";
 import { CareerFormSubmitButton } from "./_components/career-form-submit-button";
 
+export const metadata = {
+  title: "Dashboard - Edit Career",
+  description: "Edit a portfolio career entry",
+};
+
 export default async function CareerPage({
   params,
 }: {

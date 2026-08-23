@@ -2,6 +2,13 @@ export default {
   loading: "Loading",
   present: "Present",
   featured: "Featured",
+  cookieConsent: {
+    title: "Allow preference cookies?",
+    description:
+      "Used to remember your accent color and theme preferences on this device.",
+    agree: "agree",
+    reject: "reject",
+  },
   defaultNotFoundPage: {
     title: "Page not found",
     description:

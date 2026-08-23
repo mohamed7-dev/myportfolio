@@ -1,3 +1,4 @@
+import { LanguagesIcon } from "lucide-react";
 import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -52,7 +53,7 @@ export function LanguageSwitcher({ mode }: { mode: "public" | "dashboard" }) {
           onClick={() => changeLocale(item.key as LanguageCode)}
           className={cn("transition-all duration-200 capitalize")}
         >
-          {formatLanguageName(item.key)}
+          <LanguagesIcon /> {formatLanguageName(item.key)}
         </Button>
       ))}
     </div>
