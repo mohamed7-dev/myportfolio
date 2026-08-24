@@ -29,7 +29,7 @@ export const { POST, PATCH, DELETE } = createRouter({
       );
 
       revalidatePath("/achievements", "page");
-      revalidateTag(cacheKeys.publicAchievements[0], "");
+      revalidateTag(cacheKeys.publicAchievements[0], "max");
 
       return NextResponse.json(parsedResult, { status: 201 });
     },
@@ -49,7 +49,7 @@ export const { POST, PATCH, DELETE } = createRouter({
       );
 
       revalidatePath("/achievements", "page");
-      revalidateTag(cacheKeys.publicAchievements[0], "");
+      revalidateTag(cacheKeys.publicAchievements[0], "max");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },
@@ -69,7 +69,7 @@ export const { POST, PATCH, DELETE } = createRouter({
       );
 
       revalidatePath("/achievements", "page");
-      revalidateTag(cacheKeys.publicAchievements[0], "");
+      revalidateTag(cacheKeys.publicAchievements[0], "max");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },

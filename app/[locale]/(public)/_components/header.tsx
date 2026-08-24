@@ -1,46 +1,53 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { usePublicLayout } from "@/components/app-layout/public-layout/public-layout-provider";
 import { AppImage } from "@/components/shared/app-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useScopedI18n } from "@/i18n/client";
+import type { Asset } from "@/lib/dto/asset";
 import type { GetFeaturedSkillsOutputSchema } from "@/lib/dto/visitor";
+import Logo from "../../../../public/logo.png";
 
 export function HomePageHeader({
   skills,
+  cover,
+  personal,
 }: {
   skills: GetFeaturedSkillsOutputSchema["items"];
+  cover?: Asset;
+  personal?: Asset;
 }) {
   const i18n = useScopedI18n("home");
   const ctx = usePublicLayout("HomePageHeader");
-
-  const filteredAssets = ctx.profile.assets?.filter(
-    (asset) => asset.asset.id !== ctx.profile.avatar?.id,
-  );
-
-  const randomCover = filteredAssets?.length
-    ? filteredAssets[Math.floor(Math.random())]
-    : undefined;
 
   return (
     <div>
       <div className="overflow-hidden w-full bg-background relative h-60">
         <AppImage
-          asset={randomCover?.asset}
+          asset={cover}
           transform={{ preset: "full", mode: "resize" }}
           loading="eager"
+          fetchPriority="high"
           className="size-full object-cover"
         />
       </div>
       <div className="px-0 sm:px-2 md:px-8 flex flex-col sm:flex-row sm:justify-between sm:items-end relative -mt-16 z-10">
         <div className="shrink-0 w-fit p-1 bg-secondary-background">
-          <AppImage
-            asset={ctx.profile.avatar ?? undefined}
-            transform={{ preset: "thumb", mode: "resize" }}
-            loading="eager"
-            className="size-32 object-cover rounded-base grayscale-20 hover:grayscale-0 transition-all duration-500"
-          />
+          {personal ? (
+            <AppImage
+              asset={personal}
+              transform={{ preset: "thumb", mode: "resize" }}
+            />
+          ) : (
+            <Image
+              src={Logo}
+              alt="logo"
+              loading="eager"
+              className="size-20 md:size-32 object-cover rounded-base grayscale-20 hover:grayscale-0 transition-all duration-500"
+            />
+          )}
         </div>
         <div className="mb-4 flex gap-3">
           <Button size="xs" asChild>

@@ -9,6 +9,7 @@ import {
   SortableContext,
 } from "@dnd-kit/sortable";
 import type { Asset } from "@/lib/dto/asset";
+import type { EntityAssetAction } from "./entity-assets";
 import { SortableAsset } from "./sortable-asset";
 
 interface AssetListProps {
@@ -20,6 +21,7 @@ interface AssetListProps {
   onSetAsFeatured: (asset: Asset) => void;
   onRemove: (asset: Asset) => void;
   onDragEnd: (event: DragEndEvent) => void;
+  actions?: EntityAssetAction[];
 }
 
 export function AssetList({
@@ -31,6 +33,7 @@ export function AssetList({
   onSetAsFeatured,
   onRemove,
   onDragEnd,
+  actions,
 }: AssetListProps) {
   return (
     <DndContext
@@ -53,6 +56,7 @@ export function AssetList({
                 updatePermissions={updatePermissions}
                 onSetAsFeatured={onSetAsFeatured}
                 onRemove={onRemove}
+                actions={actions}
               />
             ))}
           </div>

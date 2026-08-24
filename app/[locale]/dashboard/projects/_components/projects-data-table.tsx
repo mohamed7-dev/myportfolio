@@ -127,7 +127,7 @@ export function ProjectsDataTable({
       totalItemsCount={totalItemsCount}
       entityName="project"
       deleteMutationFn={(input) =>
-        deleteProjects({ ...input, softDelete: false })
+        deleteProjects({ ...input, softDelete: true })
       }
       refetch={() => router.refresh()}
       rowActions={[

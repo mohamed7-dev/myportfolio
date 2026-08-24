@@ -184,8 +184,26 @@ class ProfileService {
       entityType: Profile,
       translationEntityType: ProfileTranslation,
       beforeSave: async (p) => {
-        await assetService.updateEntityAssets(ctx, p, input);
-        await assetService.updateEntityFeaturedAsset(ctx, p, input);
+        const profileAssetTypes = new Map(
+          input.assetIds?.map(({ id, type }) => [id, type]),
+        );
+        await assetService.updateEntityAssets(
+          ctx,
+          p,
+          {
+            ...input,
+            assetIds: input.assetIds?.map((item) => item.id),
+          },
+          {
+            getOrderableAssetValues: (asset) => ({
+              type: profileAssetTypes.get(asset.id),
+            }),
+          },
+        );
+        await assetService.updateEntityFeaturedAsset(ctx, p, {
+          ...input,
+          assetIds: input.assetIds?.map((item) => item.id),
+        });
       },
     });
 

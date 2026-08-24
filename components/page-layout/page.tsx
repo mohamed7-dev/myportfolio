@@ -109,7 +109,9 @@ export function PageActionBar({ children }: PageActionBarProps) {
       )}
 
       {/* Dropdown menu */}
-      {menuItems.length > 0 && <PageActionBarDropdownMenu items={menuItems} />}
+      {menuItems.length > 0 && isMobile && (
+        <PageActionBarDropdownMenu items={menuItems} />
+      )}
     </div>
   );
 }

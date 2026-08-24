@@ -26,9 +26,9 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, createCareerOutputSchema);
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedCareers[0], "");
+      revalidateTag(cacheKeys.publicFeaturedCareers[0], "max");
       revalidatePath("/career", "page");
-      revalidateTag(cacheKeys.publicCareers[0], "");
+      revalidateTag(cacheKeys.publicCareers[0], "max");
       return NextResponse.json(parsedResult, { status: 201 });
     },
   },
@@ -44,9 +44,9 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, updateCareerOutputSchema);
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedCareers[0], "");
+      revalidateTag(cacheKeys.publicFeaturedCareers[0], "max");
       revalidatePath("/career", "page");
-      revalidateTag(cacheKeys.publicCareers[0], "");
+      revalidateTag(cacheKeys.publicCareers[0], "max");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },
@@ -62,9 +62,9 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, deleteCareersOutputSchema);
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedCareers[0], "");
+      revalidateTag(cacheKeys.publicFeaturedCareers[0], "max");
       revalidatePath("/career", "page");
-      revalidateTag(cacheKeys.publicCareers[0], "");
+      revalidateTag(cacheKeys.publicCareers[0], "max");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },

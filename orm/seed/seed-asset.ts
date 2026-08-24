@@ -3,6 +3,7 @@ import { openAsBlob } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import mime from "mime-types";
+import { ProfileAssetType } from "@/lib/dto/profile";
 import { AssetUploader } from "@/lib/upload/asset-uploader";
 import { seedFile } from "@/lib/upload/upload";
 
@@ -58,6 +59,17 @@ type SeedAssetGroupDefinition = {
   assets: SeedAssetDefinition[];
 };
 
+type ProfileSeedAssetDefinition = SeedAssetDefinition & {
+  type: ProfileAssetType;
+};
+
+type ProfileSeedAssetGroupDefinition = Omit<
+  SeedAssetGroupDefinition,
+  "assets"
+> & {
+  assets: ProfileSeedAssetDefinition[];
+};
+
 type SeedAsset = {
   filePath: string;
   isFeatured: boolean;
@@ -68,9 +80,18 @@ type SeedAssetGroup = {
   assets: SeedAsset[];
 };
 
+type ProfileSeedAsset = SeedAsset & {
+  type: ProfileAssetType;
+};
+
+type ProfileSeedAssetGroup = Omit<SeedAssetGroup, "assets"> & {
+  assets: ProfileSeedAsset[];
+};
+
 type SeededAsset = {
   id: string;
   isFeatured: boolean;
+  type?: string;
 };
 
 export type SeededAssetGroup = {
@@ -79,14 +100,36 @@ export type SeededAssetGroup = {
   featuredAsset: SeededAsset;
 };
 
+type SeededProfileAsset = SeededAsset & {
+  type: ProfileAssetType;
+};
+
+type SeededProfileAssetGroup = Omit<
+  SeededAssetGroup,
+  "assets" | "featuredAsset"
+> & {
+  assets: SeededProfileAsset[];
+  featuredAsset: SeededProfileAsset;
+};
+
 type SeededAssets = {
-  profile: Map<string, SeededAssetGroup>;
+  profile: Map<string, SeededProfileAssetGroup>;
   projects: Map<string, SeededAssetGroup>;
   skills: Map<string, SeededAssetGroup>;
   contactMethods: Map<string, SeededAssetGroup>;
   careers: Map<string, SeededAssetGroup>;
   education: Map<string, SeededAssetGroup>;
   achievements: Map<string, SeededAssetGroup>;
+};
+
+type AssetGroupDefinitions = {
+  profile: ProfileSeedAssetGroupDefinition[];
+  projects: SeedAssetGroupDefinition[];
+  skills: SeedAssetGroupDefinition[];
+  contactMethods: SeedAssetGroupDefinition[];
+  careers: SeedAssetGroupDefinition[];
+  education: SeedAssetGroupDefinition[];
+  achievements: SeedAssetGroupDefinition[];
 };
 
 type UploadedFile = {
@@ -106,9 +149,11 @@ const assetGroups = {
         {
           path: "/dev-assets/profile/featured.png",
           isFeatured: true,
+          type: ProfileAssetType.PERSONAL,
         },
         {
           path: "/dev-assets/profile/1.png",
+          type: ProfileAssetType.COVER,
         },
       ],
     },
@@ -256,7 +301,7 @@ const assetGroups = {
       ],
     },
   ],
-} satisfies Record<string, SeedAssetGroupDefinition[]>;
+} satisfies AssetGroupDefinitions;
 
 // -----------------------------------------------------------------------------
 // Normalization
@@ -279,8 +324,21 @@ function normalizeAssetGroups(
   return groups.map(normalizeAssetGroup);
 }
 
+function normalizeProfileAssetGroups(
+  groups: ProfileSeedAssetGroupDefinition[],
+): ProfileSeedAssetGroup[] {
+  return groups.map((group) => ({
+    key: group.key,
+    assets: group.assets.map((asset) => ({
+      filePath: path.join(process.cwd(), "public", asset.path),
+      isFeatured: asset.isFeatured ?? false,
+      type: asset.type,
+    })),
+  }));
+}
+
 const normalizedAssetGroups = {
-  profile: normalizeAssetGroups(assetGroups.profile),
+  profile: normalizeProfileAssetGroups(assetGroups.profile),
   projects: normalizeAssetGroups(assetGroups.projects),
   skills: normalizeAssetGroups(assetGroups.skills),
   contactMethods: normalizeAssetGroups(assetGroups.contactMethods),
@@ -382,6 +440,30 @@ async function seedAssetGroup(
   };
 }
 
+async function seedProfileAssetGroup(
+  group: ProfileSeedAssetGroup,
+  cache: AssetCache,
+): Promise<SeededProfileAssetGroup> {
+  const seededGroup = await seedAssetGroup(group, cache);
+  const assets = seededGroup.assets.map((asset, index) => ({
+    ...asset,
+    type: group.assets[index].type,
+  }));
+  const featuredAsset = assets.find((asset) => asset.isFeatured);
+
+  if (!featuredAsset) {
+    throw new Error(
+      `Created profile assets for "${group.key}" do not contain a featured asset`,
+    );
+  }
+
+  return {
+    ...seededGroup,
+    assets,
+    featuredAsset,
+  };
+}
+
 // -----------------------------------------------------------------------------
 // Seed all assets first
 // -----------------------------------------------------------------------------
@@ -400,7 +482,7 @@ export async function seedAllAssets(): Promise<SeededAssets> {
   };
 
   for (const group of normalizedAssetGroups.profile) {
-    const seeded = await seedAssetGroup(group, cache);
+    const seeded = await seedProfileAssetGroup(group, cache);
     result.profile.set(seeded.key, seeded);
   }
 

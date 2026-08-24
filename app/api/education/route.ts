@@ -26,7 +26,7 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, createEducationOutputSchema);
 
       revalidatePath("/career", "page");
-      revalidateTag(cacheKeys.publicEducation[0], "");
+      revalidateTag(cacheKeys.publicEducation[0], "max");
 
       return NextResponse.json(parsedResult, { status: 201 });
     },
@@ -42,7 +42,7 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, updateEducationOutputSchema);
       revalidatePath("/career", "page");
-      revalidateTag(cacheKeys.publicEducation[0], "");
+      revalidateTag(cacheKeys.publicEducation[0], "max");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },
@@ -57,7 +57,7 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedResult = validateOutput(result, deleteEducationsOutputSchema);
       revalidatePath("/career", "page");
-      revalidateTag(cacheKeys.publicEducation[0], "");
+      revalidateTag(cacheKeys.publicEducation[0], "max");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },

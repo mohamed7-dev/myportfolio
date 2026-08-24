@@ -8,7 +8,7 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { authService } from "@/services/domain/auth.service";
 
-export const { POST, PUT } = createRouter({
+export const { POST, PATCH } = createRouter({
   POST: {
     authenticatedOnly: false,
     handler: async (req, _, ctx) => {

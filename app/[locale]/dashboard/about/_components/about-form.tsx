@@ -29,7 +29,11 @@ export function AboutForm({
       projectsShipped: initialValues.projectsShipped ?? 0,
       openSourceContributions: initialValues.openSourceContributions ?? 0,
       yearsOfExperience: initialValues.yearsOfExperience ?? 0,
-      assetIds: initialValues?.assets?.map((asset) => asset.asset.id) ?? [],
+      assetIds:
+        initialValues?.assets?.map((asset) => ({
+          id: asset.asset.id,
+          type: asset.type,
+        })) ?? [],
       featuredAssetId: initialValues?.featuredAsset?.id ?? "",
       translations: initialValues?.translations ?? [],
     },

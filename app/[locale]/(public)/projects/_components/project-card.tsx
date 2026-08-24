@@ -29,6 +29,8 @@ export async function ProjectCard({
           <AppImage
             asset={project.featuredAsset}
             transform={{ preset: "medium", mode: "resize" }}
+            loading="eager"
+            fetchPriority="high"
             className="size-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           />
         </div>

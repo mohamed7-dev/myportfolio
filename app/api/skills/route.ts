@@ -27,9 +27,9 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, createSkillOutputSchema);
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedSkills[0], "");
+      revalidateTag(cacheKeys.publicFeaturedSkills[0], "max");
       revalidatePath("/about", "page");
-      revalidateTag(cacheKeys.publicSkills[0], "");
+      revalidateTag(cacheKeys.publicSkills[0], "max");
 
       return NextResponse.json(parsedResult, { status: 201 });
     },
@@ -46,9 +46,9 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, updateSkillOutputSchema);
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedSkills[0], "");
+      revalidateTag(cacheKeys.publicFeaturedSkills[0], "max");
       revalidatePath("/about", "page");
-      revalidateTag(cacheKeys.publicSkills[0], "");
+      revalidateTag(cacheKeys.publicSkills[0], "max");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },
@@ -65,9 +65,9 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, deleteSkillsOutputSchema);
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedSkills[0], "");
+      revalidateTag(cacheKeys.publicFeaturedSkills[0], "max");
       revalidatePath("/about", "page");
-      revalidateTag(cacheKeys.publicSkills[0], "");
+      revalidateTag(cacheKeys.publicSkills[0], "max");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },

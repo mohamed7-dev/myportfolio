@@ -2,12 +2,17 @@ export default {
   loading: "Loading",
   present: "Present",
   featured: "Featured",
+  downloadFile: "download file",
   cookieConsent: {
     title: "Allow preference cookies?",
     description:
       "Used to remember your accent color and theme preferences on this device.",
     agree: "agree",
     reject: "reject",
+  },
+  mediaGallery: {
+    dialogTitle: "Media gallery",
+    dialogDescription: "Media gallery",
   },
   defaultNotFoundPage: {
     title: "Page not found",

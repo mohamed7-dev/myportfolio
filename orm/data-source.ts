@@ -26,7 +26,7 @@ export default new DataSource({
   migrations: [resolve(__dirname, "./migrations/*.ts")],
   synchronize: !isProductionMode(),
   logging: false,
-  // connectTimeoutMS: 5000,
+  connectTimeoutMS: 5000,
   ssl: dbSSL ? dbSSL : undefined,
   extra: {
     enableChannelBinding: dbChannelBinding,

@@ -11,6 +11,13 @@ import {
 } from "./common";
 import { languageCodeSchema } from "./language-code";
 
+export enum ProfileAssetType {
+  COVER = "COVER",
+  PERSONAL = "PERSONAL",
+}
+
+const profileAssetTypeSchema = z.nativeEnum(ProfileAssetType);
+
 const profileTranslationSchema = baseTranslationEntity.extend({
   displayName: z.string(),
   summary: z.string(),
@@ -24,6 +31,7 @@ const profileTranslationSchema = baseTranslationEntity.extend({
 
 const profileAssetSchema = entityAssetSchema.extend({
   profileId: z.string(),
+  type: profileAssetTypeSchema,
 });
 
 export type ProfileAsset = z.infer<typeof profileAssetSchema>;
@@ -93,7 +101,9 @@ export const updateProfileInputSchema = z.object({
   projectsShipped: z.coerce.number().optional(),
   openSourceContributions: z.coerce.number().optional(),
   yearsOfExperience: z.coerce.number().optional(),
-  assetIds: z.array(z.string()).optional(),
+  assetIds: z
+    .array(z.object({ id: z.string(), type: profileAssetTypeSchema }))
+    .optional(),
   featuredAssetId: z.string().optional(),
   translations: z
     .array(

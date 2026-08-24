@@ -20,12 +20,27 @@ export interface EntityAssetValue {
   featuredAssetId?: string | null;
 }
 
-interface EntityAssetsProps {
+export interface EntityAssetActionContext {
+  asset: Asset;
+}
+
+export type EntityAssetActionComponent =
+  React.ComponentType<EntityAssetActionContext>;
+
+export interface EntityAssetAction {
+  /** Lower values are rendered earlier in the asset action menu. */
+  order?: number;
+  component: EntityAssetActionComponent;
+}
+
+export interface EntityAssetsProps {
   compact?: boolean;
   updatePermissions?: boolean;
   enableMultiSelection?: boolean;
   assets?: Asset[];
   featuredAsset?: Asset | null;
+  /** Optional actions rendered in each asset's dropdown menu. */
+  actions?: EntityAssetAction[];
   value?: EntityAssetValue;
   onBlur?: () => void;
   onChange?: (change: EntityAssetValue) => void;
@@ -41,12 +56,18 @@ export function EntityAssets(props: EntityAssetsProps) {
     assets: initialAssets = [],
     featuredAsset: initialFeaturedAsset,
     enableMultiSelection = true,
+    actions,
   } = props;
   const [assets, setAssets] = React.useState<Asset[]>([...initialAssets]);
   const [featuredAsset, setFeaturedAsset] = React.useState<
     Asset | undefined | null
   >(initialFeaturedAsset);
   const [isAssetPickerOpen, setIsAssetPickerOpen] = React.useState(false);
+  const initialAssetIds = initialAssets.map((asset) => asset.id).join(",");
+  const initialAssetsRef = React.useRef(initialAssets);
+  const syncedInitialAssetIdsRef = React.useRef(initialAssetIds);
+  const hasLocalAssetChangesRef = React.useRef(false);
+  initialAssetsRef.current = initialAssets;
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -72,6 +93,8 @@ export function EntityAssets(props: EntityAssetsProps) {
   const handleAssetsPicked = React.useCallback(
     (selectedAssets: Asset[]) => {
       if (selectedAssets.length) {
+        hasLocalAssetChangesRef.current = true;
+
         // Remove duplicates
         const uniqueAssets = enableMultiSelection
           ? [
@@ -107,6 +130,8 @@ export function EntityAssets(props: EntityAssetsProps) {
       const { active, over } = event;
 
       if (over && active.id !== over.id) {
+        hasLocalAssetChangesRef.current = true;
+
         setAssets((items) => {
           const oldIndex = items.findIndex((item) => item.id === active.id);
           const newIndex = items.findIndex((item) => item.id === over.id);
@@ -122,6 +147,8 @@ export function EntityAssets(props: EntityAssetsProps) {
 
   const handleRemoveAsset = React.useCallback(
     (asset: Asset) => {
+      hasLocalAssetChangesRef.current = true;
+
       const newAssets = assets.filter((a) => a.id !== asset.id);
       let newFeaturedAsset = featuredAsset;
 
@@ -146,10 +173,16 @@ export function EntityAssets(props: EntityAssetsProps) {
 
   // Update internal state when props change
   React.useEffect(() => {
-    if (initialAssets.length) {
-      setAssets([...initialAssets]);
+    if (
+      hasLocalAssetChangesRef.current ||
+      syncedInitialAssetIdsRef.current === initialAssetIds
+    ) {
+      return;
     }
-  }, [initialAssets]);
+
+    syncedInitialAssetIdsRef.current = initialAssetIds;
+    setAssets([...initialAssetsRef.current]);
+  });
 
   React.useEffect(() => {
     setFeaturedAsset(initialFeaturedAsset);
@@ -186,6 +219,7 @@ export function EntityAssets(props: EntityAssetsProps) {
             onSetAsFeatured={handleSetAsFeatured}
             onRemove={handleRemoveAsset}
             onDragEnd={handleDragEnd}
+            actions={actions}
           />
           <AddAssetButton />
         </div>
@@ -206,6 +240,7 @@ export function EntityAssets(props: EntityAssetsProps) {
               onSetAsFeatured={handleSetAsFeatured}
               onRemove={handleRemoveAsset}
               onDragEnd={handleDragEnd}
+              actions={actions}
             />
             <AddAssetButton />
           </div>
@@ -218,6 +253,7 @@ export function EntityAssets(props: EntityAssetsProps) {
           onSelect={handleAssetsPicked}
           onClose={() => setIsAssetPickerOpen(false)}
           open={isAssetPickerOpen}
+          initialSelectedAssets={assets}
         />
       )}
     </React.Fragment>

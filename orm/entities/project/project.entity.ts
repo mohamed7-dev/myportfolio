@@ -109,10 +109,7 @@ export class Project extends AppEntity implements Translatable, SoftDeletable {
   )
   education: Education | null;
 
-  @ManyToMany(
-    () => Achievement,
-    (achievement) => achievement.projects,
-  )
+  @ManyToMany(() => Achievement)
   @JoinTable({ name: "project_achievements_achievement" })
-  achievements: Achievement[];
+  achievements: Relation<Achievement[]>;
 }

@@ -79,7 +79,7 @@ export class Career extends AppEntity {
     () => Achievement,
     (achievement) => achievement.career,
   )
-  achievements: Achievement[];
+  achievements: Relation<Achievement[]>;
 
   @OneToMany(
     () => CareerTranslation,

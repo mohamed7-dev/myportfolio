@@ -15,6 +15,12 @@ export type CreateUploadRequestInput = {
   resourceType: ObjectStorageResourceType;
 };
 
+export type ResolveUploadObjectLocationInput = {
+  location: ObjectLocation;
+  filename: string;
+  resourceType: ObjectStorageResourceType;
+};
+
 export type UploadRequest = {
   url: string;
   method: "PUT" | "POST";
@@ -31,6 +37,14 @@ export type ObjectMetadata = {
 };
 
 export interface ObjectStorage {
+  /**
+   * Lets a storage backend adjust an upload key before it is persisted and
+   * subsequently used for upload, lookup, deletion, and download.
+   */
+  resolveUploadObjectLocation(
+    input: ResolveUploadObjectLocationInput,
+  ): ObjectLocation;
+
   createUploadRequest(input: CreateUploadRequestInput): Promise<UploadRequest>;
 
   headObject(

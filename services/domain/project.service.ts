@@ -1,4 +1,4 @@
-import { type FindOptionsRelations, IsNull } from "typeorm";
+import { type FindOptionsRelations, IsNull, Not } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
 import type { DeletionResponse, InputIdSchema } from "@/lib/dto/common";
 
@@ -110,6 +110,9 @@ class ProjectService {
     const qb = await listQueryBuilder.build(Project, input, {
       ctx,
       alias: "project",
+      where: {
+        ...(!input.includeSoftDeleted && { deletedAt: IsNull() }),
+      },
       relations: {
         assets: {
           asset: true,
@@ -151,8 +154,15 @@ class ProjectService {
     });
     // 3. create entity assets
     await assetService.updateEntityAssets(ctx, project, input);
-
-    return await this.findOne(ctx, { id: project.id });
+    return await this.findOne(
+      ctx,
+      { id: project.id },
+      {
+        skills: {
+          featuredAsset: true,
+        },
+      },
+    );
   }
 
   public async update(ctx: RequestContext, input: UpdateProjectInputSchema) {

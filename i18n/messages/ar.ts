@@ -2,6 +2,11 @@ export default {
   loading: "جارٍ التحميل",
   present: "حاليًا",
   featured: "مميز",
+  downloadFile: "تحميل الملف",
+  mediaGallery: {
+    dialogTitle: "معرض الصور",
+    dialogDescription: "معرض الصور",
+  },
   cookieConsent: {
     title: "السماح بملفات تعريف الارتباط الخاصة بالتفضيلات؟",
     description:

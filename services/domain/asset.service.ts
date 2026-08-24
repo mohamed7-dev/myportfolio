@@ -28,7 +28,7 @@ import {
   UserInputError,
 } from "@/lib/errors/errors";
 import { DefaultAssetNamingStrategy } from "@/lib/helpers/asset-naming";
-import type { ClassType } from "@/lib/types/shared-types";
+import type { ClassType, DeepPartial } from "@/lib/types/shared-types";
 import { normalizeFileTypes } from "@/lib/utils/normalize-file-types";
 import { notNullOrUndefined } from "@/lib/utils/not-null-or-undefined";
 import { omit } from "@/lib/utils/omit";
@@ -53,6 +53,14 @@ export interface EntityWithAssets extends AppEntity {
 export interface EntityAssetInput {
   assetIds?: string[] | null;
   featuredAssetId?: string | null;
+}
+
+export interface UpdateEntityAssetsOptions {
+  /** Additional fields for an entity-specific orderable asset relation. */
+  getOrderableAssetValues?: (
+    asset: Asset,
+    position: number,
+  ) => Record<string, unknown>;
 }
 
 class AssetService {
@@ -269,12 +277,14 @@ class AssetService {
     ctx: RequestContext,
     entity: Entity,
     input: EntityAssetInput,
+    options: UpdateEntityAssetsOptions = {},
   ) {
     if (!entity.id) {
       throw new InternalServerError("Entity must have an id");
     }
     const { assetIds } = input;
     const repo = await ormService.getRepository(ctx, Asset);
+
     if (assetIds?.length) {
       const assets = await repo.find({
         where: {
@@ -290,6 +300,7 @@ class AssetService {
           ctx,
           entity,
           sortedAssets,
+          options,
         );
       } else {
         entity.assets = [];
@@ -336,18 +347,23 @@ class AssetService {
       previewResourceType,
     );
 
-    const sourceObjectLocation = this.getObjectLocation(
-      uploadId,
-      sourceFileKey,
-    );
+    const { objectStorageStrategy } = serverConfig.asset;
+    const sourceObjectLocation =
+      objectStorageStrategy.resolveUploadObjectLocation({
+        location: this.getObjectLocation(uploadId, sourceFileKey),
+        filename: input.source.name,
+        resourceType: sourceResourceType,
+      });
 
-    const previewObjectLocation = this.getObjectLocation(
-      uploadId,
-      previewFileKey,
-    );
+    const previewObjectLocation =
+      objectStorageStrategy.resolveUploadObjectLocation({
+        location: this.getObjectLocation(uploadId, previewFileKey),
+        filename: input.preview.name,
+        resourceType: previewResourceType,
+      });
 
     const [sourceUploadUrl, previewUploadUrl] = await Promise.all([
-      serverConfig.asset.objectStorageStrategy.createUploadRequest({
+      objectStorageStrategy.createUploadRequest({
         location: sourceObjectLocation,
         contentType: input.source.mimeType,
         contentLength: input.source.size,
@@ -355,7 +371,7 @@ class AssetService {
         resourceType: sourceResourceType,
       }),
 
-      serverConfig.asset.objectStorageStrategy.createUploadRequest({
+      objectStorageStrategy.createUploadRequest({
         location: previewObjectLocation,
         contentType: input.preview.mimeType,
         contentLength: input.preview.size,
@@ -386,11 +402,11 @@ class AssetService {
     return {
       uploadId,
       source: {
-        key: sourceFileKey,
+        key: sourceObjectLocation.key,
         upload: sourceUploadUrl,
       },
       preview: {
-        key: previewFileKey,
+        key: previewObjectLocation.key,
         upload: previewUploadUrl,
       },
     };
@@ -717,9 +733,12 @@ class AssetService {
     ctx: RequestContext,
     entity: EntityWithAssets,
     assets: Asset[],
+    options: UpdateEntityAssetsOptions,
   ) {
     const orderableAssets = await Promise.all(
-      assets.map((asset, i) => this.getOrderableAsset(ctx, entity, asset, i)),
+      assets.map((asset, i) =>
+        this.getOrderableAsset(ctx, entity, asset, i, options),
+      ),
     );
     const repo = await ormService.getRepository(
       ctx,
@@ -749,10 +768,12 @@ class AssetService {
     entity: EntityWithAssets,
     asset: Asset,
     index: number,
+    options: UpdateEntityAssetsOptions,
   ): Promise<OrderableAsset> {
     const { relationProperty, orderableAssetType } =
       await this.getOrderableAssetMetadata(ctx, entity);
     return new orderableAssetType({
+      ...options.getOrderableAssetValues?.(asset, index),
       asset: {
         id: asset.id,
       },
@@ -760,7 +781,7 @@ class AssetService {
       [relationProperty]: {
         id: entity.id,
       },
-    });
+    } as DeepPartial<OrderableAsset>);
   }
 
   private async getOrderableAssetMetadata(

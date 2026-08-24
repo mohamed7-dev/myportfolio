@@ -5,6 +5,7 @@ import {
   type ObjectMetadata,
   type ObjectStorage,
   type ObjectStorageResourceType,
+  type ResolveUploadObjectLocationInput,
   toObjectKey,
   type UploadRequest,
 } from "./object-storage-strategy.interface";
@@ -20,6 +21,13 @@ export class CloudinaryObjectStorage implements ObjectStorage {
       api_key: apiKey,
       api_secret: apiSecret,
     });
+  }
+
+  resolveUploadObjectLocation({
+    location,
+  }: ResolveUploadObjectLocationInput): ObjectLocation {
+    // Cloudinary manages extensions based on its resource type and format.
+    return location;
   }
 
   async createUploadRequest(

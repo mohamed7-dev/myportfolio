@@ -1,4 +1,5 @@
 import { Column, Entity, Index, ManyToOne, type Relation } from "typeorm";
+import type { ProfileAssetType } from "@/lib/dto/profile";
 import type { DeepPartial } from "@/lib/types/shared-types";
 import { OrderableAsset } from "../asset/orderable-asset.entity";
 import { Profile } from "./profile.entity";
@@ -9,6 +10,9 @@ export class ProfileAsset extends OrderableAsset {
     super();
     this.initialize(input);
   }
+
+  @Column({ type: "varchar" })
+  type: ProfileAssetType;
 
   @Column({ type: "uuid", name: "profileId" })
   profileId: string;

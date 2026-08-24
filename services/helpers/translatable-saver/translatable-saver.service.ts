@@ -44,7 +44,6 @@ class TranslatableSaver {
     const entity = new entityType(input);
 
     const translations: Array<TranslationEntity<Entity>> = [];
-
     if (input.translations) {
       for (const translationInput of input.translations) {
         const translation = new translationEntityType(translationInput);

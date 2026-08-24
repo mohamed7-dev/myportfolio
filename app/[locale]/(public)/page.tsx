@@ -13,6 +13,7 @@ import { DynamicLoader } from "@/components/shared/dynamic-loader";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
 import { cacheKeys } from "@/lib/constants";
+import { type ProfileAsset, ProfileAssetType } from "@/lib/dto/profile";
 import { localizedCache } from "@/lib/helpers/localized-cache";
 import { visitorService } from "@/services/domain/visitor.service";
 import { Cards } from "./_components/cards";
@@ -22,6 +23,7 @@ import { FeaturedWork } from "./_components/featured-work";
 import { HomePageHeader } from "./_components/header";
 import { ProjectCard } from "./_components/project-card";
 import { PublicSidebarTrigger } from "./_components/public-sidebar-trigger";
+import { getSuperAdminProfile } from "./layout";
 
 export const revalidate = 3600;
 
@@ -52,6 +54,38 @@ export default async function HomePage() {
   const i18n = await getScopedI18n("home");
   const skills = await getFeaturedSkills(await getCurrentLocale());
 
+  const profile = await getSuperAdminProfile(await getCurrentLocale());
+
+  const resolveAsset = (assets?: ProfileAsset[]): ProfileAsset | undefined => {
+    if (assets?.length === 1) {
+      return assets[0];
+    } else if (assets?.length) {
+      return assets[Math.floor(Math.random() * assets.length)];
+    } else {
+      return undefined;
+    }
+  };
+
+  const filteredCoverAssets = profile.assets
+    ?.filter(
+      (asset) =>
+        asset.asset.id !== profile.avatar?.id &&
+        asset.type === ProfileAssetType.COVER,
+    )
+    .sort((a, b) => a.position - b.position);
+
+  const randomCover = resolveAsset(filteredCoverAssets);
+
+  const filteredPersonalAssets = profile.assets
+    ?.filter(
+      (asset) =>
+        asset.asset.id !== profile.avatar?.id &&
+        asset.type === ProfileAssetType.PERSONAL,
+    )
+    .sort((a, b) => a.position - b.position);
+
+  const randomPersonal = resolveAsset(filteredPersonalAssets);
+
   return (
     <Page pageId="home">
       <PageTitle pageTitleBlockId="home-title">
@@ -64,7 +98,11 @@ export default async function HomePage() {
       </PageActionBar>
       <PageLayout>
         <PageBlock id="header" column="full">
-          <HomePageHeader skills={skills.items} />
+          <HomePageHeader
+            skills={skills.items}
+            cover={randomCover?.asset}
+            personal={randomPersonal?.asset}
+          />
         </PageBlock>
         <PageBlock id="cards" column="full">
           <Cards>

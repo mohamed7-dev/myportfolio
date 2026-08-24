@@ -98,7 +98,19 @@ export const createProjectInputSchema = z.object({
 
 export type CreateProjectInputSchema = z.infer<typeof createProjectInputSchema>;
 
-export const createProjectOutputSchema = z.union([project, apiErrorSchema]);
+export const createProjectOutputSchema = z.union([
+  project.extend({
+    skills: z.array(
+      skill.pick({
+        id: true,
+        name: true,
+        slug: true,
+        featuredAsset: true,
+      }),
+    ),
+  }),
+  apiErrorSchema,
+]);
 
 export type CreateProjectOutputSchema = z.infer<
   typeof createProjectOutputSchema

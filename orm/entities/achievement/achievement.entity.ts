@@ -65,11 +65,11 @@ export class Achievement extends AppEntity {
     (career) => career.achievements,
     { nullable: true },
   )
-  career?: Career | null;
+  career?: Relation<Career | null>;
 
-  @ManyToMany(
-    () => Project,
-    (project) => project.achievements,
-  )
-  projects?: Project[];
+  // @ManyToMany(
+  //   () => Project,
+  //   (project) => project.achievements,
+  // )
+  // projects?: Relation<Project[]>;
 }

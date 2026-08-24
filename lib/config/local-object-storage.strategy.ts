@@ -8,6 +8,7 @@ import {
   type ObjectMetadata,
   type ObjectStorage,
   type ObjectStorageResourceType,
+  type ResolveUploadObjectLocationInput,
   toObjectKey,
   type UploadRequest,
 } from "./object-storage-strategy.interface";
@@ -27,6 +28,17 @@ export class LocalObjectStorage implements ObjectStorage {
     private readonly downloadUrlBase: string,
     private readonly signingSecret: string,
   ) {}
+
+  resolveUploadObjectLocation({
+    location,
+    filename,
+  }: ResolveUploadObjectLocationInput): ObjectLocation {
+    const extension = path.extname(path.basename(filename));
+
+    return extension && !path.extname(location.key)
+      ? { ...location, key: `${location.key}${extension}` }
+      : location;
+  }
 
   createUploadRequest(input: CreateUploadRequestInput): Promise<UploadRequest> {
     return new Promise((resolve) => {

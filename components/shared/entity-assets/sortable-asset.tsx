@@ -10,6 +10,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Asset } from "@/lib/dto/asset";
 import { AssetDisplay } from "../assets/asset-display";
+import type { EntityAssetAction } from "./entity-assets";
+
+const FEATURED_ACTION_ORDER = 100;
+const REMOVE_ACTION_ORDER = 200;
 
 export function SortableAsset({
   asset,
@@ -18,6 +22,7 @@ export function SortableAsset({
   updatePermissions,
   onSetAsFeatured,
   onRemove,
+  actions,
 }: {
   asset: Asset;
   compact: boolean;
@@ -25,6 +30,7 @@ export function SortableAsset({
   updatePermissions: boolean;
   onSetAsFeatured: (asset: Asset) => void;
   onRemove: (asset: Asset) => void;
+  actions?: EntityAssetAction[];
 }) {
   const {
     attributes,
@@ -42,6 +48,40 @@ export function SortableAsset({
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  const menuActions = [
+    {
+      order: FEATURED_ACTION_ORDER,
+      content: (
+        <DropdownMenuItem
+          key="set-as-featured"
+          disabled={isFeatured}
+          onClick={() => onSetAsFeatured(asset)}
+        >
+          Set as featured asset
+        </DropdownMenuItem>
+      ),
+    },
+    {
+      order: REMOVE_ACTION_ORDER,
+      content: (
+        <DropdownMenuItem
+          key="remove"
+          className="text-destructive"
+          onClick={() => onRemove(asset)}
+        >
+          Remove asset
+        </DropdownMenuItem>
+      ),
+    },
+    ...(actions ?? []).map((action, index) => {
+      const Action = action.component;
+      return {
+        order: action.order ?? 10_000,
+        content: <Action key={`custom-action-${index}`} asset={asset} />,
+      };
+    }),
+  ].sort((a, b) => a.order - b.order);
 
   return (
     <div
@@ -83,18 +123,7 @@ export function SortableAsset({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                disabled={isFeatured}
-                onClick={() => onSetAsFeatured(asset)}
-              >
-                Set as featured asset
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-destructive"
-                onClick={() => onRemove(asset)}
-              >
-                Remove asset
-              </DropdownMenuItem>
+              {menuActions.map((action) => action.content)}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

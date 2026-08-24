@@ -21,7 +21,7 @@ export const { PATCH } = createRouter({
 
       revalidatePath("/about", "page");
       revalidatePath("/", "layout");
-      revalidateTag(cacheKeys.publicSuperAdminProfile[0], "");
+      revalidateTag(cacheKeys.publicSuperAdminProfile[0], "max");
 
       return NextResponse.json(parsedOutput, { status: 200 });
     },

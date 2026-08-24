@@ -29,7 +29,7 @@ export const { POST, PATCH, DELETE } = createRouter({
       );
 
       revalidatePath("/contact", "page");
-      revalidateTag(cacheKeys.publicContactMethods[0], "");
+      revalidateTag(cacheKeys.publicContactMethods[0], "max");
 
       return NextResponse.json(parsedResult, { status: 201 });
     },
@@ -49,7 +49,7 @@ export const { POST, PATCH, DELETE } = createRouter({
       );
 
       revalidatePath("/contact", "page");
-      revalidateTag(cacheKeys.publicContactMethods[0], "");
+      revalidateTag(cacheKeys.publicContactMethods[0], "max");
       return NextResponse.json(parsedResult, { status: 200 });
     },
   },
@@ -68,7 +68,7 @@ export const { POST, PATCH, DELETE } = createRouter({
       );
 
       revalidatePath("/contact", "page");
-      revalidateTag(cacheKeys.publicContactMethods[0], "");
+      revalidateTag(cacheKeys.publicContactMethods[0], "max");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },

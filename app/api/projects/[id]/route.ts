@@ -24,9 +24,9 @@ export const { DELETE } = createRouter({
       const parsedResult = validateOutput(result, deleteProjectOutputSchema);
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedProjects[0], "");
+      revalidateTag(cacheKeys.publicFeaturedProjects[0], "max");
       revalidatePath("/projects", "page");
-      revalidateTag(cacheKeys.publicProjects[0], "");
+      revalidateTag(cacheKeys.publicProjects[0], "max");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },

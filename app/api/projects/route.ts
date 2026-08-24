@@ -27,9 +27,9 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, createProjectOutputSchema);
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedProjects[0], "");
+      revalidateTag(cacheKeys.publicFeaturedProjects[0], "max");
       revalidatePath("/projects", "page");
-      revalidateTag(cacheKeys.publicProjects[0], "");
+      revalidateTag(cacheKeys.publicProjects[0], "max");
 
       return NextResponse.json(parsedResult, { status: 201 });
     },
@@ -46,9 +46,9 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, updateProjectOutputSchema);
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedProjects[0], "");
+      revalidateTag(cacheKeys.publicFeaturedProjects[0], "max");
       revalidatePath("/projects", "page");
-      revalidateTag(cacheKeys.publicProjects[0], "");
+      revalidateTag(cacheKeys.publicProjects[0], "max");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },
@@ -68,9 +68,9 @@ export const { POST, PATCH, DELETE } = createRouter({
       );
 
       revalidatePath("/", "page");
-      revalidateTag(cacheKeys.publicFeaturedProjects[0], "");
+      revalidateTag(cacheKeys.publicFeaturedProjects[0], "max");
       revalidatePath("/projects", "page");
-      revalidateTag(cacheKeys.publicProjects[0], "");
+      revalidateTag(cacheKeys.publicProjects[0], "max");
 
       return NextResponse.json(parsedResult, { status: 200 });
     },

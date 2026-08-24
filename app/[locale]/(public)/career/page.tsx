@@ -66,6 +66,8 @@ export default async function CareerPage() {
   const result = await getCareer(locale);
   const eduResult = await getEdu(locale);
 
+  const sorted = result.items.sort((a, b) => (a === b ? 0 : a ? -1 : 1));
+
   return (
     <Page pageId="public-career">
       <PageTitle pageTitleBlockId="public-career-title">
@@ -80,7 +82,7 @@ export default async function CareerPage() {
         {i18n("description")}
       </PageDescription>
       <PageLayout>
-        {result.items.map((careerItem) => (
+        {sorted.map((careerItem) => (
           <PageBlock key={careerItem.id} column="full" id="career-list-item">
             <CareerCard careerItem={careerItem} />
           </PageBlock>

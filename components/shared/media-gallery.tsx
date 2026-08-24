@@ -4,26 +4,31 @@ import {
   ChevronRightIcon,
   DownloadIcon,
   ExpandIcon,
-  XIcon,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import React from "react";
 import { AppImage } from "@/components/shared/app-image";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useDownloadAsset } from "@/hooks/use-download-asset";
 import { ObjectStorageResourceType } from "@/lib/config/object-storage-strategy.interface";
 import type { EntityAsset } from "@/lib/dto/asset";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 import { AppVideo } from "./app-video";
+import { DynamicLoader } from "./dynamic-loader";
 
-interface MediaGalleryProps {
+const MediaGalleryDialog = dynamic(
+  () => import("./media-gallery-dialog").then((mod) => mod.MediaGalleryDialog),
+  {
+    loading: () => (
+      <div className="fixed z-50 inset-0 bg-overlay/60 h-screen w-screen flex items-center justify-center text-primary">
+        <DynamicLoader />
+      </div>
+    ),
+  },
+);
+
+export interface MediaGalleryProps {
   entityAssets: EntityAsset[];
   title?: string;
   className?: string;
@@ -63,11 +68,11 @@ export function MediaGallery({
   };
 
   const downloadFile = () => {
-    downloadAsset(``, currentItem.asset.name);
+    downloadAsset(currentItem.asset.id, currentItem.asset.name);
   };
 
   return (
-    <>
+    <React.Fragment>
       <div
         className={cn(
           "group relative w-full overflow-hidden space-y-4 rounded-base border-2 border-border bg-background",
@@ -162,7 +167,6 @@ export function MediaGallery({
                 variant="neutral"
                 className="pointer-events-auto"
                 onClick={downloadFile}
-                // TODO: localize
                 aria-label="Download file"
                 disabled={isDownloading}
               >
@@ -182,80 +186,17 @@ export function MediaGallery({
           </div>
         </div>
       </div>
-
-      <Dialog
-        open={dialogOpen}
-        onOpenChange={(open) => !open && closeFullscreen()}
-      >
-        <DialogContent
-          showCloseButton={false}
-          className="max-w-[80vw]! rounded-none border-0 bg-transparent p-0 shadow-none"
-        >
-          <div className="relative flex flex-col overflow-hidden rounded-base border-2 border-border bg-background">
-            <div className="absolute right-3 top-3 z-10 flex gap-2">
-              <Button
-                type="button"
-                size="icon-sm"
-                variant="neutral"
-                onClick={closeFullscreen}
-                aria-label="Close fullscreen media"
-              >
-                <XIcon className="size-4" />
-              </Button>
-            </div>
-
-            <div className="max-w-[80vw] max-h-[80vh] flex items-center justify-center bg-background">
-              {(currentItem.asset.type === ObjectStorageResourceType.image ||
-                currentItem.asset.type === ObjectStorageResourceType.raw) && (
-                <AppImage
-                  asset={currentItem.asset}
-                  transform={{
-                    preset: "full",
-                  }}
-                  loading="eager"
-                  className="size-full object-contain"
-                />
-              )}
-              {currentItem.asset.type === ObjectStorageResourceType.video && (
-                <AppVideo
-                  asset={currentItem.asset}
-                  transform={{
-                    preset: "full",
-                  }}
-                  className={cn(
-                    "size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]",
-                  )}
-                />
-              )}
-            </div>
-
-            <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2 px-4">
-              <Button
-                type="button"
-                size="icon"
-                variant="neutralNoShadow"
-                onClick={() => updateIndex(currentIndex - 1)}
-                aria-label="Previous media"
-              >
-                <ChevronLeftIcon />
-              </Button>
-              <Button
-                type="button"
-                size="icon"
-                variant="neutralNoShadow"
-                onClick={() => updateIndex(currentIndex + 1)}
-                aria-label="Next media"
-              >
-                <ChevronRightIcon />
-              </Button>
-            </div>
-          </div>
-          <DialogHeader className="sr-only">
-            <DialogTitle>{title ?? "Media gallery"}</DialogTitle>
-            <DialogDescription>Media gallery</DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    </>
+      {dialogOpen && (
+        <MediaGalleryDialog
+          dialogOpen={dialogOpen}
+          closeFullscreen={closeFullscreen}
+          currentItem={currentItem}
+          onClickNext={() => currentIndex + 1}
+          onClickPrev={() => currentIndex - 1}
+          dialogTitle={title}
+          imageProps={overlayImageProps}
+        />
+      )}
+    </React.Fragment>
   );
 }
