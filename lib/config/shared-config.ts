@@ -1,7 +1,6 @@
 import { LanguageCode } from "../dto/language-code";
-import { registerEnv } from "../helpers/env";
 
-registerEnv();
+console.log(process.env);
 
 interface SharedAppConfig {
   server: {
