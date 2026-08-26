@@ -64,6 +64,7 @@ function wrapRoute<TCtx extends NextCtx>({
         ctx,
       });
     } catch (error) {
+      console.error("Error From Api Handler", error);
       return handleApiErrors(error);
     }
   };

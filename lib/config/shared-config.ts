@@ -27,8 +27,8 @@ interface SharedAppConfig {
 export const sharedConfig: SharedAppConfig = {
   server: {
     port: process.env.PORT ? Number(process.env.PORT) : 3000,
-    host: process.env.NEXT_PUBLIC_APP_URL
-      ? `${process.env.NEXT_PUBLIC_APP_URL}`
+    host: process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : `http://localhost:3000`,
   },
   i18n: {
