@@ -153,7 +153,7 @@ export default async function ProjectPage({
             {project.career && (
               <section
                 className={
-                  "flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
                 }
               >
                 <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
@@ -179,7 +179,7 @@ export default async function ProjectPage({
             {project.education && (
               <section
                 className={
-                  "flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
                 }
               >
                 <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
@@ -205,7 +205,7 @@ export default async function ProjectPage({
             {!!project.achievements?.length && (
               <section
                 className={
-                  "flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
                 }
               >
                 <h3 className="font-base text-sm md:text-lg text-foreground capitalize">

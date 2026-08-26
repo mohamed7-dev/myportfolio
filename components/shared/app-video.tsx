@@ -7,6 +7,7 @@ import type { AssetLike, ImageMode, ImagePreset } from "@/lib/types/image";
 import { cn } from "@/lib/utils";
 import "next-cloudinary/dist/cld-video-player.css";
 import { isDevelopmentMode } from "@/lib/helpers/env";
+import { VideoPlayer } from "./video-player/video-player";
 
 interface AppVideoProps
   extends Omit<React.VideoHTMLAttributes<HTMLVideoElement>, "src" | "poster"> {
@@ -57,7 +58,7 @@ export function AppVideo({
   const videoHeight = size.height ?? asset.height;
 
   return (
-    <video
+    <VideoPlayer
       controls
       preload="metadata"
       poster={
@@ -80,13 +81,10 @@ export function AppVideo({
                 quality,
                 width: videoWidth,
                 height: videoHeight,
-                // streamingProfile: "hd",
-                // transformations: ["hls"],
               })
         }
-        type={asset.mimetype}
       />
-    </video>
+    </VideoPlayer>
   );
 }
 

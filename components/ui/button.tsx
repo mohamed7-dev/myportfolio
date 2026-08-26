@@ -16,7 +16,7 @@ const buttonVariants = cva(
         neutral:
           "bg-secondary-background text-foreground border-2 border-border shadow-default hover:shadow-none hover:translate-x-box-shadow-x hover:translate-y-box-shadow-y",
         neutralNoShadow:
-          "bg-secondary-background text-foreground border-2 border-border",
+          "bg-secondary-background text-foreground border-2 border-border hover:text-foreground/80",
         reverseShadow:
           "bg-primary text-primary-foreground border-2 border-border shadow-default hover:shadow-none hover:translate-x-reverse-box-shadow-x hover:translate-y-reverse-box-shadow-y",
       },
