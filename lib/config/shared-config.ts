@@ -27,8 +27,8 @@ interface SharedAppConfig {
 export const sharedConfig: SharedAppConfig = {
   server: {
     port: process.env.PORT ? Number(process.env.PORT) : 3000,
-    host: process.env.APP_URL
-      ? `${process.env.APP_URL}`
+    host: process.env.NEXT_PUBLIC_APP_URL
+      ? `${process.env.NEXT_PUBLIC_APP_URL}`
       : `http://localhost:3000`,
   },
   i18n: {
