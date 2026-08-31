@@ -1,7 +1,4 @@
-"use client";
-
 import React from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import type { PageBlockProps } from "./page-block";
 
 type PageLayoutProps = {
@@ -10,8 +7,6 @@ type PageLayoutProps = {
 };
 
 export function PageLayout({ children, className }: PageLayoutProps) {
-  const isMobile = useIsMobile();
-
   // Normalize and extract PageBlock children
   const blocks: React.ReactElement<PageBlockProps>[] = [];
 
@@ -44,25 +39,23 @@ export function PageLayout({ children, className }: PageLayoutProps) {
   const sideBlocks = blocks.filter((block) => block.props.column === "side");
 
   return (
-    <div className={className}>
-      {isMobile ? (
-        // Mobile: stack everything vertically
-        <div className="space-y-4">{blocks}</div>
-      ) : (
-        // Desktop grid layout
-        <div className="grid grid-cols-5 gap-4">
-          {/* Full width section */}
-          {fullWidthBlocks.length > 0 && (
-            <div className="col-span-5 space-y-4">{fullWidthBlocks}</div>
-          )}
-
-          {/* Main content */}
-          <div className="col-span-3 space-y-4">{mainBlocks}</div>
-
-          {/* Sidebar */}
-          <div className="col-span-2 space-y-4">{sideBlocks}</div>
+    <div
+      className={["grid grid-cols-1 gap-4 lg:grid-cols-5", className]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {/* Full width */}
+      {fullWidthBlocks.length > 0 && (
+        <div className="col-span-1 space-y-4 lg:col-span-5">
+          {fullWidthBlocks}
         </div>
       )}
+
+      {/* Main */}
+      <div className="col-span-1 space-y-4 lg:col-span-3">{mainBlocks}</div>
+
+      {/* Sidebar */}
+      <div className="col-span-1 space-y-4 lg:col-span-2">{sideBlocks}</div>
     </div>
   );
 }

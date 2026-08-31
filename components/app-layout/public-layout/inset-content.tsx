@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export function InsetContent({ children }: { children: React.ReactNode }) {
   return (
     <SidebarInset
-      className={cn("col-span-12 overflow-hidden h-screen", "lg:col-span-9")}
+      className={cn("col-span-12 lg:col-span-9 lg:overflow-hidden lg:h-screen")}
     >
       <div
         id="main-content"

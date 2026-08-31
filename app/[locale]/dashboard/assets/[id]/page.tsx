@@ -1,11 +1,10 @@
 import { notFound } from "next/navigation";
 import { wrapService } from "@/api/common/create-router";
+import { Page, PageTitle } from "@/components/page-layout/page";
 import {
-  Page,
   PageActionBar,
   PageActionBarItem,
-  PageTitle,
-} from "@/components/page-layout/page";
+} from "@/components/page-layout/page-action-bar";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Field, FieldLabel } from "@/components/ui/field";

@@ -5,12 +5,14 @@ import { notFound } from "next/navigation";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
-  PageActionBar,
-  PageActionBarItem,
-  PageActionBarMenuItem,
   PageDescription,
   PageTitle,
 } from "@/components/page-layout/page";
+import {
+  PageActionBar,
+  PageActionBarItem,
+  PageActionBarMenuItem,
+} from "@/components/page-layout/page-action-bar";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { AppImage } from "@/components/shared/app-image";

@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { ContactEmail } from "@/components/email-templates/contact-email";
-import { LOCALE_HEADER } from "@/lib/constants";
+import { sharedConfig } from "@/lib/config/shared-config";
 import { sendContactEmailInputSchema } from "@/lib/dto/email";
 import { languageCodeSchema } from "@/lib/dto/language-code";
 import { handleApiErrors } from "@/lib/helpers/handle-api-errors";
@@ -11,7 +11,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const parsedBody = validateInput(body, sendContactEmailInputSchema);
-    const locale = languageCodeSchema.parse(req.headers.get(LOCALE_HEADER));
+    const locale = languageCodeSchema.parse(
+      req.headers.get(sharedConfig.api.languageCodeHeaderName),
+    );
     const { data, error } = await resend.emails.send({
       from: "Acme <onboarding@resend.dev>",
       to: ["mo.job3830@gmail.com"],

@@ -44,7 +44,7 @@ export function MediaGalleryDialog({
     >
       <DialogContent
         showCloseButton={false}
-        className="max-w-[80vw]! rounded-none border-0 bg-transparent p-0 shadow-none"
+        className="max-w-[98vw]! lg:max-w-[80vw]! rounded-none border-0 bg-transparent p-0 shadow-none"
       >
         <div className="relative flex flex-col overflow-hidden rounded-base border-2 border-border bg-background">
           <div className="absolute right-3 top-3 z-10 flex gap-2">
@@ -59,7 +59,7 @@ export function MediaGalleryDialog({
             </Button>
           </div>
 
-          <div className="max-w-[80vw] max-h-[80vh] flex items-center justify-center bg-background">
+          <div className="flex items-center justify-center bg-background">
             {(currentItem.asset.type === ObjectStorageResourceType.image ||
               currentItem.asset.type === ObjectStorageResourceType.raw) && (
               <AppImage
