@@ -1,13 +1,12 @@
 "use client";
 import { VideoIcon } from "lucide-react";
-import { getCldImageUrl, getCldVideoUrl } from "next-cloudinary";
 import type React from "react";
+import { getCloudinaryAssetUrl } from "@/lib/helpers/cloudinary-url";
 import { resolveSize } from "@/lib/helpers/image";
 import type { AssetLike, ImageMode, ImagePreset } from "@/lib/types/image";
 import { cn } from "@/lib/utils";
-import "next-cloudinary/dist/cld-video-player.css";
-import { isDevelopmentMode } from "@/lib/helpers/env";
 import { VideoPlayer } from "./video-player/video-player";
+import { isDevelopmentMode } from "@/lib/utils/is-env";
 
 interface AppVideoProps
   extends Omit<React.VideoHTMLAttributes<HTMLVideoElement>, "src" | "poster"> {
@@ -64,7 +63,7 @@ export function AppVideo({
       poster={
         isDevelopmentMode()
           ? `/object-storage/${asset.previewIdentifier}`
-          : getCldImageUrl({ src: asset.previewIdentifier })
+          : getCloudinaryAssetUrl(asset.previewIdentifier, "image", ["f_auto"])
       }
       width={videoWidth}
       height={videoHeight}
@@ -75,13 +74,12 @@ export function AppVideo({
         src={
           isDevelopmentMode()
             ? `/object-storage/${asset.sourceIdentifier}`
-            : getCldVideoUrl({
-                src: asset.sourceIdentifier,
-                crop: mode === "resize" ? "fit" : "fill",
-                quality,
-                width: videoWidth,
-                height: videoHeight,
-              })
+            : getCloudinaryAssetUrl(asset.sourceIdentifier, "video", [
+                `c_${mode === "resize" ? "fit" : "fill"}`,
+                `q_${quality ?? "auto"}`,
+                `w_${videoWidth}`,
+                `h_${videoHeight}`,
+              ])
         }
       />
     </VideoPlayer>

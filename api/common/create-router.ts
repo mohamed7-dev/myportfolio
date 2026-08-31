@@ -1,51 +1,106 @@
-import type { NextRequest, NextResponse } from "next/server";
-import { authorize } from "@/lib/helpers/authorize";
+import { type NextRequest, NextResponse } from "next/server";
+import { serverConfig } from "@/lib/config/server-config";
+import type { SessionCacheEntry } from "@/lib/config/session-cache-strategy.interface";
+import { languageCodeSchema } from "@/lib/dto/language-code";
+import { ForbiddenError } from "@/lib/errors/errors";
 import { handleApiErrors } from "@/lib/helpers/handle-api-errors";
 import type { NextCtx } from "@/lib/types/shared-types";
 import { ormService } from "@/orm/orm.service";
 import { transactionManager } from "@/orm/transaction-manager";
+import { sessionService } from "@/services/domain/session.service";
 import { requestContextService } from "@/services/helpers/request-context.service";
 import type { RequestContext } from "../request-context/request-context";
+import { getSessionToken, setSessionToken } from "./session-utils";
 
 type RouteHandler<TCtx = unknown> = (
-  req: NextRequest,
-  ctx: TCtx,
+  req: Request,
   requestContext: RequestContext,
-) => Promise<NextResponse>;
+  headers: Headers,
+  ctx: TCtx,
+) => Promise<{ body: any; init: ResponseInit }>;
 
 type ServiceHandler<TArgs extends unknown[] = [], TResult = unknown> = (
   requestContext: RequestContext,
   ...args: TArgs
 ) => Promise<TResult>;
 
+type ExecutionContext =
+  | {
+      type: "route";
+      req: Request;
+      headers: Headers;
+    }
+  | {
+      type: "server";
+    };
+
 async function executeWithRequestContext<TResult, TCtx extends NextCtx>({
-  req,
+  executionContext,
   authenticatedOnly = true,
   work,
-  ctx,
 }: {
-  req?: NextRequest;
+  executionContext: ExecutionContext;
   authenticatedOnly?: boolean;
   work(requestContext: RequestContext): Promise<TResult>;
   ctx?: TCtx;
 }) {
-  const requestContext = await requestContextService.create(
-    req,
-    ctx,
-    authenticatedOnly,
-  );
+  let reqContext: RequestContext;
+  // API Context
+  if (executionContext.type === "route") {
+    // API Context
+    const session = await getSession();
+    reqContext = await requestContextService.buildFromReq(
+      executionContext.req,
+      session,
+    );
+  } else {
+    // Non API Context
+    const languageCode = languageCodeSchema.parse(
+      (await import("@/i18n/server")
+        .then((mod) => mod.getCurrentLocale())
+        .catch(() => serverConfig.defaultLanguageCode)) ??
+        serverConfig.defaultLanguageCode,
+    );
 
-  if (authenticatedOnly) {
-    await authorize(requestContext);
+    let session: SessionCacheEntry | undefined;
+    if (authenticatedOnly) {
+      session = await getSession();
+    }
+    reqContext = await requestContextService.create({
+      languageCode,
+      session,
+    });
   }
+  await authorize(reqContext, authenticatedOnly);
 
   const dataSource = await ormService.getDataSource();
 
   return transactionManager.executeInTransaction({
-    requestContext,
+    requestContext: reqContext,
     dataSource,
     work,
   });
+}
+
+async function getSession(): Promise<SessionCacheEntry | undefined> {
+  const sessionToken = await getSessionToken();
+  let cachedSession: SessionCacheEntry | undefined;
+  if (sessionToken) {
+    cachedSession = await sessionService.getSessionByToken(sessionToken);
+    if (cachedSession) return cachedSession;
+    // if there is a token but it cannot be validated to a Session,
+    // then the token is no longer valid and should be unset.
+    await setSessionToken({
+      sessionToken: "",
+    });
+  }
+  return cachedSession;
+}
+
+async function authorize(ctx: RequestContext, authenticatedOnly: boolean) {
+  if (authenticatedOnly && !ctx.activeUserId) {
+    throw new ForbiddenError();
+  }
 }
 
 function wrapRoute<TCtx extends NextCtx>({
@@ -56,15 +111,23 @@ function wrapRoute<TCtx extends NextCtx>({
   authenticatedOnly?: boolean;
 }): (req: NextRequest, ctx: TCtx) => Promise<NextResponse> {
   return async (req, ctx) => {
+    const headers = new Headers();
     try {
-      return await executeWithRequestContext({
-        req,
+      const result = await executeWithRequestContext({
+        executionContext: {
+          type: "route",
+          req,
+          headers,
+        },
         authenticatedOnly,
-        work: (requestContext) => handler(req, ctx, requestContext),
+        work: (requestContext) => handler(req, requestContext, headers, ctx),
         ctx,
       });
+      return NextResponse.json(result.body, {
+        ...result.init,
+        headers: headers,
+      });
     } catch (error) {
-      console.error("Error From Api Handler", error);
       return handleApiErrors(error);
     }
   };
@@ -85,6 +148,9 @@ export function wrapService<
 }) {
   return async (...args: TArgs): Promise<TResult> => {
     return executeWithRequestContext({
+      executionContext: {
+        type: "server",
+      },
       authenticatedOnly,
       work: (requestContext) => handler(requestContext, ...args),
       ctx,

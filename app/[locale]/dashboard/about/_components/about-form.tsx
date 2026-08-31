@@ -26,6 +26,7 @@ export function AboutForm({
     defaultValues: {
       id: initialValues.id,
       handle: initialValues.handle ?? "",
+      cvAssetId: initialValues.cvAssetId ?? "",
       projectsShipped: initialValues.projectsShipped ?? 0,
       openSourceContributions: initialValues.openSourceContributions ?? 0,
       yearsOfExperience: initialValues.yearsOfExperience ?? 0,

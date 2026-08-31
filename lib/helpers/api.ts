@@ -1,5 +1,5 @@
-import { LOCALE_HEADER } from "@/lib/constants";
 import type { LanguageCode } from "@/lib/dto/language-code";
+import { sharedConfig } from "../config/shared-config";
 
 type BaseRouteConfig = {
   url: string;
@@ -64,13 +64,13 @@ export function api(
     ...(routeConfig.contentType === "application/json" && {
       headers: {
         "Content-Type": "application/json",
-        ...(locale && { [LOCALE_HEADER]: locale }),
+        ...(locale && { [sharedConfig.api.languageCodeHeaderName]: locale }),
       },
     }),
 
     ...(locale &&
       routeConfig.contentType !== "application/json" && {
-        headers: { [LOCALE_HEADER]: locale },
+        headers: { [sharedConfig.api.languageCodeHeaderName]: locale },
       }),
   });
 }

@@ -1,17 +1,15 @@
-import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
 import type { RequestContext } from "@/api/request-context/request-context";
-import { serverConfig } from "@/lib/config/server-config";
 import type {
   AuthenticateAdminUserInputSchema,
   LogoutInputSchema,
 } from "@/lib/dto/auth";
 import { UnAuthorizedError } from "@/lib/errors/errors";
-import { Profile } from "@/orm/entities/profile/profile.entity";
+import type { Profile } from "@/orm/entities/profile/profile.entity";
+import { Session } from "@/orm/entities/session/session.entity";
 import { ormService } from "@/orm/orm.service";
-import { translator } from "../helpers/translator.service";
 import { profileService } from "./profile.service";
+import { sessionService } from "./session.service";
 
 class AuthService {
   public async me(ctx: RequestContext) {
@@ -19,6 +17,12 @@ class AuthService {
       const translatedProfile = await profileService.findOne(
         ctx,
         ctx.activeUserId,
+        {
+          featuredAsset: true,
+          assets: {
+            asset: true,
+          },
+        },
       );
 
       return translatedProfile;
@@ -26,91 +30,50 @@ class AuthService {
     return undefined;
   }
 
-  public async authenticateAdminUser(
+  public async authenticate(
     ctx: RequestContext,
     credentials: AuthenticateAdminUserInputSchema,
   ) {
-    const repo = await ormService.getRepository(ctx, Profile);
+    const profile = await profileService.getOneByUsername(
+      ctx,
+      credentials.username,
+      { featuredAsset: true },
+      true,
+    );
 
-    const foundAdmin = await repo.findOne({
-      where: {
-        username: credentials.username,
-      },
-    });
-
-    if (!foundAdmin) {
+    if (!profile) {
       throw new UnAuthorizedError("Invalid credentials");
     }
 
     const isPasswordValid = await bcrypt.compare(
       credentials.password,
-      (foundAdmin as Profile).password,
+      profile.password,
     );
 
     if (!isPasswordValid) {
       throw new UnAuthorizedError("Invalid credentials");
     }
 
-    const token = await this.generateSessionToken();
+    const session = await sessionService.startSession(ctx, profile as Profile);
 
-    foundAdmin.token = token;
-
-    await repo.save(foundAdmin);
-
-    return {
-      profile: translator.translate(ctx.languageCode, foundAdmin),
-      token,
-    };
+    return session;
   }
 
   public async logoutAdminUser(ctx: RequestContext, input: LogoutInputSchema) {
-    const foundAdmin = await profileService.findAdminUserByToken(
-      ctx,
-      input.token,
-    );
-    if (!foundAdmin) {
-      return { success: false };
-    }
+    const repo = await ormService.getRepository(ctx, Session);
 
-    const repo = await ormService.getRepository(ctx, Profile);
-
-    foundAdmin.token = "";
-
-    await repo.save(foundAdmin);
-
-    return {
-      success: true,
-    };
-  }
-
-  public async getSession(ctx: RequestContext) {
-    const sessionToken = (await cookies()).get(serverConfig.sessionKey);
-    if (!sessionToken?.value) {
-      return undefined;
-    }
-    const profile = await profileService.findAdminUserByToken(
-      ctx,
-      sessionToken.value,
-      {
-        assets: {
-          asset: true,
-        },
-        featuredAsset: true,
+    const session = await repo.findOne({
+      where: {
+        token: input.token,
       },
-    );
-
-    return { token: sessionToken.value, profile };
-  }
-
-  private async generateSessionToken(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      randomBytes(32, (err, buf) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(buf.toString("hex"));
-      });
+      relations: {
+        profile: true,
+      },
     });
+
+    if (session) {
+      await sessionService.deleteSessions(ctx, session.profile);
+    }
   }
 }
 

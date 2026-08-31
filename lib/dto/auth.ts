@@ -1,4 +1,5 @@
 import { z } from "@/lib/helpers/zod";
+import { asset } from "./asset";
 import { apiErrorSchema } from "./common";
 import { clientSafeSchema } from "./profile";
 
@@ -11,8 +12,22 @@ export type AuthenticateAdminUserInputSchema = z.infer<
   typeof authenticateAdminUserInputSchema
 >;
 
+const authenticateAdminUserSuccessOutputSchema = clientSafeSchema
+  .pick({
+    username: true,
+    id: true,
+    displayName: true,
+  })
+  .extend({
+    featuredAsset: asset.omit({ translations: true, tags: true }).nullish(),
+  });
+
+export type AuthenticateAdminUserSuccessOutputSchema = z.infer<
+  typeof authenticateAdminUserSuccessOutputSchema
+>;
+
 export const authenticateAdminUserOutputSchema = z.union([
-  clientSafeSchema,
+  authenticateAdminUserSuccessOutputSchema,
   apiErrorSchema,
 ]);
 

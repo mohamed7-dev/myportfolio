@@ -10,7 +10,6 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { DynamicLoader } from "@/components/shared/dynamic-loader";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
 import { cacheKeys } from "@/lib/constants";
 import { type ProfileAsset, ProfileAssetType } from "@/lib/dto/profile";
@@ -53,7 +52,6 @@ const getFeaturedSkills = localizedCache(
 export default async function HomePage() {
   const i18n = await getScopedI18n("home");
   const skills = await getFeaturedSkills(await getCurrentLocale());
-
   const profile = await getSuperAdminProfile(await getCurrentLocale());
 
   const resolveAsset = (assets?: ProfileAsset[]): ProfileAsset | undefined => {
@@ -102,10 +100,11 @@ export default async function HomePage() {
             skills={skills.items}
             cover={randomCover?.asset}
             personal={randomPersonal?.asset}
+            profile={profile}
           />
         </PageBlock>
         <PageBlock id="cards" column="full">
-          <Cards>
+          <Cards profile={profile}>
             <ProjectCard>
               <React.Suspense fallback={<DynamicLoader />}>
                 <FeaturedWork />

@@ -1,21 +1,18 @@
-import type { NextRequest } from "next/server";
 import type { ReplicationMode } from "typeorm";
+import type { SessionCacheEntry } from "@/lib/config/session-cache-strategy.interface";
 import { LanguageCode } from "@/lib/dto/language-code";
-import type { Profile } from "@/lib/dto/profile";
 
 interface RequestContextOptions {
   languageCode?: LanguageCode;
-  req?: NextRequest;
-  session?: ActiveSession;
+  req?: Request;
+  session?: SessionCacheEntry;
   isAuthenticated?: boolean;
 }
 
-export type ActiveSession = { token: string; profile: Profile };
-
 export class RequestContext {
   private _languageCode: LanguageCode;
-  private _req?: NextRequest;
-  private _session?: ActiveSession;
+  private _req?: Request;
+  private _session?: SessionCacheEntry;
   private _replicationMode?: ReplicationMode;
   private _isAuthenticated: boolean;
 
@@ -34,16 +31,16 @@ export class RequestContext {
     return this._isAuthenticated;
   }
 
-  get req(): NextRequest | undefined {
+  get req(): Request | undefined {
     return this._req;
   }
 
-  get session(): ActiveSession | undefined {
+  get session(): SessionCacheEntry | undefined {
     return this._session;
   }
 
   get activeUserId(): string | undefined {
-    return this.session?.profile?.id;
+    return this.session?.user.id;
   }
 
   setReplicationMode(mode: ReplicationMode): void {

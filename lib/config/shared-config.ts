@@ -1,6 +1,10 @@
 import { LanguageCode } from "../dto/language-code";
 
 interface SharedAppConfig {
+  api: {
+    languageCodeHeaderName: string;
+    authTokenCookieName: string;
+  };
   server: {
     port: number;
     host: string;
@@ -22,6 +26,10 @@ interface SharedAppConfig {
 }
 
 export const sharedConfig: SharedAppConfig = {
+  api: {
+    languageCodeHeaderName: "X-languageCode",
+    authTokenCookieName: "session-token",
+  },
   server: {
     port: process.env.PORT ? Number(process.env.PORT) : 3000,
     host: process.env.NEXT_PUBLIC_APP_URL

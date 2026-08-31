@@ -1,9 +1,8 @@
 "use client";
 import { ImageIcon } from "lucide-react";
-import Image, { type ImageProps } from "next/image";
-import { CldImage, type CldImageProps } from "next-cloudinary";
+import Image, { type ImageLoaderProps, type ImageProps } from "next/image";
 import type React from "react";
-import { isDevelopmentMode } from "@/lib/helpers/env";
+import { getCloudinaryAssetUrl } from "@/lib/helpers/cloudinary-url";
 import { resolveSize } from "@/lib/helpers/image";
 import type {
   AssetLike,
@@ -12,10 +11,9 @@ import type {
   ImagePreset,
 } from "@/lib/types/image";
 import { cn } from "@/lib/utils";
+import { isDevelopmentMode } from "@/lib/utils/is-env";
 
-type ImageCompProps =
-  | Omit<CldImageProps, "src" | "placeholder" | "alt">
-  | Omit<ImageProps, "src" | "placeholder" | "alt">;
+type ImageCompProps = Omit<ImageProps, "src" | "placeholder" | "alt">;
 
 type AppImageProps = ImageCompProps & {
   asset: AssetLike | undefined;
@@ -77,18 +75,32 @@ export function AppImage({
     );
   }
 
+  const cloudinaryLoader = ({
+    src,
+    width: requestedWidth,
+    quality,
+  }: ImageLoaderProps) => {
+    const publicId = src.split("/upload/").at(-1) ?? asset.previewIdentifier;
+
+    return getCloudinaryAssetUrl(publicId, "image", [
+      `f_${format ?? "auto"}`,
+      `q_${quality ?? "auto"}`,
+      `c_${mode === "resize" ? "fit" : "fill"}`,
+      `w_${requestedWidth}`,
+    ]);
+  };
+
   return (
-    <CldImage
+    <Image
       ref={ref}
-      src={asset.previewIdentifier}
+      src={getCloudinaryAssetUrl(asset.previewIdentifier, "image")}
       alt={alt ?? asset.name ?? ""}
       width={size.width === undefined ? asset.width : size.width}
       height={size.height === undefined ? asset.height : size.height}
       className={cn("rounded-base size-auto", className)}
       loading="lazy"
+      loader={cloudinaryLoader}
       quality={quality}
-      format={format ?? undefined}
-      crop={mode === "resize" ? "fit" : "fill"}
       {...props}
     />
   );

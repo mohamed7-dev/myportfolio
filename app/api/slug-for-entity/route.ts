@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
 import {
   slugForEntityInputSchema,
@@ -11,12 +10,12 @@ import { slugService } from "@/services/helpers/slug.service";
 export const { PUT } = createRouter({
   PUT: {
     authenticatedOnly: true,
-    handler: async (req, _, ctx) => {
+    handler: async (req, ctx) => {
       const body = await req.json();
       const parsedInput = validateInput(body, slugForEntityInputSchema);
       const result = await slugService.slugForEntity(ctx, parsedInput);
       const parsedResult = validateOutput(result, slugForEntityOutputSchema);
-      return NextResponse.json(parsedResult, { status: 200 });
+      return { body: parsedResult, init: { status: 200 } };
     },
   },
 });

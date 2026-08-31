@@ -151,6 +151,10 @@ export default async function AboutPage() {
             <MediaGallery
               entityAssets={profileAssets}
               title={profile.displayName}
+              staticImageProps={{
+                loading: "eager",
+                fetchPriority: "high",
+              }}
             />
           </PageBlock>
         )}

@@ -1,15 +1,20 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: we do pre-check and throw errors*/
 import path from "node:path";
 import { LanguageCode } from "../dto/language-code";
-import { isDevelopmentMode, registerEnv } from "../helpers/env";
+import { registerEnv } from "../helpers/env";
 import { apiRoutes } from "../helpers/router";
+import { isDevelopmentMode } from "../utils/is-env";
+import type { CacheStrategy } from "./cache-strategy.interface";
 import { CloudinaryObjectStorage } from "./cloudinary-object-storage.strategy";
+import { DefaultSessionCacheStrategy } from "./default-session-cache.strategy";
+import { InMemoryCacheStrategy } from "./in-memory-cache.strategy";
 import { LocalObjectStorage } from "./local-object-storage.strategy";
 import type { ObjectStorage } from "./object-storage-strategy.interface";
+import type { SessionCacheStrategy } from "./session-cache-strategy.interface";
 
 registerEnv();
 
-interface ServerConfig {
+export interface ServerConfig {
   sessionKey: string;
   defaultLanguageCode: LanguageCode;
   listQueryLimit: number;
@@ -22,9 +27,17 @@ interface ServerConfig {
       signingKey: string;
     };
   };
-  adminCredentials: {
-    username: string;
-    password: string;
+  auth: {
+    adminCredentials: {
+      username: string;
+      password: string;
+    };
+    sessionDurationInMs: number;
+    sessionCacheTTLInMs: number;
+    sessionCache: SessionCacheStrategy;
+  };
+  system: {
+    cache: CacheStrategy;
   };
 }
 
@@ -54,8 +67,22 @@ export const serverConfig: ServerConfig = {
           process.env.CLOUDINARY_API_SECRET!,
         ),
   },
-  adminCredentials: {
-    username: process.env.ADMIN_USERNAME ?? "",
-    password: process.env.ADMIN_PASSWORD ?? "",
+  auth: {
+    adminCredentials: {
+      username: process.env.ADMIN_USERNAME ?? "",
+      password: process.env.ADMIN_PASSWORD ?? "",
+    },
+    /**
+     * @default 1 year
+     */
+    sessionDurationInMs: 31_536_000_000,
+    /**
+     * @default 3 minutes
+     */
+    sessionCacheTTLInMs: 180_000,
+    sessionCache: new DefaultSessionCacheStrategy(),
+  },
+  system: {
+    cache: new InMemoryCacheStrategy(),
   },
 };

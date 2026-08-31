@@ -1,7 +1,8 @@
 import { resolve } from "node:path";
 import { DataSource } from "typeorm";
-import { isProductionMode, registerEnv } from "@/lib/helpers/env";
+import { registerEnv } from "@/lib/helpers/env";
 import { entitiesMap } from "./entities/entities-map";
+import { isProductionMode } from "@/lib/utils/is-env";
 
 registerEnv();
 

@@ -66,7 +66,9 @@ export default async function CareerPage() {
   const result = await getCareer(locale);
   const eduResult = await getEdu(locale);
 
-  const sorted = result.items.sort((a, b) => (a === b ? 0 : a ? -1 : 1));
+  const sorted = result.items.sort(
+    (a, b) => b.startDate.getTime() - a.startDate.getTime(),
+  );
 
   return (
     <Page pageId="public-career">

@@ -1,19 +1,23 @@
 import { redirect } from "next/navigation";
+import { isAuthenticated } from "@/api/common/is-authenticated";
 import { DashboardLayout as DashboardLayoutImpl } from "@/components/app-layout/dashboard-layout";
-import { requestContextService } from "@/services/helpers/request-context.service";
+import { QueryClientProvider } from "@/components/providers/query-client-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default async function DashboardLayout({
   children,
 }: LayoutProps<"/[locale]/dashboard">) {
-  const requestContext = await requestContextService.create(
-    undefined,
-    undefined,
-    true,
-  );
+  const shouldRedirect = !(await isAuthenticated());
 
-  if (!requestContext.isAuthenticated) {
+  if (shouldRedirect) {
     redirect("/login", "replace");
   }
 
-  return <DashboardLayoutImpl>{children} </DashboardLayoutImpl>;
+  return (
+    <DashboardLayoutImpl>
+      <QueryClientProvider>
+        <TooltipProvider>{children}</TooltipProvider>
+      </QueryClientProvider>
+    </DashboardLayoutImpl>
+  );
 }

@@ -1,5 +1,4 @@
 import { revalidatePath, revalidateTag } from "next/cache";
-import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
 import { cacheKeys } from "@/lib/constants";
 import {
@@ -17,7 +16,7 @@ import { skillService } from "@/services/domain/skill.service";
 export const { POST, PATCH, DELETE } = createRouter({
   POST: {
     authenticatedOnly: true,
-    handler: async (req, _, ctx) => {
+    handler: async (req, ctx) => {
       const body = await req.json();
 
       const parsedData = validateInput(body, createSkillInputSchema);
@@ -31,12 +30,12 @@ export const { POST, PATCH, DELETE } = createRouter({
       revalidatePath("/about", "page");
       revalidateTag(cacheKeys.publicSkills[0], "max");
 
-      return NextResponse.json(parsedResult, { status: 201 });
+      return { body: parsedResult, init: { status: 201 } };
     },
   },
   PATCH: {
     authenticatedOnly: true,
-    handler: async (req, _, ctx) => {
+    handler: async (req, ctx) => {
       const body = await req.json();
 
       const parsedData = validateInput(body, updateSkillInputSchema);
@@ -50,12 +49,12 @@ export const { POST, PATCH, DELETE } = createRouter({
       revalidatePath("/about", "page");
       revalidateTag(cacheKeys.publicSkills[0], "max");
 
-      return NextResponse.json(parsedResult, { status: 200 });
+      return { body: parsedResult, init: { status: 200 } };
     },
   },
   DELETE: {
     authenticatedOnly: true,
-    handler: async (req, _, ctx) => {
+    handler: async (req, ctx) => {
       const body = await req.json();
 
       const parsedData = validateInput(body, deleteSkillsInputSchema);
@@ -69,7 +68,7 @@ export const { POST, PATCH, DELETE } = createRouter({
       revalidatePath("/about", "page");
       revalidateTag(cacheKeys.publicSkills[0], "max");
 
-      return NextResponse.json(parsedResult, { status: 200 });
+      return { body: parsedResult, init: { status: 200 } };
     },
   },
 });

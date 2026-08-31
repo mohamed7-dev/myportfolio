@@ -1,20 +1,27 @@
-import React, { useTransition } from "react";
+"use client";
+import dynamic from "next/dynamic";
+import { useEffect, useState, useTransition } from "react";
 import { setAccentColor } from "@/api/actions/set-accent-color.action";
-import {
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   ACCENT_COLOR_CLASSNAME_KEY,
   PREFERENCES_CONSENT_KEY,
 } from "@/lib/constants";
 import { themes } from "@/lib/theme";
+import { DynamicLoader } from "../shared/dynamic-loader";
+import { Button } from "../ui/button";
+
+const DashboardAccentSwitcher = dynamic(
+  () =>
+    import("./dashboard-accent-switcher").then(
+      (mod) => mod.DashboardAccentSwitcher,
+    ),
+  {
+    loading: () => <DynamicLoader />,
+  },
+);
 
 export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
-  const [accentClassName, setAccentClassName] = React.useState("");
+  const [accentClassName, setAccentClassName] = useState("");
 
   const [_, startTransition] = useTransition();
 
@@ -49,7 +56,7 @@ export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
     });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const getAccentColor = async () => {
       const accent = await window.cookieStore.get(ACCENT_COLOR_CLASSNAME_KEY);
       if (accent?.value) {
@@ -61,44 +68,28 @@ export function AccentSwitcher({ mode }: { mode: "dashboard" | "public" }) {
 
   if (mode === "dashboard") {
     return (
-      <DropdownMenuSub>
-        <DropdownMenuSubTrigger>Accent Color</DropdownMenuSubTrigger>
-        <DropdownMenuSubContent>
-          <DropdownMenuRadioGroup
-            value={accentClassName}
-            onValueChange={(value) => onChange(value)}
-          >
-            {Object.values(themes).map((theme) => (
-              <DropdownMenuRadioItem key={theme.name} value={theme.className}>
-                <span
-                  className="block size-6 rounded-full border-2 border-border"
-                  style={{ backgroundColor: theme.labelColor }}
-                ></span>
-                {theme.name} {theme.isDefault && "(Default)"}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuSubContent>
-      </DropdownMenuSub>
+      <DashboardAccentSwitcher onChange={onChange} value={accentClassName} />
     );
   }
 
   return (
     <div className="flex items-center gap-2">
       {Object.values(themes).map((theme) => (
-        <button
-          type="button"
+        <Button
           key={theme.name}
+          variant={"neutralNoShadow"}
+          size={"icon-xs"}
           onClick={() => onChange(theme.className)}
+          className="size-auto rounded-base"
         >
           <span
-            className="block size-6 rounded-base border-2 border-border relative"
+            className="block size-6"
             style={{ backgroundColor: theme.labelColor }}
           ></span>
           <span className="sr-only">
             {theme.name} {theme.isDefault && "(Default)"}
           </span>
-        </button>
+        </Button>
       ))}
     </div>
   );

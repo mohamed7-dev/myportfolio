@@ -2,13 +2,10 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import "reflect-metadata";
-import { Analytics } from "@vercel/analytics/next";
+import dynamic from "next/dynamic";
 import { cookies } from "next/headers";
 import { wrapService } from "@/api/common/create-router";
 import { I18nProvider } from "@/components/providers/i18n-provider";
-import { QueryClientProvider } from "@/components/providers/query-client-provider";
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { sharedConfig } from "@/lib/config/shared-config";
 import { ACCENT_COLOR_CLASSNAME_KEY } from "@/lib/constants";
 import type { LanguageCode } from "@/lib/dto/language-code";
@@ -16,6 +13,14 @@ import { isRtl } from "@/lib/helpers/locale-utils";
 import { themes } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { visitorService } from "@/services/domain/visitor.service";
+
+const Analytics = dynamic(() =>
+  import("@vercel/analytics/next").then((mod) => mod.Analytics),
+);
+
+const Toaster = dynamic(() =>
+  import("@/components/ui/sonner").then((mod) => mod.Toaster),
+);
 
 const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex-sans",
@@ -92,15 +97,10 @@ export default async function RootLayout({
         isRtl(typedLocale) ? ibmPlexSansAr.variable : ibmPlexSans.variable,
         accentColorClassName,
       )}
-      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col">
         <Toaster />
-        <QueryClientProvider>
-          <I18nProvider locale={locale}>
-            <TooltipProvider>{children}</TooltipProvider>
-          </I18nProvider>
-        </QueryClientProvider>
+        <I18nProvider locale={locale}>{children}</I18nProvider>
         <Analytics />
       </body>
     </html>

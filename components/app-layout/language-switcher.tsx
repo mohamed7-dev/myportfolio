@@ -1,17 +1,23 @@
+"use client";
 import { LanguagesIcon } from "lucide-react";
-import {
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "@/components/ui/dropdown-menu";
+import dynamic from "next/dynamic";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
 import { useChangeLocale, useCurrentLocale } from "@/i18n/client";
 import { sharedConfig } from "@/lib/config/shared-config";
 import type { LanguageCode } from "@/lib/dto/language-code";
 import { cn } from "@/lib/utils";
+import { DynamicLoader } from "../shared/dynamic-loader";
 import { Button } from "../ui/button";
+
+const DashboardLanguageSwitcher = dynamic(
+  () =>
+    import("./dashboard-language-switcher").then(
+      (mod) => mod.DashboardLanguageSwitcher,
+    ),
+  {
+    loading: () => <DynamicLoader />,
+  },
+);
 
 export function LanguageSwitcher({ mode }: { mode: "public" | "dashboard" }) {
   const currentLocale = useCurrentLocale();
@@ -20,26 +26,10 @@ export function LanguageSwitcher({ mode }: { mode: "public" | "dashboard" }) {
   const { formatLanguageName } = useLocalFormatter();
   if (mode === "dashboard") {
     return (
-      <DropdownMenuSub>
-        <DropdownMenuSubTrigger>Content Language</DropdownMenuSubTrigger>
-        <DropdownMenuSubContent>
-          <DropdownMenuRadioGroup
-            value={currentLocale}
-            onValueChange={(value) => {
-              changeLocale(value as LanguageCode);
-            }}
-          >
-            {sharedConfig.i18n.locales.map((locale) => (
-              <DropdownMenuRadioItem key={locale.key} value={locale.key}>
-                {formatLanguageName(locale.key)}
-                {locale.key === sharedConfig.i18n.defaultLocale
-                  ? "(Default)"
-                  : ""}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuSubContent>
-      </DropdownMenuSub>
+      <DashboardLanguageSwitcher
+        value={currentLocale as LanguageCode}
+        onChange={changeLocale}
+      />
     );
   }
 

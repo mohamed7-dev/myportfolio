@@ -1,26 +1,29 @@
-"use client";
 import Image from "next/image";
 import Link from "next/link";
-import { usePublicLayout } from "@/components/app-layout/public-layout/public-layout-provider";
 import { AppImage } from "@/components/shared/app-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useScopedI18n } from "@/i18n/client";
+import { getScopedI18n } from "@/i18n/server";
 import type { Asset } from "@/lib/dto/asset";
-import type { GetFeaturedSkillsOutputSchema } from "@/lib/dto/visitor";
+import type {
+  GetFeaturedSkillsOutputSchema,
+  GetSuperAdminProfileOutputSchema,
+} from "@/lib/dto/visitor";
 import Logo from "../../../../public/logo.png";
+import { DownloadCvButton } from "./download-cv-button";
 
-export function HomePageHeader({
+export async function HomePageHeader({
   skills,
   cover,
   personal,
+  profile,
 }: {
   skills: GetFeaturedSkillsOutputSchema["items"];
   cover?: Asset;
   personal?: Asset;
+  profile: GetSuperAdminProfileOutputSchema;
 }) {
-  const i18n = useScopedI18n("home");
-  const ctx = usePublicLayout("HomePageHeader");
+  const i18n = await getScopedI18n("home");
 
   return (
     <div>
@@ -53,20 +56,18 @@ export function HomePageHeader({
           <Button size="xs" asChild>
             <Link href={"/contact"}>{i18n("connect")}</Link>
           </Button>
-          <Button size="xs" variant={"neutral"}>
-            {i18n("cv")}
-          </Button>
+          <DownloadCvButton />
         </div>
       </div>
       <div className="px-0 sm:px-2 md:px-8 mt-4">
         <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-heading text-foreground">
-          {ctx.profile.intro}
+          {profile.intro}
         </h1>
         <p className="text-sm sm:text-base font-base text-foreground/80 mt-1">
-          {ctx.profile.jobTitle}
+          {profile.jobTitle}
         </p>
         <p className="text-xs sm:text-sm font-base text-foreground mt-4 max-w-2xl">
-          {ctx.profile.subHeading}
+          {profile.subHeading}
         </p>
         <div className="flex gap-2 mt-4 overflow-x-auto">
           {skills?.map((skill) => (

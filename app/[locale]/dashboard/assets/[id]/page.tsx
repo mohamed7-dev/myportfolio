@@ -8,6 +8,8 @@ import {
 } from "@/components/page-layout/page";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { type Asset, asset as assetSchema } from "@/lib/dto/asset";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/domain/asset.service";
@@ -57,6 +59,24 @@ export default async function AssetDetailPage({
           </PageBlock>
           <PageBlock id="asset-name" column="side">
             <NameField />
+          </PageBlock>
+          <PageBlock id="asset-id" column="side">
+            <Field>
+              <FieldLabel>Asset Id</FieldLabel>
+              <Input readOnly defaultValue={asset.id} />
+            </Field>
+          </PageBlock>
+          <PageBlock id="asset-source-identifier" column="side">
+            <Field>
+              <FieldLabel>Source identifier</FieldLabel>
+              <Input readOnly defaultValue={asset.sourceIdentifier} />
+            </Field>
+          </PageBlock>
+          <PageBlock id="asset-preview-identifier" column="side">
+            <Field>
+              <FieldLabel>Preview identifier</FieldLabel>
+              <Input readOnly defaultValue={asset.previewIdentifier} />
+            </Field>
           </PageBlock>
           <PageBlock id="asset-tags" column="side">
             <TagsField />

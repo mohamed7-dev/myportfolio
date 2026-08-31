@@ -13,6 +13,7 @@ import { validateOutput } from "@/lib/helpers/validate-output";
 import { authService } from "@/services/domain/auth.service";
 import { AboutForm } from "./_components/about-form";
 import { AssetField } from "./_components/asset-field";
+import { CvAssetIdField } from "./_components/cv-field";
 import { MainFields } from "./_components/main-fields";
 import { SubmitButton } from "./_components/submit-button";
 
@@ -51,6 +52,9 @@ export default async function AboutPage() {
         <PageLayout>
           <PageBlock column="main" id="info">
             <MainFields />
+          </PageBlock>
+          <PageBlock column="side" id="cv-source-identifier">
+            <CvAssetIdField />
           </PageBlock>
           <PageBlock column="side" id="assets">
             <AssetField

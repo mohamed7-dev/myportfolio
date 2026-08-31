@@ -1,5 +1,4 @@
 import { revalidatePath, revalidateTag } from "next/cache";
-import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
 import { cacheKeys } from "@/lib/constants";
 import {
@@ -13,7 +12,7 @@ import { projectService } from "@/services/domain/project.service";
 export const { DELETE } = createRouter({
   DELETE: {
     authenticatedOnly: true,
-    handler: async (_req, nextCtx, ctx) => {
+    handler: async (_req, ctx, _headers, nextCtx) => {
       const { id } = await (nextCtx as { params: Promise<{ id: string }> })
         .params;
 
@@ -28,7 +27,7 @@ export const { DELETE } = createRouter({
       revalidatePath("/projects", "page");
       revalidateTag(cacheKeys.publicProjects[0], "max");
 
-      return NextResponse.json(parsedResult, { status: 200 });
+      return { body: parsedResult, init: { status: 200 } };
     },
   },
 });

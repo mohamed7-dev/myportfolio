@@ -14,6 +14,7 @@ import type {
 } from "@/lib/types/translatable";
 import { AppEntity } from "../app-entity";
 import { Asset } from "../asset/asset.entity";
+import { Session } from "../session/session.entity";
 import { ProfileAsset } from "./profile-asset.entity";
 import { ProfileTranslation } from "./profile-translation.entity";
 
@@ -52,14 +53,14 @@ export class Profile extends AppEntity implements Translatable {
   @Column()
   handle: string;
 
+  @Column({ nullable: true })
+  cvAssetId: string;
+
   @Column()
   username: string;
 
   @Column()
   password: string;
-
-  @Column({ nullable: true })
-  token?: string;
 
   @OneToMany(
     () => ProfileAsset,
@@ -81,4 +82,10 @@ export class Profile extends AppEntity implements Translatable {
     { eager: true },
   )
   translations: Relation<TranslationEntity<ProfileTranslation>[]>;
+
+  @OneToMany(
+    () => Session,
+    (sessions) => sessions.profile,
+  )
+  sessions: Relation<Session[]>;
 }

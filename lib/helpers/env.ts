@@ -1,13 +1,7 @@
 import { resolve } from "node:path";
 import { config } from "dotenv";
+import { isDevelopmentMode } from "../utils/is-env";
 
-export const isDevelopmentMode = () => {
-  return process.env.NODE_ENV === "development";
-};
-
-export const isProductionMode = () => {
-  return process.env.NODE_ENV === "production";
-};
 
 export function requireEnv(name: string | undefined): string {
   const value = process.env[name as string];

@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
 import {
   downloadAssetInputSchema,
@@ -8,10 +7,10 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/domain/asset.service";
 
-export const { POST } = createRouter({
-  POST: {
+export const { GET } = createRouter({
+  GET: {
     authenticatedOnly: true,
-    handler: async (_req, nextCtx, ctx) => {
+    handler: async (_req, ctx, _, nextCtx) => {
       const { id } = await nextCtx.params;
 
       const parsedData = validateInput(
@@ -26,7 +25,12 @@ export const { POST } = createRouter({
         downloadAssetOutputSchema,
       );
 
-      return NextResponse.json(parsedResult, { status: 200 });
+      return {
+        body: parsedResult,
+        init: {
+          status: 200,
+        },
+      };
     },
   },
 });

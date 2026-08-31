@@ -1,11 +1,10 @@
-"use client";
 import { FolderIcon } from "lucide-react";
 import { IconTile } from "@/components/shared/icon-tile";
-import { useScopedI18n } from "@/i18n/client";
+import { getScopedI18n } from "@/i18n/server";
 import { BentoLink } from "./bento-link";
 
-export function ProjectCard({ children }: { children: React.ReactNode }) {
-  const i18n = useScopedI18n("home.cards.projects");
+export async function ProjectCard({ children }: { children: React.ReactNode }) {
+  const i18n = await getScopedI18n("home.cards.projects");
 
   return (
     <BentoLink href="/projects" className="md:col-span-2">

@@ -24,7 +24,7 @@ export const apiRoutes = {
     },
     getDownloadUrl: {
       url: (assetId: string) => apiUrl(`assets/${assetId}/download-url`),
-      method: "POST",
+      method: "GET",
       contentType: null,
     },
     createUploadSession: {

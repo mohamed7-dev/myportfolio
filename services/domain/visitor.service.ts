@@ -26,7 +26,9 @@ import { skillService } from "./skill.service";
 
 class VisitorService {
   public async getSuperAdminProfileInfo(ctx: RequestContext) {
-    const profile = await profileService.getSuperAdmin(ctx);
+    const profile = await profileService.getSuperAdmin(ctx, {
+      assets: { asset: true },
+    });
     const result = validateOutput(
       { ...profile, avatar: profile.featuredAsset },
       getSuperAdminProfileOutputSchema,

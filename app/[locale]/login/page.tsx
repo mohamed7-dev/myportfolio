@@ -1,15 +1,11 @@
 import { redirect } from "next/navigation";
+import { isAuthenticated } from "@/api/common/is-authenticated";
 import { LoginForm } from "@/components/login-form/login-form";
-import { requestContextService } from "@/services/helpers/request-context.service";
 
 export default async function LoginPage() {
-  const requestContext = await requestContextService.create(
-    undefined,
-    undefined,
-    false,
-  );
+  const shouldRedirect = await isAuthenticated();
 
-  if (requestContext.isAuthenticated) {
+  if (shouldRedirect) {
     redirect("/dashboard", "replace");
   }
 

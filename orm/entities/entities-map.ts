@@ -19,6 +19,7 @@ import { ProfileTranslation } from "./profile/profile-translation.entity";
 import { Project } from "./project/project.entity";
 import { ProjectAsset } from "./project/project-asset.entity";
 import { ProjectTranslation } from "./project/project-translation.entity";
+import { Session } from "./session/session.entity";
 import { Skill } from "./skill/skill.entity";
 import { SkillAsset } from "./skill/skill-asset.entity";
 import { SkillTranslation } from "./skill/skill-translation.entity";
@@ -31,6 +32,7 @@ export const entitiesMap = {
   Profile,
   ProfileAsset,
   ProfileTranslation,
+  Session,
   Skill,
   SkillAsset,
   SkillTranslation,

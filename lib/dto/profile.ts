@@ -41,6 +41,7 @@ export const profile = baseSchema.extend({
   summary: z.string(),
   username: z.string(),
   handle: z.string(),
+  cvAssetId: z.string().nullish(),
   intro: z.string(),
   subHeading: z.string(),
   subtitle: z.string(),
@@ -73,6 +74,7 @@ const profileTranslationInputSchema = baseTranslationEntityInput.extend({
 export const clientSafeSchema = z.object({
   id: z.string(),
   handle: z.string(),
+  cvAssetId: z.string().nullish(),
   projectsShipped: z.number(),
   openSourceContributions: z.number(),
   yearsOfExperience: z.number(),
@@ -98,6 +100,7 @@ export type ClientSafeProfile = z.infer<typeof clientSafeSchema>;
 export const updateProfileInputSchema = z.object({
   id: z.string(),
   handle: z.string().optional(),
+  cvAssetId: z.string().optional(),
   projectsShipped: z.coerce.number().optional(),
   openSourceContributions: z.coerce.number().optional(),
   yearsOfExperience: z.coerce.number().optional(),

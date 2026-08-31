@@ -10,6 +10,8 @@ export function SummaryCard() {
         <AppImage
           asset={ctx.profile.avatar ?? undefined}
           transform={{ preset: "small", mode: "resize" }}
+          loading="eager"
+          fetchPriority="high"
           className="w-full h-60 object-cover grayscale-20 hover:grayscale-0 transition-all duration-500"
         />
       </div>

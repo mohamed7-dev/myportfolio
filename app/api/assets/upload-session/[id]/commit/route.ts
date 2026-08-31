@@ -1,18 +1,17 @@
-import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
 import {
   commitUploadSessionInputSchema,
   commitUploadSessionOutputSchema,
 } from "@/lib/dto/asset-upload";
-import { isDevelopmentMode } from "@/lib/helpers/env";
 import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
+import { isDevelopmentMode } from "@/lib/utils/is-env";
 import { assetService } from "@/services/domain/asset.service";
 
 export const { PATCH } = createRouter({
   PATCH: {
     authenticatedOnly: isDevelopmentMode() ? false : true,
-    handler: async (_, nextCtx, ctx) => {
+    handler: async (_req, ctx, _headers, nextCtx) => {
       const { id } = await nextCtx.params;
       const parsedInput = validateInput(
         { uploadSessionId: id },
@@ -23,7 +22,7 @@ export const { PATCH } = createRouter({
         result,
         commitUploadSessionOutputSchema,
       );
-      return NextResponse.json(parsedResult, { status: 200 });
+      return { body: parsedResult, init: { status: 200 } };
     },
   },
 });

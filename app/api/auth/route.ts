@@ -1,9 +1,9 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
-import { serverConfig } from "@/lib/config/server-config";
-import { authenticateAdminUserInputSchema } from "@/lib/dto/auth";
-import { clientSafeSchema } from "@/lib/dto/profile";
+import { getSessionToken, setSessionToken } from "@/api/common/session-utils";
+import {
+  authenticateAdminUserInputSchema,
+  authenticateAdminUserOutputSchema,
+} from "@/lib/dto/auth";
 import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { authService } from "@/services/domain/auth.service";
@@ -11,33 +11,40 @@ import { authService } from "@/services/domain/auth.service";
 export const { POST, PATCH } = createRouter({
   POST: {
     authenticatedOnly: false,
-    handler: async (req, _, ctx) => {
+    handler: async (req, ctx) => {
       const body = await req.json();
 
       const parsedBody = validateInput(body, authenticateAdminUserInputSchema);
+      const result = await authService.authenticate(ctx, parsedBody);
 
-      const result = await authService.authenticateAdminUser(ctx, parsedBody);
+      const parsedOutput = validateOutput(
+        result.profile,
+        authenticateAdminUserOutputSchema,
+      );
 
-      (await cookies()).set(serverConfig.sessionKey, result.token, {
-        httpOnly: true,
-        path: "/",
+      await setSessionToken({
+        sessionToken: result.token,
       });
 
-      const parsedOutput = validateOutput(result.profile, clientSafeSchema);
-
-      return NextResponse.json(parsedOutput, { status: 200 });
+      return { body: parsedOutput, init: { status: 200 } };
     },
   },
   PATCH: {
     authenticatedOnly: true,
-    handler: async (_req, _, ctx) => {
+    handler: async (_req, ctx) => {
       const res: { success: boolean } = { success: false };
-      if (ctx.session?.token) {
-        await authService.logoutAdminUser(ctx, { token: ctx.session.token });
-        (await cookies()).delete("session");
+      const sessionToken = await getSessionToken();
+
+      if (!sessionToken) {
+        res.success = false;
+      } else {
+        await authService.logoutAdminUser(ctx, { token: sessionToken });
         res.success = true;
+        await setSessionToken({
+          sessionToken: "",
+        });
       }
-      return NextResponse.json(res, { status: 200 });
+      return { body: res, init: { status: 200 } };
     },
   },
 });

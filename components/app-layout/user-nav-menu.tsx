@@ -19,8 +19,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import type { LogoutOutputSchema } from "@/lib/dto/auth";
-import type { ClientSafeProfile } from "@/lib/dto/profile";
+import type {
+  AuthenticateAdminUserSuccessOutputSchema,
+  LogoutOutputSchema,
+} from "@/lib/dto/auth";
 import { isAppError } from "@/lib/errors/app-error";
 import { api } from "@/lib/helpers/api";
 import {
@@ -28,6 +30,7 @@ import {
   removeUserInfoFromLS,
 } from "@/lib/helpers/auth-storage";
 import { apiRoutes } from "@/lib/helpers/router";
+import { AppImage } from "../shared/app-image";
 import { AccentSwitcher } from "./accent-switcher";
 import { LanguageSwitcher } from "./language-switcher";
 
@@ -36,7 +39,7 @@ export function UserNavMenu() {
   const { isMobile, state } = useSidebar();
   const isSidebarExpanded = state === "expanded";
   const [userInfo, setUserInfo] = React.useState<
-    ClientSafeProfile | undefined
+    AuthenticateAdminUserSuccessOutputSchema | undefined
   >();
 
   const handleLogout = async () => {
@@ -60,10 +63,6 @@ export function UserNavMenu() {
       });
   };
 
-  const avatar = React.useMemo(() => {
-    return userInfo?.displayName?.charAt(0) ?? "";
-  }, [userInfo]);
-
   React.useEffect(() => {
     setUserInfo(getUserInfoFromLS());
   }, []);
@@ -77,9 +76,15 @@ export function UserNavMenu() {
               size={"lg"}
               className="data-open:bg-primary data-open:text-primary-foreground"
             >
-              <div className="size-8 relative flex justify-center items-center rounded-base border-2 border-border">
-                {avatar}
-              </div>
+              {userInfo?.featuredAsset && (
+                <div className="flex justify-center items-center rounded-base border-2 border-border">
+                  <AppImage
+                    asset={userInfo?.featuredAsset}
+                    transform={{ preset: "icon", mode: "resize" }}
+                    className="size-8 object-cover"
+                  />
+                </div>
+              )}
               {isSidebarExpanded && (
                 <div className="flex flex-col text-sm leading-wide">
                   <span className="truncate font-base text-foreground">
@@ -97,9 +102,15 @@ export function UserNavMenu() {
             <DropdownMenuGroup>
               <DropdownMenuLabel className="p-0">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <div className="size-8 relative flex justify-center items-center rounded-base border-2 border-border">
-                    {avatar}
-                  </div>
+                  {userInfo?.featuredAsset && (
+                    <div className="flex justify-center items-center rounded-base border-2 border-border">
+                      <AppImage
+                        asset={userInfo?.featuredAsset}
+                        transform={{ preset: "icon", mode: "resize" }}
+                        className="size-8 object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="flex flex-col text-sm leading-tight">
                     <span className="truncate font-base text-foreground">
                       {userInfo?.displayName ?? ""}

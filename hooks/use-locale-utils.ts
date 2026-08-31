@@ -13,5 +13,6 @@ export function useLocaleUtils() {
     bcp47LanguageTag: getBcp47LanguageTag(displayLocale),
     languageAndLocaleDisplayName: getLocaleDisplayName(displayLocale),
     isRTL: isRtl(displayLocale),
+    urlSegmentLocale: displayLocale,
   };
 }

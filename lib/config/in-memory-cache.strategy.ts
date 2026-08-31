@@ -1,19 +1,20 @@
+import type { JSONCompatible } from "../types/shared-types";
+import type {
+  CacheEntryOptions,
+  CacheStrategy,
+} from "./cache-strategy.interface";
+
 interface CacheEntry<Value> {
   value: Value;
   ttl: number | undefined;
   tags: Set<string>;
 }
 
-export interface CacheEntryOptions {
-  ttlInMs?: number;
-  tags?: string[];
-}
-
 interface InMemoryCacheOptions {
   cacheSize?: number;
 }
 
-export class InMemoryCacheStrategy {
+export class InMemoryCacheStrategy implements CacheStrategy {
   private cacheSize: number;
   constructor(options?: InMemoryCacheOptions) {
     this.cacheSize = options?.cacheSize ?? 10_000;
@@ -21,7 +22,7 @@ export class InMemoryCacheStrategy {
 
   private readonly cacheStore = new Map<string, CacheEntry<any>>();
 
-  public store<Value>(
+  public store<Value extends JSONCompatible<Value>>(
     key: string,
     value: Value,
     options?: CacheEntryOptions,
@@ -44,7 +45,7 @@ export class InMemoryCacheStrategy {
     });
   }
 
-  public retrieve<Value>(
+  public retrieve<Value extends JSONCompatible<Value>>(
     key: string,
   ): undefined | Value | Promise<undefined | Value> {
     const cacheHit = this.cacheStore.get(key) as CacheEntry<Value> | undefined;

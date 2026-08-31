@@ -4,10 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: "m48vtebflu.ufs.sh",
+        hostname: "localhost",
       },
       {
-        hostname: "localhost",
+        hostname: "res.cloudinary.com",
       },
     ],
   },
@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
     },
   },
   experimental: {
+    inlineCss: true,
+    optimizePackageImports: ["radix-ui"],
     serverMinification: false,
   },
 };

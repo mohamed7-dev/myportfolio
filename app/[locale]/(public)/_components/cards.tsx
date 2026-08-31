@@ -1,16 +1,20 @@
-"use client";
 import { TargetIcon, TrendingUpIcon } from "lucide-react";
 import type React from "react";
-import { usePublicLayout } from "@/components/app-layout/public-layout/public-layout-provider";
 import { CardWrapper } from "@/components/shared/card-wrapper";
-import { useLocalFormatter } from "@/hooks/use-locale-formatter";
-import { useScopedI18n } from "@/i18n/client";
-import { IconTile } from "../../../../components/shared/icon-tile";
+import { IconTile } from "@/components/shared/icon-tile";
+import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
+import type { GetSuperAdminProfileOutputSchema } from "@/lib/dto/visitor";
+import { formatNumber } from "@/lib/helpers/locale-utils";
 
-export function Cards({ children }: { children: React.ReactNode }) {
-  const ctx = usePublicLayout("Cards");
-  const i18n = useScopedI18n("home.cards");
-  const { formatNumber } = useLocalFormatter();
+export async function Cards({
+  children,
+  profile,
+}: {
+  children: React.ReactNode;
+  profile: GetSuperAdminProfileOutputSchema;
+}) {
+  const i18n = await getScopedI18n("home.cards");
+  const currentLocale = await getCurrentLocale();
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-4 ">
       <CardWrapper
@@ -29,7 +33,7 @@ export function Cards({ children }: { children: React.ReactNode }) {
             <p className="w-full text-sm font-base flex items-center justify-between">
               <span>{i18n("stats.experience")}:</span>
               <strong className="text-sm font-base">
-                {formatNumber(ctx.profile.yearsOfExperience)}{" "}
+                {formatNumber(profile.yearsOfExperience, currentLocale)}{" "}
                 {i18n("stats.years")}
               </strong>
             </p>
@@ -38,7 +42,7 @@ export function Cards({ children }: { children: React.ReactNode }) {
             <p className="w-full text-sm font-base flex items-center justify-between">
               <span>{i18n("stats.projectsShipped")}: </span>
               <strong className="text-sm font-base">
-                {formatNumber(ctx.profile.projectsShipped)}
+                {formatNumber(profile.projectsShipped, currentLocale)}
               </strong>
             </p>
           </li>
@@ -46,7 +50,7 @@ export function Cards({ children }: { children: React.ReactNode }) {
             <p className="w-full text-sm font-base flex items-center justify-between">
               <span>{i18n("stats.openSourceContributions")}: </span>
               <strong className="text-sm font-base">
-                {formatNumber(ctx.profile.openSourceContributions)}
+                {formatNumber(profile.openSourceContributions, currentLocale)}
               </strong>
             </p>
           </li>
@@ -64,14 +68,11 @@ export function Cards({ children }: { children: React.ReactNode }) {
         }
       >
         <div
-          dangerouslySetInnerHTML={{ __html: ctx.profile.currentFocus }}
+          dangerouslySetInnerHTML={{ __html: profile.currentFocus }}
           className="space-y-2"
         />
       </CardWrapper>
       {children}
-
-      {/* <ProjectsCard>{children}</ProjectsCard> */}
-      {/* <CareerCard /> */}
     </div>
   );
 }

@@ -1,5 +1,9 @@
 import { useCallback } from "react";
-import { LanguageCode } from "@/lib/dto/language-code";
+import {
+  formatDate as baseFormatDate,
+  formatLanguageName as baseFormatLanguageName,
+  formatNumber as baseFormatNumber,
+} from "@/lib/helpers/locale-utils";
 import { useLocaleUtils } from "./use-locale-utils";
 
 export function useLocalFormatter() {
@@ -7,20 +11,14 @@ export function useLocalFormatter() {
 
   const formatDate = useCallback(
     (value: string | Date, options?: Intl.DateTimeFormatOptions) => {
-      return new Intl.DateTimeFormat(locale, {
-        ...options,
-        ...(locale === LanguageCode.ar ? { numberingSystem: "arab" } : {}),
-      }).format(new Date(value));
+      return baseFormatDate(value, locale, options);
     },
     [locale],
   );
 
   const formatNumber = useCallback(
     (value: number, options?: Intl.NumberFormatOptions) => {
-      return new Intl.NumberFormat(locale, {
-        ...options,
-        ...(locale === LanguageCode.ar ? { numberingSystem: "arab" } : {}),
-      }).format(value);
+      return baseFormatNumber(value, locale, options);
     },
     [locale],
   );
@@ -28,11 +26,7 @@ export function useLocalFormatter() {
   const formatLanguageName = useCallback(
     (value: string): string => {
       try {
-        return (
-          new Intl.DisplayNames([locale], { type: "language" }).of(
-            value.replace("_", "-"),
-          ) ?? value
-        );
+        return baseFormatLanguageName(value, locale);
       } catch {
         return value;
       }

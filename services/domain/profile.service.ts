@@ -4,7 +4,11 @@ import type { RequestContext } from "@/api/request-context/request-context";
 import { serverConfig } from "@/lib/config/server-config";
 import type { UpdateProfileInputSchema } from "@/lib/dto/profile";
 import { EntityNotFoundError } from "@/lib/errors/errors";
+import type { RawEntity } from "@/lib/types/raw-entity";
+import type { Translated } from "@/lib/types/translatable";
+import type { Asset } from "@/orm/entities/asset/asset.entity";
 import { Profile } from "@/orm/entities/profile/profile.entity";
+import type { ProfileAsset } from "@/orm/entities/profile/profile-asset.entity";
 import { ProfileTranslation } from "@/orm/entities/profile/profile-translation.entity";
 import { ormService } from "@/orm/orm.service";
 import { profileSeed } from "@/orm/seed/profile";
@@ -23,7 +27,7 @@ class ProfileService {
 
     const existing = await profileRepo.find();
 
-    const { username, password } = serverConfig.adminCredentials;
+    const { username, password } = serverConfig.auth.adminCredentials;
     const existingProfile = existing[0];
 
     if (existingProfile) {
@@ -81,9 +85,6 @@ class ProfileService {
         id,
       },
       relations: relations ?? {
-        assets: {
-          asset: true,
-        },
         featuredAsset: true,
       },
     });
@@ -92,24 +93,31 @@ class ProfileService {
       throw new EntityNotFoundError("Profile not found");
     }
 
-    const translatedProfile = translator.translate(ctx.languageCode, profile);
-    const translatedAssets = translatedProfile.assets.flatMap(
-      (profileAsset) => {
-        return {
-          ...profileAsset,
-          asset: translator.translate(ctx.languageCode, profileAsset.asset),
-        };
-      },
-    );
+    return this.translate(ctx, profile);
+  }
 
-    return {
-      ...translatedProfile,
-      assets: translatedAssets,
-      featuredAsset: translator.translate(
-        ctx.languageCode,
-        translatedProfile.featuredAsset,
-      ),
-    };
+  public async getOneByUsername(
+    ctx: RequestContext,
+    username: string,
+    relations?: FindOptionsRelations<Profile>,
+    translate: boolean = false,
+  ) {
+    const repo = await ormService.getRepository(ctx, Profile);
+    const profile = await repo.findOne({
+      where: {
+        username,
+      },
+      relations: {
+        featuredAsset: true,
+        ...relations,
+      },
+    });
+
+    if (!profile) {
+      throw new EntityNotFoundError("Profile not found");
+    }
+
+    return translate ? this.translate(ctx, profile) : profile;
   }
 
   public async getSuperAdmin(
@@ -119,13 +127,11 @@ class ProfileService {
     const repo = await ormService.getRepository(ctx, Profile);
     const profile = await repo.findOne({
       where: {
-        username: serverConfig.adminCredentials.username,
+        username: serverConfig.auth.adminCredentials.username,
       },
-      relations: relations ?? {
-        assets: {
-          asset: true,
-        },
+      relations: {
         featuredAsset: true,
+        ...relations,
       },
     });
 
@@ -133,48 +139,7 @@ class ProfileService {
       throw new EntityNotFoundError("Profile not found");
     }
 
-    const translatedProfile = translator.translate(ctx.languageCode, profile);
-    const translatedAssets = translatedProfile.assets.flatMap(
-      (profileAsset) => {
-        return {
-          ...profileAsset,
-          asset: translator.translate(ctx.languageCode, profileAsset.asset),
-        };
-      },
-    );
-
-    return {
-      ...translatedProfile,
-      assets: translatedAssets,
-      featuredAsset: translator.translate(
-        ctx.languageCode,
-        translatedProfile.featuredAsset,
-      ),
-    };
-  }
-
-  public async findAdminUserByToken(
-    ctx: RequestContext,
-    token: string,
-    relations?: FindOptionsRelations<Profile>,
-  ) {
-    if (!token) {
-      return undefined;
-    }
-
-    const repo = await ormService.getRepository(ctx, Profile);
-
-    const foundAdmin = await repo.findOne({
-      where: {
-        token: token,
-      },
-      relations: {
-        ...relations,
-        translations: true,
-      },
-    });
-
-    return foundAdmin ?? undefined;
+    return this.translate(ctx, profile);
   }
 
   public async update(ctx: RequestContext, input: UpdateProfileInputSchema) {
@@ -208,6 +173,41 @@ class ProfileService {
     });
 
     return await this.findOne(ctx, updatedProfile.id);
+  }
+
+  public translate(ctx: RequestContext, profile: Profile) {
+    const translatedProfile = translator.translate(ctx.languageCode, profile);
+    let translatedAssets: Array<
+      RawEntity<ProfileAsset> & {
+        asset: Translated<RawEntity<Asset>>;
+      }
+    > = [];
+
+    if (profile.assets?.length) {
+      translatedAssets = translatedProfile.assets.flatMap((profileAsset) => {
+        return {
+          ...profileAsset,
+          asset: translator.translate(ctx.languageCode, profileAsset.asset),
+        };
+      });
+    }
+
+    let translatedFeaturedAsset: Translated<RawEntity<Asset>> | null = null;
+
+    if (profile.featuredAsset) {
+      translatedFeaturedAsset = translator.translate(
+        ctx.languageCode,
+        translatedProfile.featuredAsset,
+      );
+    }
+
+    return {
+      ...translatedProfile,
+      ...(translatedAssets.length && { assets: translatedAssets }),
+      ...(translatedFeaturedAsset && {
+        featuredAsset: translatedFeaturedAsset,
+      }),
+    };
   }
 }
 

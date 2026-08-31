@@ -28,3 +28,5 @@ export function isRouteActive(currentPath: string, targetPath: string) {
 
   return current === target || current.startsWith(`${target}/`);
 }
+
+

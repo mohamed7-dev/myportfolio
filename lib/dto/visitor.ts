@@ -26,6 +26,7 @@ export const getSuperAdminProfileOutputSchema = clientSafeSchema
     location: true,
     currentFocus: true,
     assets: true,
+    cvAssetId: true,
   })
   .extend({
     avatar: clientSafeSchema.shape.featuredAsset,

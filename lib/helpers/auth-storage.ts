@@ -1,8 +1,10 @@
-import type { ClientSafeProfile } from "../dto/profile";
+import type { AuthenticateAdminUserSuccessOutputSchema } from "../dto/auth";
 
 const USER_INFO_LS_KEY = "user-info";
 
-export function setUserInfoToLS(input: ClientSafeProfile) {
+export function setUserInfoToLS(
+  input: AuthenticateAdminUserSuccessOutputSchema,
+) {
   try {
     window.localStorage.setItem(USER_INFO_LS_KEY, JSON.stringify(input));
   } catch {
@@ -10,7 +12,9 @@ export function setUserInfoToLS(input: ClientSafeProfile) {
   }
 }
 
-export function getUserInfoFromLS(): ClientSafeProfile | undefined {
+export function getUserInfoFromLS():
+  | AuthenticateAdminUserSuccessOutputSchema
+  | undefined {
   try {
     const userInfo = window.localStorage.getItem(USER_INFO_LS_KEY);
     if (userInfo) {

@@ -1,5 +1,4 @@
 import { revalidatePath, revalidateTag } from "next/cache";
-import { NextResponse } from "next/server";
 import { createRouter } from "@/api/common/create-router";
 import { cacheKeys } from "@/lib/constants";
 import {
@@ -17,7 +16,7 @@ import { educationService } from "@/services/domain/education.service";
 export const { POST, PATCH, DELETE } = createRouter({
   POST: {
     authenticatedOnly: true,
-    handler: async (req, _, ctx) => {
+    handler: async (req, ctx) => {
       const body = await req.json();
 
       const parsedData = validateInput(body, createEducationInputSchema);
@@ -28,12 +27,12 @@ export const { POST, PATCH, DELETE } = createRouter({
       revalidatePath("/career", "page");
       revalidateTag(cacheKeys.publicEducation[0], "max");
 
-      return NextResponse.json(parsedResult, { status: 201 });
+      return { body: parsedResult, init: { status: 201 } };
     },
   },
   PATCH: {
     authenticatedOnly: true,
-    handler: async (req, _, ctx) => {
+    handler: async (req, ctx) => {
       const body = await req.json();
 
       const parsedData = validateInput(body, updateEducationInputSchema);
@@ -43,12 +42,12 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, updateEducationOutputSchema);
       revalidatePath("/career", "page");
       revalidateTag(cacheKeys.publicEducation[0], "max");
-      return NextResponse.json(parsedResult, { status: 200 });
+      return { body: parsedResult, init: { status: 200 } };
     },
   },
   DELETE: {
     authenticatedOnly: true,
-    handler: async (req, _, ctx) => {
+    handler: async (req, ctx) => {
       const body = await req.json();
 
       const parsedData = validateInput(body, deleteEducationsInputSchema);
@@ -58,7 +57,7 @@ export const { POST, PATCH, DELETE } = createRouter({
       const parsedResult = validateOutput(result, deleteEducationsOutputSchema);
       revalidatePath("/career", "page");
       revalidateTag(cacheKeys.publicEducation[0], "max");
-      return NextResponse.json(parsedResult, { status: 200 });
+      return { body: parsedResult, init: { status: 200 } };
     },
   },
 });
