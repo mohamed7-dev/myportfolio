@@ -10,7 +10,11 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
-import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import {
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { useLocaleUtils } from "@/hooks/use-locale-utils";
 import { useScopedI18n } from "@/i18n/client";
 import { cn, isRouteActive } from "@/lib/utils";
@@ -50,14 +54,14 @@ export function NavItems() {
   const i18n = useScopedI18n("publicLayout.nav");
 
   const isActive = (href: string) => isRouteActive(pathname, href);
-
+  const { setOpenMobile } = useSidebar();
   return (
     <React.Fragment>
       {navLinks.map((item) => {
         const active = isActive(item.href(urlSegmentLocale));
         return (
           <SidebarMenuItem key={item.href(urlSegmentLocale)}>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton onClick={() => setOpenMobile(false)} asChild>
               <Link
                 href={item.href(urlSegmentLocale)}
                 className={cn(

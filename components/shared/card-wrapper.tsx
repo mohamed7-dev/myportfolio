@@ -16,12 +16,12 @@ export function CardWrapper({
       {...props}
       className={cn(
         "group p-1.5 sm:p-1 md:p-4 bg-background rounded-base border-2 border-border overflow-hidden transition-all duration-300",
-        interactive && "hover:-translate-y-1 hover:border-border/30 ",
+        interactive && "hover:-translate-y-1 hover:border-border/50 ",
         className,
       )}
     >
       {cardTitle && (
-        <h3 className="font-heading text-sm md:text-lg text-foreground mb-2 capitalize">
+        <h3 className="font-heading text-sm md:text-lg text-foreground mb-3 capitalize">
           {cardTitle}
         </h3>
       )}

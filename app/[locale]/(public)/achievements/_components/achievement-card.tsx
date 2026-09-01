@@ -60,6 +60,7 @@ export function AchievementCard({
             transform: { preset: "thumb", mode: "resize" },
             className: "size-full object-cover",
           }}
+          className="border-0"
         />
       </div>
       <div className="space-y-2 mt-4">

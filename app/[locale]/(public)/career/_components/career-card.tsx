@@ -93,7 +93,7 @@ export function CareerCard({
           </h4>
           <div
             dangerouslySetInnerHTML={{ __html: careerItem.impact }}
-            className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
+            className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:border-2 [&>ul>li]:border-border [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
           />
         </section>
         <Separator orientation="vertical" />
@@ -106,7 +106,7 @@ export function CareerCard({
           </h4>
           <div
             dangerouslySetInnerHTML={{ __html: careerItem.learned }}
-            className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
+            className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:border-2 [&>ul>li]:border-border [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
           />
         </section>
       </div>

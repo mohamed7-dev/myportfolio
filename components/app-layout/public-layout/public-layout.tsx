@@ -27,7 +27,7 @@ export function PublicLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="relative mx-auto w-full max-w-[100vw] lg:max-w-7xl grid grid-cols-12 lg:overflow-hidden lg:h-screen">
+      <div className="relative mx-auto w-full max-w-[100vw] lg:max-w-7xl grid grid-cols-12 lg:overflow-hidden h-full lg:h-screen">
         <PublicSidebar profile={profile} />
         <InsetContent>{children}</InsetContent>
       </div>
