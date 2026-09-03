@@ -8,19 +8,20 @@ export async function ProjectCard({ children }: { children: React.ReactNode }) {
 
   return (
     <BentoLink href="/projects" className="md:col-span-2">
-      <div className="min-h-77 flex">
-        <div className="max-w-42.5 self-center">
+      <div className="h-77 flex flex-row gap-2">
+        <div className="w-1/3 flex flex-col self-center">
           <IconTile>
             <FolderIcon className="size-6" />
           </IconTile>
           <h3 className="mt-4 whitespace-pre-line leading-none tracking-wider uppercase font-heading text-sm md:text-lg text-foreground">
-            {i18n("title").replace(" ", "\n")}
+            {i18n("title")}
           </h3>
           <p className="mt-2 text-xs font-base leading-4 text-foreground">
             {i18n("description")}
           </p>
         </div>
-        <div className="flex w-42.5 flex-col gap-5 sm:right-5">{children}</div>
+
+        <div className="flex-1 relative">{children}</div>
       </div>
     </BentoLink>
   );

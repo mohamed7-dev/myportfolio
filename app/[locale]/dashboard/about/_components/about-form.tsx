@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import {
 } from "@/lib/dto/profile";
 import { isAppError } from "@/lib/errors/app-error";
 import { api } from "@/lib/helpers/api";
+import { formSubmittedEvent } from "@/lib/helpers/events";
 import { Form } from "@/lib/helpers/form";
 import { apiRoutes } from "@/lib/helpers/router";
 
@@ -22,6 +24,7 @@ export function AboutForm({
   children: React.ReactNode;
   initialValues: ClientSafeProfile;
 }) {
+  const router = useRouter();
   const form = useForm<UpdateProfileInputSchema>({
     defaultValues: {
       id: initialValues.id,
@@ -51,8 +54,14 @@ export function AboutForm({
       }
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Profile was updated successfully");
+      formSubmittedEvent().emit(
+        "update",
+        data.assets,
+        data.featuredAsset ?? undefined,
+      );
+      router.refresh();
     },
     onError: (error) => {
       toast.error(error.message);

@@ -8,6 +8,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
+import { SortDirection } from "@/lib/dto/common";
 import { skillListOutputSchema } from "@/lib/dto/skill";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { skillService } from "@/services/domain/skill.service";
@@ -41,6 +42,7 @@ export default async function SkillsListPage({
       ...(name && { name: { contains: name } }),
       ...(category && { category: { equals: category } }),
     },
+    sort: { updatedAt: SortDirection.DESC },
   });
 
   const skills = validateOutput(result, skillListOutputSchema);

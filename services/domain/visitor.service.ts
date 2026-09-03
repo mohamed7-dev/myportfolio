@@ -1,4 +1,5 @@
 import type { RequestContext } from "@/api/request-context/request-context";
+import { SortDirection } from "@/lib/dto/common";
 import {
   type GetPublicProjectInputSchema,
   getFeaturedCareersOutputSchema,
@@ -65,7 +66,9 @@ class VisitorService {
     return result;
   }
   public async getSkills(ctx: RequestContext) {
-    const skills = await skillService.find(ctx, {});
+    const skills = await skillService.find(ctx, {
+      sort: { updatedAt: SortDirection.DESC },
+    });
 
     const result = validateOutput(skills, getSkillsOutputSchema);
     return result;
@@ -77,6 +80,7 @@ class VisitorService {
         filter: {
           enabled: { equals: true },
         },
+        sort: { updatedAt: SortDirection.DESC },
         includeSoftDeleted: false,
       },
       { skills: true },
@@ -134,6 +138,7 @@ class VisitorService {
       filter: {
         enabled: { equals: true },
       },
+      sort: { updatedAt: SortDirection.DESC },
     });
 
     const result = validateOutput(
@@ -144,7 +149,9 @@ class VisitorService {
   }
 
   public async getAchievements(ctx: RequestContext) {
-    const achievements = await achievementService.find(ctx, {});
+    const achievements = await achievementService.find(ctx, {
+      sort: { updatedAt: SortDirection.DESC },
+    });
 
     const result = validateOutput(
       achievements,
@@ -154,14 +161,18 @@ class VisitorService {
   }
 
   public async getCareer(ctx: RequestContext) {
-    const career = await careerService.find(ctx, {});
+    const career = await careerService.find(ctx, {
+      sort: { updatedAt: SortDirection.DESC },
+    });
 
     const result = validateOutput(career, getPublicCareerOutputSchema);
     return result;
   }
 
   public async getEducation(ctx: RequestContext) {
-    const edu = await educationService.find(ctx, {});
+    const edu = await educationService.find(ctx, {
+      sort: { updatedAt: SortDirection.DESC },
+    });
 
     const result = validateOutput(edu, getPublicEducationOutputSchema);
     return result;

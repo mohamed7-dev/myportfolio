@@ -16,6 +16,7 @@ import {
 } from "@/lib/dto/contact-method";
 import { isAppError } from "@/lib/errors/app-error";
 import { api } from "@/lib/helpers/api";
+import { formSubmittedEvent } from "@/lib/helpers/events";
 import { Form } from "@/lib/helpers/form";
 import { apiRoutes } from "@/lib/helpers/router";
 
@@ -69,7 +70,8 @@ export function ContactMethodForm({
     },
     onSuccess: () => {
       toast.success("Contact method was created successfully");
-      router.refresh();
+      form.reset();
+      formSubmittedEvent().emit("create");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -86,8 +88,10 @@ export function ContactMethodForm({
       }
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Contact method was updated successfully");
+      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
+      router.refresh();
     },
     onError: (error) => {
       toast.error(error.message);

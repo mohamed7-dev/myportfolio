@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ export function UpdateAssetForm({
   children: React.ReactNode;
   asset: Asset;
 }) {
+  const router = useRouter();
   const form = useForm<UpdateAssetInputSchema>({
     defaultValues: {
       id: asset.id,
@@ -43,6 +45,7 @@ export function UpdateAssetForm({
     },
     onSuccess: () => {
       toast.success("Asset was updated successfully");
+      router.refresh();
     },
     onError: (error) => {
       toast.error(error.message);

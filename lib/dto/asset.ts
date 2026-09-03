@@ -10,6 +10,8 @@ import {
   forbiddenErrorSchema,
   inputIdsSchema,
   internalServerErrorSchema,
+  numericFilterOperators,
+  sortDirection,
   stringFilterOperators,
   unAuthorizedErrorSchema,
 } from "./common";
@@ -34,7 +36,7 @@ export const asset = baseSchema.extend({
   fileSize: z.number(),
   sourceIdentifier: z.string(),
   previewIdentifier: z.string(),
-  tags: z.array(tag).nullish(),
+  tags: z.array(tag).optional(),
   translations: z.array(assetTranslationSchema),
 });
 
@@ -110,6 +112,26 @@ export const assetListInputSchema = createPaginatedListInputSchema(
     .object({
       name: stringFilterOperators,
       type: stringFilterOperators,
+      mimetype: stringFilterOperators,
+      width: numericFilterOperators,
+      height: numericFilterOperators,
+      fileSize: numericFilterOperators,
+      sourceIdentifier: stringFilterOperators,
+      previewIdentifier: stringFilterOperators,
+    })
+    .partial(),
+  z
+    .object({
+      name: sortDirection,
+      type: sortDirection,
+      mimetype: sortDirection,
+      width: sortDirection,
+      height: sortDirection,
+      fileSize: sortDirection,
+      sourceIdentifier: sortDirection,
+      previewIdentifier: sortDirection,
+      createdAt: sortDirection,
+      updatedAt: sortDirection,
     })
     .partial(),
 )

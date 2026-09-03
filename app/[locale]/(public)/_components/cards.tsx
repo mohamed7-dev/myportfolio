@@ -2,6 +2,7 @@ import { TargetIcon, TrendingUpIcon } from "lucide-react";
 import type React from "react";
 import { CardWrapper } from "@/components/shared/card-wrapper";
 import { IconTile } from "@/components/shared/icon-tile";
+import { RichTextDisplay } from "@/components/shared/rich-text-editor/rich-text-display";
 import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
 import type { GetSuperAdminProfileOutputSchema } from "@/lib/dto/visitor";
 import { formatNumber } from "@/lib/helpers/locale-utils";
@@ -67,10 +68,7 @@ export async function Cards({
           </span>
         }
       >
-        <div
-          dangerouslySetInnerHTML={{ __html: profile.currentFocus }}
-          className="space-y-2"
-        />
+        <RichTextDisplay html={profile.currentFocus} />
       </CardWrapper>
       {children}
     </div>

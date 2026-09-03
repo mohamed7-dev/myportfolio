@@ -5,11 +5,13 @@ const paginatedListInputSchema = z.object({
   skip: z.coerce.number(),
 });
 
-export function createPaginatedListInputSchema<Filter = any>(
+export function createPaginatedListInputSchema<Filter = any, Sort = any>(
   filterSchema: ZodSchema<Filter>,
+  sortSchema: ZodSchema<Sort>,
 ) {
   return paginatedListInputSchema
     .extend({ filter: filterSchema })
+    .extend({ sort: sortSchema })
     .partial()
     .optional();
 }

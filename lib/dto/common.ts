@@ -112,6 +112,13 @@ export enum FilterGroupOperator {
 
 export const filterGroupOperator = z.nativeEnum(FilterGroupOperator);
 
+export enum SortDirection {
+  ASC = "ASC",
+  DESC = "DESC",
+}
+
+export const sortDirection = z.nativeEnum(SortDirection);
+
 //############################ Errors ##########################
 export enum ErrorCode {
   INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",

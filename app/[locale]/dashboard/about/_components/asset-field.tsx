@@ -33,7 +33,9 @@ interface AssetFieldProps {
 export function AssetField({ profileAssets, featuredAsset }: AssetFieldProps) {
   const form = useFormContext<UpdateProfileInputSchema>();
   const assetIds = useWatch({ control: form.control, name: "assetIds" });
-  const assets = profileAssets?.map((pa) => pa.asset);
+  const assets = profileAssets
+    .sort((a, b) => a.position - b.position)
+    ?.map((pa) => pa.asset);
 
   const setAssetType = (assetId: string, type: ProfileAssetType) => {
     form.setValue(

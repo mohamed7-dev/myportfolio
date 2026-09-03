@@ -16,6 +16,7 @@ import {
 } from "@/lib/dto/achievement";
 import { isAppError } from "@/lib/errors/app-error";
 import { api } from "@/lib/helpers/api";
+import { formSubmittedEvent } from "@/lib/helpers/events";
 import { Form } from "@/lib/helpers/form";
 import { apiRoutes } from "@/lib/helpers/router";
 
@@ -67,7 +68,8 @@ export function AchievementForm({
     },
     onSuccess: () => {
       toast.success("Achievement was created successfully");
-      router.refresh();
+      form.reset();
+      formSubmittedEvent().emit("create");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -84,8 +86,10 @@ export function AchievementForm({
       }
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Achievement was updated successfully");
+      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
+      router.refresh();
     },
     onError: (error) => {
       toast.error(error.message);

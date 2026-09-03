@@ -2,6 +2,8 @@ export default {
   loading: "جارٍ التحميل",
   present: "حاليًا",
   featured: "مميز",
+  previous: "السابق",
+  next: "التالي",
   downloadFile: "تحميل الملف",
   mediaGallery: {
     dialogTitle: "معرض الصور",

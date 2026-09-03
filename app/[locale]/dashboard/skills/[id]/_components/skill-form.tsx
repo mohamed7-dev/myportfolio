@@ -16,6 +16,7 @@ import {
 } from "@/lib/dto/skill";
 import { isAppError } from "@/lib/errors/app-error";
 import { api } from "@/lib/helpers/api";
+import { formSubmittedEvent } from "@/lib/helpers/events";
 import { Form } from "@/lib/helpers/form";
 import { apiRoutes } from "@/lib/helpers/router";
 
@@ -33,6 +34,7 @@ export function SkillForm({
   const form = useForm<CreateSkillInputSchema>({
     defaultValues: {
       isFeatured: false,
+      category: undefined,
       assetIds: [],
       translations: [],
     },
@@ -63,7 +65,8 @@ export function SkillForm({
     },
     onSuccess: () => {
       toast.success("Skill was created successfully");
-      router.refresh();
+      form.reset();
+      formSubmittedEvent().emit("create");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -80,8 +83,10 @@ export function SkillForm({
       }
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Skill was updated successfully");
+      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
+      router.refresh();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -91,6 +96,7 @@ export function SkillForm({
   const onSubmit = (
     values: CreateSkillInputSchema | UpdateSkillInputSchema,
   ) => {
+    console.log({ values });
     if (creatingNewEntity) {
       createSkill({
         ...values,
@@ -102,6 +108,8 @@ export function SkillForm({
       } as UpdateSkillInputSchema);
     }
   };
+
+  console.log(form.formState.errors);
 
   return (
     <Form {...((creatingNewEntity ? form : updateForm) as any)}>

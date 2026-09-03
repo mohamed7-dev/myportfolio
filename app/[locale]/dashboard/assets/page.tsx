@@ -7,6 +7,7 @@ import {
   AssetType,
 } from "@/components/shared/assets/asset-gallery/asset-gallery";
 import { assetListOutputSchema } from "@/lib/dto/asset";
+import { SortDirection } from "@/lib/dto/common";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { assetService } from "@/services/domain/asset.service";
 
@@ -58,6 +59,7 @@ export default async function AssetsPage({
       take: Number(pageSize),
       skip: (Number(page) - 1) * Number(pageSize),
       filter: filter,
+      sort: { updatedAt: SortDirection.DESC },
       ...(tag ? { tag } : {}),
     },
     { tags: true },

@@ -36,7 +36,7 @@ export default async function AssetDetailPage({
     handler: assetService.findOne,
   });
 
-  const result = await findOne({ id });
+  const result = await findOne({ id }, { tags: true });
   const asset = validateOutput(result, assetSchema);
   if (!asset) return notFound();
 

@@ -16,6 +16,7 @@ import {
 } from "@/lib/dto/project";
 import { isAppError } from "@/lib/errors/app-error";
 import { api } from "@/lib/helpers/api";
+import { formSubmittedEvent } from "@/lib/helpers/events";
 import { Form } from "@/lib/helpers/form";
 import { apiRoutes } from "@/lib/helpers/router";
 
@@ -37,6 +38,7 @@ export function ProjectForm({
       repoUrl: "",
       enabled: true,
       featured: false,
+      finished: false,
       translations: [],
       skillIds: [],
       achievementIds: [],
@@ -77,7 +79,8 @@ export function ProjectForm({
     },
     onSuccess: () => {
       toast.success("Project was created successfully");
-      router.refresh();
+      form.reset();
+      formSubmittedEvent().emit("create");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -94,8 +97,10 @@ export function ProjectForm({
       }
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Project was updated successfully");
+      router.refresh();
+      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
     },
     onError: (error) => {
       toast.error(error.message);

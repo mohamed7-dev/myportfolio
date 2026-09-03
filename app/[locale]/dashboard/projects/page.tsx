@@ -8,6 +8,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
+import { SortDirection } from "@/lib/dto/common";
 import { projectListOutputSchema } from "@/lib/dto/project";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { projectService } from "@/services/domain/project.service";
@@ -58,6 +59,9 @@ export default async function ProjectsPage({
       }),
       ...(liveDemoUrl && { liveDemoUrl: { contains: liveDemoUrl } }),
       ...(repoUrl && { repoUrl: { contains: repoUrl } }),
+    },
+    sort: {
+      updatedAt: SortDirection.DESC,
     },
   });
   const projects = validateOutput(result, projectListOutputSchema);

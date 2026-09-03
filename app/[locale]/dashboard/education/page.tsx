@@ -8,6 +8,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
+import { SortDirection } from "@/lib/dto/common";
 import { educationListOutputSchema } from "@/lib/dto/education";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { educationService } from "@/services/domain/education.service";
@@ -61,6 +62,7 @@ export default async function EducationListPage({
         isPresent: { equals: Boolean(isPresent) },
       }),
     },
+    sort: { updatedAt: SortDirection.DESC },
   });
 
   const education = validateOutput(result, educationListOutputSchema);

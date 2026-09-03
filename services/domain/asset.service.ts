@@ -86,7 +86,7 @@ class AssetService {
         .leftJoin("asset.tags", "tags")
         .where("tags.id = :tag");
 
-      qb.andWhere(`asset.id = (${subquery.getQuery()})`).setParameters({
+      qb.andWhere(`asset.id IN (${subquery.getQuery()})`).setParameters({
         tag,
       });
     }
@@ -101,12 +101,19 @@ class AssetService {
     });
   }
 
-  public async findOne(ctx: RequestContext, input: InputIdSchema) {
+  public async findOne(
+    ctx: RequestContext,
+    input: InputIdSchema,
+    relations?: FindOptionsRelations<Asset>,
+  ) {
     const repo = await ormService.getRepository(ctx, Asset);
     return await repo
       .findOne({
         where: {
           id: input.id,
+        },
+        relations: {
+          ...relations,
         },
       })
       .then((result) =>

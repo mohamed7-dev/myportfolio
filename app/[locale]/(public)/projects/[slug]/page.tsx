@@ -1,3 +1,4 @@
+import { load } from "cheerio";
 import { ChevronLeftIcon, CodeIcon, LinkIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -17,14 +18,23 @@ import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { AppImage } from "@/components/shared/app-image";
 import { MediaGallery } from "@/components/shared/media-gallery";
+import { RichTextDisplay } from "@/components/shared/rich-text-editor/rich-text-display";
+import { RichTextListDisplay } from "@/components/shared/rich-text-editor/rich-text-list-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
 import { cacheKeys } from "@/lib/constants";
 import { localizedCache } from "@/lib/helpers/localized-cache";
+import { cn } from "@/lib/utils";
 import { visitorService } from "@/services/domain/visitor.service";
 import { PublicSidebarTrigger } from "../../_components/public-sidebar-trigger";
+import { ChallengesSlider } from "./_components/challenges-slider";
 
 export const revalidate = 3600;
 
@@ -59,6 +69,22 @@ const getProject = localizedCache(
   { revalidate: 3600, tags: cacheKeys.publicProjects },
 );
 
+function parseChallenges(html: string) {
+  const $ = load(html);
+
+  const challenges: string[] = [];
+
+  $("h3").each((_, element) => {
+    const challenge = $(element).nextUntil("h3").toArray();
+
+    challenges.push(
+      $(element).toString() + challenge.map((node) => $.html(node)).join(""),
+    );
+  });
+
+  return challenges;
+}
+
 export default async function ProjectPage({
   params,
 }: PageProps<"/[locale]/projects/[slug]">) {
@@ -69,6 +95,8 @@ export default async function ProjectPage({
   if (!project) {
     return notFound();
   }
+
+  const challenges = parseChallenges(project.challengesAndSolutions);
 
   return (
     <Page pageId="project">
@@ -127,7 +155,7 @@ export default async function ProjectPage({
       </PageActionBar>
       <PageLayout>
         <PageBlock id="relations" column="full" title={i18n("relations.title")}>
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-x-auto pb-4">
             <section
               className={
                 "flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
@@ -136,26 +164,24 @@ export default async function ProjectPage({
               <h3 className="font-base text-sm md:text-lg text-foreground mb-2 capitalize">
                 {i18n("relations.techStack")}:
               </h3>
-              <div className={"flex items-center gap-4"}>
-                {project.skills?.map((skill) => {
-                  if (skill.featuredAsset) {
-                    return (
-                      <AppImage
-                        key={skill.id}
-                        asset={skill.featuredAsset}
-                        transform={{ preset: "tiny", mode: "resize" }}
-                        className="size-8 sm:size-10 md:size-14 object-contain"
-                      />
-                    );
-                  }
-                  return null;
-                })}
-              </div>
+              {project.skills?.map((skill) => (
+                <Tooltip key={skill.id}>
+                  <TooltipTrigger>
+                    <AppImage
+                      asset={skill.featuredAsset}
+                      transform={{ preset: "tiny", mode: "resize" }}
+                      className="size-6 sm:size-8 md:size-10 object-contain"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>{skill.name}</TooltipContent>
+                </Tooltip>
+              ))}
             </section>
+
             {project.career && (
               <section
                 className={
-                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap"
                 }
               >
                 <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
@@ -181,7 +207,7 @@ export default async function ProjectPage({
             {project.education && (
               <section
                 className={
-                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap"
                 }
               >
                 <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
@@ -207,7 +233,7 @@ export default async function ProjectPage({
             {!!project.achievements?.length && (
               <section
                 className={
-                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
+                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap"
                 }
               >
                 <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
@@ -239,13 +265,14 @@ export default async function ProjectPage({
           </div>
         </PageBlock>
         <PageBlock id="assets" column="full">
-          <MediaGallery entityAssets={project.assets} title={project.name} />
-        </PageBlock>
-        <PageBlock id="overview" column="main" title={i18n("summary.title")}>
-          <div
-            dangerouslySetInnerHTML={{ __html: project.overview }}
-            className="[&>p]:first:mb-4 [&>p]:leading-relaxed [&>p]:tracking-wide [&>p]:text-sm [&>p]:font-base"
+          <MediaGallery
+            entityAssets={project.assets}
+            title={project.name}
+            staticImageProps={{ loading: "eager", fetchPriority: "high" }}
           />
+        </PageBlock>
+        <PageBlock id="overview" column="full" title={i18n("summary.title")}>
+          <RichTextListDisplay html={project.overview} />
         </PageBlock>
         <PageBlock id="execution" column="side" title={i18n("execution.title")}>
           <p className="flex flex-col gap-2">
@@ -264,26 +291,17 @@ export default async function ProjectPage({
           column="side"
           title={i18n("techStack.title")}
         >
-          <div
-            dangerouslySetInnerHTML={{ __html: project.techStack }}
-            className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
-          />
+          <RichTextListDisplay html={project.techStack} />
         </PageBlock>
         <PageBlock id="features" column="main" title={i18n("features.title")}>
-          <div
-            dangerouslySetInnerHTML={{ __html: project.features }}
-            className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
-          />
+          <RichTextListDisplay html={project.features} />
         </PageBlock>
         <PageBlock
           id="challenges"
           column="full"
           title={i18n("challenges.title")}
         >
-          <div
-            dangerouslySetInnerHTML={{ __html: project.challengesAndSolutions }}
-            className="space-y-4 [&>ul]:divide-y-2 md:[&>ul]:divide-x-2 md:[&>ul]:divide-y-0 [&>ul]:divide-border [&>ul]:grid [&>ul]:grid-cols-1 [&>ul]:md:grid-cols-2 [&>ul]:gap-4 [&>ul]:bg-background [&>ul]:p-2 [&>ul]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
-          />
+          <ChallengesSlider challenges={challenges} />
         </PageBlock>
         {project.technicalHighlights.length && (
           <PageBlock
@@ -291,10 +309,7 @@ export default async function ProjectPage({
             column="main"
             title={i18n("technicalHighlights.title")}
           >
-            <div
-              dangerouslySetInnerHTML={{ __html: project.technicalHighlights }}
-              className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
-            />
+            <RichTextListDisplay html={project.technicalHighlights} />
           </PageBlock>
         )}
         {project.contributions.length && (
@@ -303,10 +318,7 @@ export default async function ProjectPage({
             column="side"
             title={i18n("contributions.title")}
           >
-            <div
-              dangerouslySetInnerHTML={{ __html: project.contributions }}
-              className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
-            />
+            <RichTextListDisplay html={project.contributions} />
           </PageBlock>
         )}
       </PageLayout>

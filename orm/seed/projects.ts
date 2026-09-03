@@ -54,12 +54,10 @@ export const projectsSeed: SeedProject[] = [
           "</ul>",
         ].join("\n"),
 
-        challengesAndSolutions: [
-          "<ul>",
-          "<li><p>كان التطبيق بحاجة إلى تنسيق واجهة سطح المكتب مع عملية خارجية لتنزيل الوسائط، مع الحفاظ على استجابة الواجهة.</p></li>",
-          "<li><p>تفصل البنية المعمارية بين واجهة المستخدم وطبقة معالجة الوسائط، ويتم التواصل بينهما من خلال حدود واضحة ومحددة.</p></li>",
-          "</ul>",
-        ].join("\n"),
+        challengesAndSolutions: `
+          <h3>التحدي الاول</h3>
+          <h3>التحدي الثاني</h3>
+        `,
 
         techStack: [
           "<ul>",
@@ -106,13 +104,22 @@ export const projectsSeed: SeedProject[] = [
           "</ul>",
         ].join("\n"),
 
-        challengesAndSolutions: [
-          "<ul>",
-          "<li><p>The application needed to coordinate a desktop UI with an external media downloading process while keeping the interface responsive</p></li>",
-          "<li><p>The architecture separates the UI from the media-processing layer and communicates through well-defined boundaries.</p></li>",
-          "</ul>",
-        ].join("\n"),
+        challengesAndSolutions: `
+          <h3>Managing FFmpeg, yt-dlp, and the JavaScript Runtime</h3>
 
+          <h4>Problem</h4>
+
+          <p><strong>Vidora</strong> depends on three external binaries: <code>FFmpeg</code>, <code>yt-dlp</code>, and a JavaScript runtime. Downloading all three during the application's first launch would make the initial setup unnecessarily slow, particularly on slower network connections. However, bundling <code>yt-dlp</code> with the application would make it harder to update independently as new yt-dlp releases become available.
+          </p>
+
+          <h4>Solution</h4>
+
+          <p>I adopted a hybrid distribution strategy. FFmpeg and the JavaScript runtime are bundled with the application at build time, while <code>yt-dlp</code> is downloaded during the application's first launch so it can remain independently updatable.
+
+          The application is built for Linux, Windows, and macOS using GitHub Actions. During the build process, the corresponding platform-specific FFmpeg and JavaScript runtime binaries are fetched from a repository I maintain and bundled into the application. This reduces the amount of data that needs to be downloaded during first launch while keeping yt-dlp independently updateable.
+          </p>
+        
+        `,
         techStack: [
           "<ul>",
           "<li><p><strong>Front end: </strong> Electron, Web Components, and Typescript</p></li>",

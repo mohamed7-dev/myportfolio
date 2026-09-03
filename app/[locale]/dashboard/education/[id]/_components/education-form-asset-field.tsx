@@ -24,7 +24,9 @@ export function EducationFormAssetField({
   featuredAsset,
 }: EducationFormAssetFieldProps) {
   const form = useFormContext();
-  const assets = educationItemAssets?.map((pa) => pa.asset);
+  const assets = educationItemAssets
+    .sort((a, b) => a.position - b.position)
+    ?.map((pa) => pa.asset);
   return (
     <Field>
       <EntityAssets

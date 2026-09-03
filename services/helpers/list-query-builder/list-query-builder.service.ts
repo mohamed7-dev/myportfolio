@@ -1,5 +1,6 @@
 import {
   Brackets,
+  type FindOneOptions,
   type FindOptionsRelations,
   type FindOptionsWhere,
   type SelectQueryBuilder,
@@ -22,6 +23,7 @@ import {
   type WhereCondition,
   type WhereGroup,
 } from "./build-conditions-from-filter-params";
+import { buildOrderbyFromSortParams } from "./build-orderby-from-sort-params";
 
 interface ExtraOptions<Entity extends AppEntity> {
   ignoreQueryLimits?: boolean;
@@ -29,6 +31,7 @@ interface ExtraOptions<Entity extends AppEntity> {
   relations?: FindOptionsRelations<Entity>;
   ctx?: RequestContext;
   where?: FindOptionsWhere<Entity>;
+  orderBy?: FindOneOptions<Entity>["order"];
 }
 
 class ListQueryBuilder {
@@ -64,6 +67,16 @@ class ListQueryBuilder {
       extraOptions.ctx,
     );
 
+    // maps gql input fields to typeorm OrderByCondition
+    const sortParams = Object.assign({}, options.sort, extraOptions.orderBy);
+
+    const order = buildOrderbyFromSortParams(
+      ds,
+      entityType,
+      sortParams,
+      qb.alias,
+    );
+
     let filterConditions: Array<WhereGroup | WhereCondition> = [];
     if (options.filter) {
       // maps input fields to where clause and params
@@ -92,6 +105,8 @@ class ListQueryBuilder {
         }),
       );
     }
+
+    qb.orderBy(order);
 
     return qb;
   }

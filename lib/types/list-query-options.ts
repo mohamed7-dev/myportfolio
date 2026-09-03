@@ -3,6 +3,7 @@ import type {
   BooleanFilterOperators,
   DateTimeFilterOperators,
   NumericFilterOperators,
+  SortDirection,
   StringFilterOperators,
 } from "../dto/common";
 import type { LocaleString } from "./translatable";
@@ -11,6 +12,7 @@ export interface ListQueryOptions<Entity extends AppEntity> {
   take?: number;
   skip?: number;
   filter?: FilterParameter<Entity> | null;
+  sort?: SortParameter<Entity> | null;
 }
 
 export type PrimitiveFields<Entity extends AppEntity> = {
@@ -37,4 +39,8 @@ export type FilterParameter<Entity extends AppEntity> = {
 } & {
   _and?: Array<FilterParameter<Entity>>;
   _or?: Array<FilterParameter<Entity>>;
+};
+
+export type SortParameter<Entity extends AppEntity> = {
+  [Key in PrimitiveFields<Entity>]?: SortDirection;
 };

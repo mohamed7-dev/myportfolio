@@ -48,17 +48,21 @@ export const { PATCH, DELETE, GET } = createRouter({
 
       const input = Object.fromEntries(
         searchParams.entries(),
-      ) as AssetListInputSchema;
+      ) as unknown as AssetListInputSchema & { filter: string };
+
       const parsedInput = validateInput(
         {
           ...input,
           filter:
-            input.filter && typeof input.filter === "object"
-              ? JSON.parse(input.filter as string)
+            input.filter &&
+            input.filter !== "undefined" &&
+            typeof input.filter === "string"
+              ? JSON.parse(input.filter)
               : undefined,
         },
         assetListInputSchema,
       );
+
       const result = await assetService.find(ctx, parsedInput, { tags: true });
       const assets = validateOutput(result, assetListOutputSchema);
       return { body: assets, init: { status: 200 } };

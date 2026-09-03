@@ -5,9 +5,11 @@ import {
   baseSchema,
   baseTranslationEntity,
   baseTranslationEntityInput,
+  dateTimeFilterOperators,
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  sortDirection,
   stringFilterOperators,
 } from "./common";
 import {
@@ -132,6 +134,23 @@ export const achievementListInputSchema = createPaginatedListInputSchema(
   z
     .object({
       name: stringFilterOperators,
+      slug: stringFilterOperators,
+      organization: stringFilterOperators,
+      type: stringFilterOperators,
+      credentialUrl: stringFilterOperators,
+      issueDate: dateTimeFilterOperators,
+    })
+    .partial(),
+  z
+    .object({
+      name: sortDirection,
+      slug: sortDirection,
+      organization: sortDirection,
+      type: sortDirection,
+      credentialUrl: sortDirection,
+      issueDate: sortDirection,
+      createdAt: sortDirection,
+      updatedAt: sortDirection,
     })
     .partial(),
 );

@@ -7,6 +7,7 @@ import { localizedCache } from "@/lib/helpers/localized-cache";
 import { visitorService } from "@/services/domain/visitor.service";
 import "./public.css";
 import dynamic from "next/dynamic";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const CookieConsent = dynamic(() =>
   import("@/components/app-layout/public-layout/cookie-consent").then(
@@ -39,7 +40,9 @@ export default async function PublicLayout({
     <PublicLayoutProvider profile={profile}>
       <CookieConsent />
       <div className="public-layout min-h-screen bg-background text-foreground overflow-hidden">
-        <PublicLayoutImpl profile={profile}>{children}</PublicLayoutImpl>
+        <PublicLayoutImpl profile={profile}>
+          <TooltipProvider>{children}</TooltipProvider>
+        </PublicLayoutImpl>
       </div>
     </PublicLayoutProvider>
   );

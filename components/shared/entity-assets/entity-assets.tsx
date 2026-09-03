@@ -11,6 +11,10 @@ import { PaperclipIcon } from "lucide-react";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import type { Asset } from "@/lib/dto/asset";
+import {
+  type FormSubmittedEventPayload,
+  formSubmittedEvent,
+} from "@/lib/helpers/events";
 import AssetPickerDialog from "../assets/asset-picker-dialog";
 import { AssetList } from "./asset-list";
 import { FeaturedAsset } from "./featured-asset";
@@ -187,6 +191,30 @@ export function EntityAssets(props: EntityAssetsProps) {
   React.useEffect(() => {
     setFeaturedAsset(initialFeaturedAsset);
   }, [initialFeaturedAsset]);
+
+  React.useEffect(() => {
+    const handler = (e: any) => {
+      setAssets(
+        (e as CustomEvent<FormSubmittedEventPayload>).detail.formType ===
+          "create"
+          ? []
+          : e.detail.assets,
+      );
+      setFeaturedAsset(
+        (e as CustomEvent<FormSubmittedEventPayload>).detail.formType ===
+          "create"
+          ? undefined
+          : e.detail.featuredAsset,
+      );
+    };
+    window.addEventListener(formSubmittedEvent().eventName, (e) => handler(e));
+
+    return () => {
+      window.removeEventListener(formSubmittedEvent().eventName, (e) =>
+        handler(e),
+      );
+    };
+  }, []);
 
   const AddAssetButton = () =>
     updatePermissions && (

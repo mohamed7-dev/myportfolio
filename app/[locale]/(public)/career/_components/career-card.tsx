@@ -2,6 +2,8 @@
 import { BrainCircuitIcon, MapPinIcon, ZapIcon } from "lucide-react";
 import { AppImage } from "@/components/shared/app-image";
 import { IconTile } from "@/components/shared/icon-tile";
+import { RichTextDisplay } from "@/components/shared/rich-text-editor/rich-text-display";
+import { RichTextListDisplay } from "@/components/shared/rich-text-editor/rich-text-list-display";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
@@ -83,7 +85,7 @@ export function CareerCard({
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-4">
         <section className="space-y-2">
           <h4 className="group font-base flex items-center gap-2">
             <IconTile className="size-6">
@@ -91,12 +93,8 @@ export function CareerCard({
             </IconTile>
             {i18n("career.careerCard.impact")}
           </h4>
-          <div
-            dangerouslySetInnerHTML={{ __html: careerItem.impact }}
-            className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:border-2 [&>ul>li]:border-border [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
-          />
+          <RichTextListDisplay html={careerItem.impact} />
         </section>
-        <Separator orientation="vertical" />
         <section className="space-y-2">
           <h4 className="group font-base flex items-center gap-2">
             <IconTile className="size-6">
@@ -104,10 +102,7 @@ export function CareerCard({
             </IconTile>
             {i18n("career.careerCard.learned")}
           </h4>
-          <div
-            dangerouslySetInnerHTML={{ __html: careerItem.learned }}
-            className="[&>ul]:flex [&>ul]:flex-col [&>ul]:gap-4 [&>ul>li]:bg-background [&>ul>li]:border-2 [&>ul>li]:border-border [&>ul>li]:p-2 [&>ul>li]:rounded-base [&>ul>li>p]:flex [&>ul>li>p]:flex-col [&>ul>li>p]:gap-2 [&>ul>li>p]:text-sm [&>ul>li>p]:font-base [&>ul>li>p>strong]:font-heading"
-          />
+          <RichTextListDisplay html={careerItem.learned} />
         </section>
       </div>
     </article>

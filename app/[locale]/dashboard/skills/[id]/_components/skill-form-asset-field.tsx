@@ -24,7 +24,9 @@ export function SkillFormAssetField({
   featuredAsset,
 }: SkillFormFormAssetFieldProps) {
   const form = useFormContext();
-  const assets = skillAssets?.map((pa) => pa.asset);
+  const assets = skillAssets
+    .sort((a, b) => a.position - b.position)
+    ?.map((pa) => pa.asset);
   return (
     <Field>
       <EntityAssets

@@ -24,7 +24,9 @@ export function AchievementFormAssetField({
   featuredAsset,
 }: AchievementFormAssetFieldProps) {
   const form = useFormContext();
-  const assets = achievementAssets?.map((pa) => pa.asset);
+  const assets = achievementAssets
+    .sort((a, b) => a.position - b.position)
+    ?.map((pa) => pa.asset);
   return (
     <Field>
       <EntityAssets

@@ -8,6 +8,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
+import { SortDirection } from "@/lib/dto/common";
 import { contactMethodListOutputSchema } from "@/lib/dto/contact-method";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { contactMethodService } from "@/services/domain/contact-method.service";
@@ -40,6 +41,7 @@ export default async function ContactMethodListPage({
     filter: {
       ...(name && { name: { contains: name } }),
     },
+    sort: { updatedAt: SortDirection.DESC },
   });
 
   const contactMethods = validateOutput(result, contactMethodListOutputSchema);

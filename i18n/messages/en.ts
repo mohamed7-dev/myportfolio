@@ -2,6 +2,8 @@ export default {
   loading: "Loading",
   present: "Present",
   featured: "Featured",
+  previous: "Previous",
+  next: "Next",
   downloadFile: "download file",
   cookieConsent: {
     title: "Allow preference cookies?",

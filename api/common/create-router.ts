@@ -128,6 +128,7 @@ function wrapRoute<TCtx extends NextCtx>({
         headers: headers,
       });
     } catch (error) {
+      console.log("Error From WrapRoute", error);
       return handleApiErrors(error);
     }
   };

@@ -4,9 +4,14 @@ import type { PageBlockProps } from "./page-block";
 type PageLayoutProps = {
   children: React.ReactNode;
   className?: string;
+  fullWidthFirst?: boolean;
 };
 
-export function PageLayout({ children, className }: PageLayoutProps) {
+export function PageLayout({
+  children,
+  className,
+  fullWidthFirst = true,
+}: PageLayoutProps) {
   // Normalize and extract PageBlock children
   const blocks: React.ReactElement<PageBlockProps>[] = [];
 
@@ -44,8 +49,8 @@ export function PageLayout({ children, className }: PageLayoutProps) {
         .filter(Boolean)
         .join(" ")}
     >
-      {/* Full width */}
-      {fullWidthBlocks.length > 0 && (
+      {/* Full width at the top */}
+      {fullWidthFirst && fullWidthBlocks.length > 0 && (
         <div className="col-span-1 space-y-4 lg:col-span-5">
           {fullWidthBlocks}
         </div>
@@ -56,6 +61,13 @@ export function PageLayout({ children, className }: PageLayoutProps) {
 
       {/* Sidebar */}
       <div className="col-span-1 space-y-4 lg:col-span-2">{sideBlocks}</div>
+
+      {/* Full width at the top */}
+      {!fullWidthFirst && fullWidthBlocks.length > 0 && (
+        <div className="col-span-1 space-y-4 lg:col-span-5">
+          {fullWidthBlocks}
+        </div>
+      )}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
 import { careerListOutputSchema } from "@/lib/dto/career";
+import { SortDirection } from "@/lib/dto/common";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { careerService } from "@/services/domain/career.service";
 import { CareerDataTable } from "./_components/careers-data-table";
@@ -61,6 +62,7 @@ export default async function CareersListPage({
         isPresent: { equals: Boolean(isPresent) },
       }),
     },
+    sort: { updatedAt: SortDirection.DESC },
   });
 
   const careers = validateOutput(result, careerListOutputSchema);

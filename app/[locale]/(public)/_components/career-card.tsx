@@ -9,7 +9,7 @@ export async function CareerCard({ children }: { children: React.ReactNode }) {
 
   return (
     <BentoLink href="/career" className="md:col-span-2">
-      <div className="flex min-h-77 flex-col items-center p-6 text-center">
+      <div className="flex h-77 flex-col items-center p-6 text-center">
         <IconTile>
           <BriefcaseIcon className="size-6" />
         </IconTile>

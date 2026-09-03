@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
+import {
+  IBM_Plex_Mono,
+  IBM_Plex_Sans,
+  IBM_Plex_Sans_Arabic,
+} from "next/font/google";
 import "./globals.css";
 import "reflect-metadata";
 import dynamic from "next/dynamic";
@@ -25,6 +29,12 @@ const Toaster = dynamic(() =>
 const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex-sans",
   subsets: ["latin"],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
+  subsets: ["latin"],
+  weight: ["200", "400", "700"],
 });
 
 const ibmPlexSansAr = IBM_Plex_Sans_Arabic({
@@ -95,6 +105,7 @@ export default async function RootLayout({
       className={cn(
         "h-full antialiased",
         isRtl(typedLocale) ? ibmPlexSansAr.variable : ibmPlexSans.variable,
+        ibmPlexMono.variable,
         accentColorClassName,
       )}
     >

@@ -9,6 +9,7 @@ import {
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  sortDirection,
   stringFilterOperators,
 } from "./common";
 import { languageCodeSchema } from "./language-code";
@@ -98,6 +99,17 @@ export const skillListInputSchema = createPaginatedListInputSchema(
       name: stringFilterOperators,
       category: stringFilterOperators,
       isFeatured: booleanFilterOperators,
+      slug: stringFilterOperators,
+    })
+    .partial(),
+  z
+    .object({
+      name: sortDirection,
+      category: sortDirection,
+      isFeatured: sortDirection,
+      slug: sortDirection,
+      createdAt: sortDirection,
+      updatedAt: sortDirection,
     })
     .partial(),
 );

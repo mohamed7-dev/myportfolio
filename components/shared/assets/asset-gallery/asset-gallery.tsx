@@ -10,6 +10,7 @@ import type {
   Asset as AssetEntity,
   AssetListOutputSchema,
 } from "@/lib/dto/asset";
+import type { Tag } from "@/lib/dto/tag";
 import { isAppError } from "@/lib/errors/app-error";
 import { api } from "@/lib/helpers/api";
 import { apiRoutes } from "@/lib/helpers/router";
@@ -85,11 +86,11 @@ export function AssetGallery({
 
   const queryKey = [
     "asset-gallery",
-    assetType,
+    _assetType,
     debouncedSearch,
-    page,
-    pageSize,
-    tag,
+    _page,
+    _pageSize,
+    _tag,
   ];
 
   const {
@@ -269,6 +270,10 @@ export function AssetGallery({
     }
   };
 
+  const onSearchInputChange = (value: string) => {
+    setSearchInput(value);
+  };
+
   const handleRefetching = () => {
     if (shouldFetchInternally) {
       refetch();
@@ -284,16 +289,26 @@ export function AssetGallery({
   }, [source, preview, mutate]);
 
   React.useEffect(() => {
-    if (debouncedSearch) {
+    if (debouncedSearch && !shouldFetchInternally) {
       updateSearchParams({ searchQuery: debouncedSearch });
     }
-  }, [debouncedSearch, updateSearchParams]);
+  }, [debouncedSearch, updateSearchParams, shouldFetchInternally]);
 
   const assets = shouldFetchInternally ? data?.items : initialAssets;
 
   const tags = filterUnique(
     assets?.flatMap((asset) => asset.tags).filter(notNullOrUndefined) ?? [],
   );
+
+  const tagsMap: Record<string, Tag> = {};
+
+  if (assets) {
+    for (const tag of tags) {
+      tagsMap[tag.id] = tag;
+    }
+  }
+
+  const uniqueTags = Object.values(tagsMap);
 
   const currentTag = shouldFetchInternally ? _tag : tag;
   const currentAssetType = shouldFetchInternally ? _assetType : assetType;
@@ -306,11 +321,11 @@ export function AssetGallery({
   return (
     <div className="flex flex-col gap-4">
       <ActionsBar
-        tags={tags}
+        tags={uniqueTags}
         currentTag={currentTag ?? undefined}
         onSelectingTag={handleSelectingTag}
         searchInput={searchInput}
-        onSearchInputChange={(value) => setSearchInput(value)}
+        onSearchInputChange={onSearchInputChange}
         assetType={currentAssetType}
         onAssetTypeChange={onAssetTypeChange}
       />

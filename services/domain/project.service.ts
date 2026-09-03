@@ -1,4 +1,4 @@
-import { type FindOptionsRelations, IsNull, Not } from "typeorm";
+import { type FindOptionsRelations, IsNull } from "typeorm";
 import type { RequestContext } from "@/api/request-context/request-context";
 import type { DeletionResponse, InputIdSchema } from "@/lib/dto/common";
 
@@ -107,7 +107,7 @@ class ProjectService {
     input: ProjectListInputSchema,
     relations?: FindOptionsRelations<Project>,
   ) {
-    const qb = await listQueryBuilder.build(Project, input, {
+    const qb = await listQueryBuilder.build(Project, input as any, {
       ctx,
       alias: "project",
       where: {

@@ -191,8 +191,8 @@ export function MediaGallery({
           dialogOpen={dialogOpen}
           closeFullscreen={closeFullscreen}
           currentItem={currentItem}
-          onClickNext={() => currentIndex + 1}
-          onClickPrev={() => currentIndex - 1}
+          onClickNext={() => updateIndex(currentIndex + 1)}
+          onClickPrev={() => updateIndex(currentIndex - 1)}
           dialogTitle={title}
           imageProps={overlayImageProps}
         />

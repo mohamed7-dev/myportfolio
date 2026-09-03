@@ -9,6 +9,7 @@ import {
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  sortDirection,
   stringFilterOperators,
 } from "./common";
 import {
@@ -123,7 +124,21 @@ export const contactMethodListInputSchema = createPaginatedListInputSchema(
   z
     .object({
       name: stringFilterOperators,
+      url: stringFilterOperators,
       enabled: booleanFilterOperators,
+      primary: booleanFilterOperators,
+      copyableText: stringFilterOperators,
+    })
+    .partial(),
+  z
+    .object({
+      name: sortDirection,
+      url: sortDirection,
+      enabled: sortDirection,
+      primary: sortDirection,
+      copyableText: sortDirection,
+      createdAt: sortDirection,
+      updatedAt: sortDirection,
     })
     .partial(),
 );

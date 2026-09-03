@@ -24,7 +24,9 @@ export function ProjectFormAssetField({
   featuredAsset,
 }: CreateProjectFormAssetFieldProps) {
   const form = useFormContext();
-  const assets = projectAssets?.map((pa) => pa.asset);
+  const assets = projectAssets
+    .sort((a, b) => a.position - b.position)
+    ?.map((pa) => pa.asset);
   return (
     <Field>
       <EntityAssets

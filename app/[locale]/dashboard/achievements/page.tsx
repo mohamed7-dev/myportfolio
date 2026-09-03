@@ -9,6 +9,7 @@ import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { Button } from "@/components/ui/button";
 import { achievementListOutputSchema } from "@/lib/dto/achievement";
+import { SortDirection } from "@/lib/dto/common";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { achievementService } from "@/services/domain/achievement.service";
 import { AchievementsDataTable } from "./_components/achievements-data-table";
@@ -40,6 +41,7 @@ export default async function AchievementListPage({
     filter: {
       ...(name && { name: { contains: name } }),
     },
+    sort: { updatedAt: SortDirection.DESC },
   });
 
   const achievements = validateOutput(result, achievementListOutputSchema);

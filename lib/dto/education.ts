@@ -10,6 +10,8 @@ import {
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  numericFilterOperators,
+  sortDirection,
   stringFilterOperators,
 } from "./common";
 import {
@@ -114,6 +116,22 @@ export const educationListInputSchema = createPaginatedListInputSchema(
       startDate: dateTimeFilterOperators,
       endDate: dateTimeFilterOperators,
       isPresent: booleanFilterOperators,
+      slug: stringFilterOperators,
+      gpa: numericFilterOperators,
+    })
+    .partial(),
+  z
+    .object({
+      school: sortDirection,
+      degree: sortDirection,
+      location: sortDirection,
+      startDate: sortDirection,
+      endDate: sortDirection,
+      isPresent: sortDirection,
+      slug: sortDirection,
+      gpa: sortDirection,
+      createdAt: sortDirection,
+      updatedAt: sortDirection,
     })
     .partial(),
 );

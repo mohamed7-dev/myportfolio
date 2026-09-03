@@ -24,7 +24,9 @@ export function ContactMethodFormAssetField({
   featuredAsset,
 }: ContactMethodFormAssetFieldProps) {
   const form = useFormContext();
-  const assets = contactMethodAssets?.map((pa) => pa.asset);
+  const assets = contactMethodAssets
+    .sort((a, b) => a.position - b.position)
+    ?.map((pa) => pa.asset);
   return (
     <Field>
       <EntityAssets

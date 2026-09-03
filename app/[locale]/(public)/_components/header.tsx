@@ -27,7 +27,7 @@ export async function HomePageHeader({
 
   return (
     <div>
-      <div className="overflow-hidden w-full bg-background relative h-60">
+      <div className="overflow-hidden w-full bg-background relative h-60 border-2 border-border">
         <AppImage
           asset={cover}
           transform={{ preset: "full", mode: "resize" }}
@@ -36,12 +36,13 @@ export async function HomePageHeader({
           className="size-full object-cover"
         />
       </div>
-      <div className="px-0 sm:px-2 md:px-8 flex flex-col sm:flex-row sm:justify-between sm:items-end relative -mt-16 z-10">
+      <div className="px-0 sm:px-2 md:px-8 flex flex-col sm:flex-row sm:justify-between sm:items-end relative -mt-10 md:-mt-16 z-10">
         <div className="shrink-0 w-fit p-1 bg-secondary-background">
           {personal ? (
             <AppImage
               asset={personal}
               transform={{ preset: "thumb", mode: "resize" }}
+              className="size-20 md:size-32 object-cover rounded-base grayscale-20 hover:grayscale-0 transition-all duration-500"
             />
           ) : (
             <Image

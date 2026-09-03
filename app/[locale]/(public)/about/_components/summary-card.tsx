@@ -1,6 +1,7 @@
 "use client";
 import { usePublicLayout } from "@/components/app-layout/public-layout/public-layout-provider";
 import { AppImage } from "@/components/shared/app-image";
+import { RichTextDisplay } from "@/components/shared/rich-text-editor/rich-text-display";
 
 export function SummaryCard() {
   const ctx = usePublicLayout("SummaryCard");
@@ -15,11 +16,7 @@ export function SummaryCard() {
           className="w-full h-60 object-cover grayscale-20 hover:grayscale-0 transition-all duration-500"
         />
       </div>
-      <div
-        dangerouslySetInnerHTML={{ __html: ctx.profile.summary }}
-        className="col-span-2 [&>h3]:text-sm [&>h3]:md:text-base [&>h3]:md:font-heading [&>h3]:mb-4 [&>p]:text-foreground [&>p]:font-base [&>p]:leading-relaxed [&>p>strong]:mt-4"
-        suppressHydrationWarning
-      />
+      <RichTextDisplay html={ctx.profile.summary} className="col-span-2" />
     </div>
   );
 }

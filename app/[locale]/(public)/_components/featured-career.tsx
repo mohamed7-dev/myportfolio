@@ -27,7 +27,7 @@ export async function FeaturedCareer() {
       {featuredCareers.items.map((item, index) => (
         <div
           key={item.id}
-          className="grid size-14 shrink-0 place-items-center rounded-base border-2 border-border transition duration-500 group-hover:-translate-y-2"
+          className="grid size-14 shrink-0 place-items-center bg-secondary-background p-1 rounded-base border-2 border-border transition duration-500 group-hover:-translate-y-2"
           style={{ transitionDelay: `${index * 60}ms` }}
         >
           <AppImage

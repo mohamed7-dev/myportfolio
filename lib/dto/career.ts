@@ -10,6 +10,7 @@ import {
   deletionResponseSchema,
   inputIdSchema,
   inputIdsSchema,
+  sortDirection,
   stringFilterOperators,
 } from "./common";
 import {
@@ -157,6 +158,31 @@ export const careerListInputSchema = createPaginatedListInputSchema(
       endDate: dateTimeFilterOperators,
       isPresent: booleanFilterOperators,
       isFeatured: booleanFilterOperators,
+      slug: stringFilterOperators,
+      responsibilities: stringFilterOperators,
+      learned: stringFilterOperators,
+      impact: stringFilterOperators,
+      mode: stringFilterOperators,
+      type: stringFilterOperators,
+    })
+    .partial(),
+  z
+    .object({
+      name: sortDirection,
+      organization: sortDirection,
+      location: sortDirection,
+      startDate: sortDirection,
+      endDate: sortDirection,
+      isPresent: sortDirection,
+      isFeatured: sortDirection,
+      slug: sortDirection,
+      responsibilities: sortDirection,
+      learned: sortDirection,
+      impact: sortDirection,
+      mode: sortDirection,
+      type: sortDirection,
+      createdAt: sortDirection,
+      updatedAt: sortDirection,
     })
     .partial(),
 );
