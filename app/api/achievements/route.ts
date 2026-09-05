@@ -2,6 +2,9 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { createRouter } from "@/api/common/create-router";
 import { cacheKeys } from "@/lib/constants";
 import {
+  type AchievementListInputSchema,
+  achievementListInputSchema,
+  achievementListOutputSchema,
   createAchievementInputSchema,
   createAchievementOutputSchema,
   deleteAchievementsInputSchema,
@@ -13,7 +16,7 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { achievementService } from "@/services/domain/achievement.service";
 
-export const { POST, PATCH, DELETE } = createRouter({
+export const { POST, PATCH, DELETE, GET } = createRouter({
   POST: {
     authenticatedOnly: true,
     handler: async (req, ctx) => {
@@ -71,6 +74,32 @@ export const { POST, PATCH, DELETE } = createRouter({
       revalidateTag(cacheKeys.publicAchievements[0], "max");
 
       return { body: parsedResult, init: { status: 200 } };
+    },
+  },
+  GET: {
+    authenticatedOnly: true,
+    handler: async (req, ctx) => {
+      const { searchParams } = new URL(req.url);
+
+      const input = Object.fromEntries(
+        searchParams.entries(),
+      ) as unknown as AchievementListInputSchema & { filter: string };
+      const parsedInput = validateInput(
+        {
+          ...input,
+          filter:
+            input.filter &&
+            input.filter !== "undefined" &&
+            typeof input.filter === "string"
+              ? JSON.parse(input.filter)
+              : undefined,
+        },
+        achievementListInputSchema,
+      );
+
+      const result = await achievementService.find(ctx, parsedInput);
+      const achievements = validateOutput(result, achievementListOutputSchema);
+      return { body: achievements, init: { status: 200 } };
     },
   },
 });

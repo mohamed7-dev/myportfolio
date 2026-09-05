@@ -4,12 +4,15 @@ import { useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useLocaleUtils } from "@/hooks/use-locale-utils";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
+  type CreateSkillFormInput,
   type CreateSkillInputSchema,
   type CreateSkillOutputSchema,
   createSkillInputSchema,
   type Skill,
+  type UpdateSkillFormInput,
   type UpdateSkillInputSchema,
   type UpdateSkillOutputSchema,
   updateSkillInputSchema,
@@ -30,18 +33,25 @@ export function SkillForm({
   const params = useParams();
   const creatingNewEntity = params.id === NEW_ENTITY_PATH;
   const router = useRouter();
+  const { contentLanguage } = useLocaleUtils();
 
-  const form = useForm<CreateSkillInputSchema>({
+  const form = useForm<CreateSkillFormInput>({
     defaultValues: {
       isFeatured: false,
-      category: undefined,
+      category: "",
       assetIds: [],
-      translations: [],
+      translations: [
+        {
+          languageCode: contentLanguage,
+          name: "",
+          slug: "",
+        },
+      ],
     },
     resolver: zodResolver(createSkillInputSchema),
   });
 
-  const updateForm = useForm<UpdateSkillInputSchema>({
+  const updateForm = useForm<UpdateSkillFormInput>({
     defaultValues: {
       id: initialValues?.id ?? "",
       isFeatured: initialValues?.isFeatured ?? false,
@@ -53,7 +63,7 @@ export function SkillForm({
     resolver: zodResolver(updateSkillInputSchema),
   });
 
-  const { mutate: createSkill } = useMutation({
+  const { mutateAsync: createSkill } = useMutation({
     mutationKey: ["create-skill"],
     mutationFn: async (input: CreateSkillInputSchema) => {
       const res = await api(apiRoutes.skills.create, input, true);
@@ -73,7 +83,7 @@ export function SkillForm({
     },
   });
 
-  const { mutate: updateSkill } = useMutation({
+  const { mutateAsync: updateSkill } = useMutation({
     mutationKey: ["update-skill"],
     mutationFn: async (input: UpdateSkillInputSchema) => {
       const res = await api(apiRoutes.skills.update, input, true);
@@ -93,23 +103,20 @@ export function SkillForm({
     },
   });
 
-  const onSubmit = (
-    values: CreateSkillInputSchema | UpdateSkillInputSchema,
+  const onSubmit = async (
+    values: CreateSkillFormInput | UpdateSkillFormInput,
   ) => {
-    console.log({ values });
     if (creatingNewEntity) {
-      createSkill({
+      await createSkill({
         ...values,
       } as CreateSkillInputSchema);
     } else {
-      updateSkill({
+      await updateSkill({
         ...values,
         id: params.id as string,
       } as UpdateSkillInputSchema);
     }
   };
-
-  console.log(form.formState.errors);
 
   return (
     <Form {...((creatingNewEntity ? form : updateForm) as any)}>

@@ -29,8 +29,12 @@ export function CareerFormModeTypeFields() {
           <Select
             value={field.value}
             onValueChange={(value) => field.onChange(value)}
+            disabled={form.formState.isSubmitting}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
               <SelectValue placeholder={"Career Mode"} />
             </SelectTrigger>
             <SelectContent>
@@ -51,8 +55,12 @@ export function CareerFormModeTypeFields() {
           <Select
             value={field.value}
             onValueChange={(value) => field.onChange(value)}
+            disabled={form.formState.isSubmitting}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
               <SelectValue placeholder={"Career Type"} />
             </SelectTrigger>
             <SelectContent>
@@ -70,11 +78,14 @@ export function CareerFormModeTypeFields() {
         name="isFeatured"
         label="Is featured?"
         render={({ field }) => (
-          <Checkbox
-            {...(field as any)}
-            checked={field.value}
-            onCheckedChange={field.onChange}
-          />
+          <div className="w-4">
+            <Checkbox
+              {...(field as any)}
+              checked={field.value}
+              onCheckedChange={field.onChange}
+              disabled={form.formState.isSubmitting}
+            />
+          </div>
         )}
       />
     </FieldGroup>

@@ -58,6 +58,12 @@ export const apiRoutes = {
     },
   },
   achievements: {
+    list: {
+      url: (searchParams: URLSearchParams) =>
+        apiUrl(`achievements?${searchParams.toString()}`),
+      method: "GET",
+      contentType: null,
+    },
     create: {
       url: apiUrl("achievements"),
       method: "POST",
@@ -75,6 +81,12 @@ export const apiRoutes = {
     },
   },
   careers: {
+    list: {
+      url: (searchParams: URLSearchParams) =>
+        apiUrl(`careers?${searchParams.toString()}`),
+      method: "GET",
+      contentType: null,
+    },
     create: {
       url: apiUrl("careers"),
       method: "POST",
@@ -92,6 +104,12 @@ export const apiRoutes = {
     },
   },
   education: {
+    list: {
+      url: (searchParams: URLSearchParams) =>
+        apiUrl(`education?${searchParams.toString()}`),
+      method: "GET",
+      contentType: null,
+    },
     create: {
       url: apiUrl("education"),
       method: "POST",
@@ -126,6 +144,12 @@ export const apiRoutes = {
     },
   },
   skills: {
+    list: {
+      url: (searchParams: URLSearchParams) =>
+        apiUrl(`skills?${searchParams.toString()}`),
+      method: "GET",
+      contentType: null,
+    },
     create: {
       url: apiUrl("skills"),
       method: "POST",
@@ -162,6 +186,29 @@ export const apiRoutes = {
       url: (projectId: string) => apiUrl(`projects/${projectId}`),
       method: "DELETE",
       contentType: null,
+    },
+  },
+  tags: {
+    list: {
+      url: (searchParams: URLSearchParams) =>
+        apiUrl(`tags?${searchParams.toString()}`),
+      method: "GET",
+      contentType: null,
+    },
+    create: {
+      url: apiUrl("tags"),
+      method: "POST",
+      contentType: "application/json",
+    },
+    update: {
+      url: apiUrl("tags"),
+      method: "PATCH",
+      contentType: "application/json",
+    },
+    delete: {
+      url: apiUrl("tags"),
+      method: "DELETE",
+      contentType: "application/json",
     },
   },
   profile: {

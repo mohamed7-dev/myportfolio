@@ -21,7 +21,7 @@ export async function ProjectCard({ children }: { children: React.ReactNode }) {
           </p>
         </div>
 
-        <div className="flex-1 relative">{children}</div>
+        <div className="flex-1">{children}</div>
       </div>
     </BentoLink>
   );

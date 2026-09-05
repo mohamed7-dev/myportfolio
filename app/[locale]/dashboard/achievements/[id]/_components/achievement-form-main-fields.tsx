@@ -19,7 +19,9 @@ export function AchievementFormMainFields() {
           control={form.control}
           name={"name"}
           label={"Achievement Name"}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+          )}
         />
         <TranslatableFormField
           control={form.control}
@@ -32,6 +34,7 @@ export function AchievementFormMainFields() {
               fieldName="slug"
               watchFieldName="name"
               entityId={form.getValues("id")}
+              disabled={form.formState.isSubmitting}
             />
           )}
         />
@@ -40,13 +43,17 @@ export function AchievementFormMainFields() {
         control={form.control}
         name={"organization"}
         label={"organization"}
-        render={({ field }) => <Input {...(field as any)} />}
+        render={({ field }) => (
+          <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+        )}
       />
       <FormField
         control={form.control}
         name={"credentialUrl"}
         label={"Credential URL"}
-        render={({ field }) => <Input {...(field as any)} />}
+        render={({ field }) => (
+          <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+        )}
       />
     </FieldGroup>
   );

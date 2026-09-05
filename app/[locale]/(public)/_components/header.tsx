@@ -70,7 +70,7 @@ export async function HomePageHeader({
         <p className="text-xs sm:text-sm font-base text-foreground mt-4 max-w-2xl">
           {profile.subHeading}
         </p>
-        <div className="flex gap-2 mt-4 overflow-x-auto">
+        <div className="flex gap-2 mt-4 flex-wrap">
           {skills?.map((skill) => (
             <Badge variant="neutral" key={skill.id}>
               {skill.name}

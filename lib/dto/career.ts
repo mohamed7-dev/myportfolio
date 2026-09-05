@@ -92,12 +92,14 @@ export const createCareerInputSchema = z.object({
   endDate: z.coerce.date().nullish(),
   isPresent: z.boolean(),
   isFeatured: z.boolean().optional(),
-  type: careerTypeSchema,
-  mode: careerModeSchema,
+  type: z.string().min(1, "Career type is required").pipe(careerTypeSchema),
+  mode: z.string().min(1, "Career mode is required").pipe(careerModeSchema),
   achievementIds: z.array(z.string()).optional(),
 });
-
-export type CreateCareerInputSchema = z.infer<typeof createCareerInputSchema>;
+export type CreateCareerFormInputSchema = z.input<
+  typeof createCareerInputSchema
+>;
+export type CreateCareerInputSchema = z.output<typeof createCareerInputSchema>;
 
 export const createCareerOutputSchema = z.union([career, apiErrorSchema]);
 
@@ -121,12 +123,24 @@ export const updateCareerInputSchema = z.object({
   endDate: z.coerce.date().nullish().optional(),
   isPresent: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
-  type: careerTypeSchema.optional(),
-  mode: careerModeSchema.optional(),
+  type: z
+    .string()
+    .min(1, "Career type is required")
+    .pipe(careerTypeSchema)
+    .optional(),
+  mode: z
+    .string()
+    .min(1, "Career mode is required")
+    .pipe(careerModeSchema)
+    .optional(),
   achievementIds: z.array(z.string()).optional(),
 });
 
-export type UpdateCareerInputSchema = z.infer<typeof updateCareerInputSchema>;
+export type UpdateCareerFormInputSchema = z.input<
+  typeof updateCareerInputSchema
+>;
+
+export type UpdateCareerInputSchema = z.output<typeof updateCareerInputSchema>;
 
 export const updateCareerOutputSchema = z.union([career, apiErrorSchema]);
 

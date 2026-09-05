@@ -25,6 +25,7 @@ export function ContactMethodFormStatusField() {
               {...(field as any)}
               checked={field.value}
               onCheckedChange={field.onChange}
+              disabled={form.formState.isSubmitting}
             />
           )}
         />
@@ -39,6 +40,7 @@ export function ContactMethodFormStatusField() {
               {...(field as any)}
               checked={field.value}
               onCheckedChange={field.onChange}
+              disabled={form.formState.isSubmitting}
             />
           )}
         />

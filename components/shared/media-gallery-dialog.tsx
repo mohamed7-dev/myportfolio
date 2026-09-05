@@ -78,17 +78,18 @@ export function MediaGalleryDialog({
                 transform={{
                   preset: "full",
                 }}
-                className={cn(
-                  "size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]",
+                containerClassName={cn(
+                  "transition-transform duration-700 group-hover:scale-[1.04]",
                 )}
+                videoClassName="aspect-video"
               />
             )}
           </div>
 
-          <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2 px-4">
+          <div className="absolute inset-s-1/2 -translate-x-1/3 md:-translate-x-1/2 bottom-3 flex justify-center gap-2 px-4">
             <Button
               type="button"
-              size="icon"
+              size="icon-sm"
               variant="neutralNoShadow"
               onClick={onClickPrev}
               aria-label="Previous media"
@@ -97,7 +98,7 @@ export function MediaGalleryDialog({
             </Button>
             <Button
               type="button"
-              size="icon"
+              size="icon-sm"
               variant="neutralNoShadow"
               onClick={onClickNext}
               aria-label="Next media"

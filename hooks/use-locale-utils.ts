@@ -14,5 +14,6 @@ export function useLocaleUtils() {
     languageAndLocaleDisplayName: getLocaleDisplayName(displayLocale),
     isRTL: isRtl(displayLocale),
     urlSegmentLocale: displayLocale,
+    contentLanguage: displayLocale,
   };
 }

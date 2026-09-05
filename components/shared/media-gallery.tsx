@@ -119,10 +119,11 @@ export function MediaGallery({
                       preset: "large",
                       mode: "resize",
                     }}
-                    className={cn(
-                      "size-full object-cover transition-transform duration-700 group-hover:scale-[1.04]",
+                    containerClassName={cn(
+                      "size-full transition-transform duration-700 group-hover:scale-[1.04]",
                       !isCurrent && "brightness-75",
                     )}
+                    videoClassName="w-full aspect-video"
                   />
                 )}
               </div>

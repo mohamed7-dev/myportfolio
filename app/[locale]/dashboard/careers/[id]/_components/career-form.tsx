@@ -4,12 +4,15 @@ import { useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useLocaleUtils } from "@/hooks/use-locale-utils";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type Career,
+  type CreateCareerFormInputSchema,
   type CreateCareerInputSchema,
   type CreateCareerOutputSchema,
   createCareerInputSchema,
+  type UpdateCareerFormInputSchema,
   type UpdateCareerInputSchema,
   type UpdateCareerOutputSchema,
   updateCareerInputSchema,
@@ -30,20 +33,34 @@ export function CareerForm({
   const params = useParams();
   const creatingNewEntity = params.id === NEW_ENTITY_PATH;
   const router = useRouter();
+  const { contentLanguage } = useLocaleUtils();
 
-  const form = useForm<CreateCareerInputSchema>({
+  const form = useForm<CreateCareerFormInputSchema>({
     defaultValues: {
       assetIds: [],
-      translations: [],
+      translations: [
+        {
+          languageCode: contentLanguage,
+          name: "",
+          slug: "",
+          organization: "",
+          responsibilities: "",
+          learned: "",
+          impact: "",
+          location: "",
+        },
+      ],
       isPresent: false,
       startDate: undefined,
       endDate: undefined,
       isFeatured: false,
+      mode: "",
+      type: "",
     },
     resolver: zodResolver(createCareerInputSchema),
   });
 
-  const updateForm = useForm<UpdateCareerInputSchema>({
+  const updateForm = useForm<UpdateCareerFormInputSchema>({
     defaultValues: {
       id: initialValues?.id ?? "",
       mode: initialValues?.mode ?? undefined,
@@ -59,7 +76,7 @@ export function CareerForm({
     resolver: zodResolver(updateCareerInputSchema),
   });
 
-  const { mutate: createCareer } = useMutation({
+  const { mutateAsync: createCareer } = useMutation({
     mutationKey: ["create-career"],
     mutationFn: async (input: CreateCareerInputSchema) => {
       const res = await api(apiRoutes.careers.create, input, true);
@@ -79,7 +96,7 @@ export function CareerForm({
     },
   });
 
-  const { mutate: updateCareer } = useMutation({
+  const { mutateAsync: updateCareer } = useMutation({
     mutationKey: ["update-career"],
     mutationFn: async (input: UpdateCareerInputSchema) => {
       const res = await api(apiRoutes.careers.update, input, true);
@@ -99,15 +116,15 @@ export function CareerForm({
     },
   });
 
-  const onSubmit = (
-    values: CreateCareerInputSchema | UpdateCareerInputSchema,
+  const onSubmit = async (
+    values: CreateCareerFormInputSchema | UpdateCareerFormInputSchema,
   ) => {
     if (creatingNewEntity) {
-      createCareer({
+      await createCareer({
         ...values,
       } as CreateCareerInputSchema);
     } else {
-      updateCareer({
+      await updateCareer({
         ...values,
         id: params.id,
       } as UpdateCareerInputSchema);

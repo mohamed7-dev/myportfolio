@@ -23,6 +23,7 @@ export function SkillFormStatusField() {
             {...(field as any)}
             checked={field.value}
             onCheckedChange={field.onChange}
+            disabled={form.formState.isSubmitting}
           />
         )}
       />

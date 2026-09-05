@@ -2,6 +2,9 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { createRouter } from "@/api/common/create-router";
 import { cacheKeys } from "@/lib/constants";
 import {
+  type CareerListInputSchema,
+  careerListInputSchema,
+  careerListOutputSchema,
   createCareerInputSchema,
   createCareerOutputSchema,
   deleteCareersInputSchema,
@@ -13,7 +16,7 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { careerService } from "@/services/domain/career.service";
 
-export const { POST, PATCH, DELETE } = createRouter({
+export const { POST, PATCH, DELETE, GET } = createRouter({
   POST: {
     authenticatedOnly: true,
     handler: async (req, ctx) => {
@@ -81,6 +84,32 @@ export const { POST, PATCH, DELETE } = createRouter({
           status: 200,
         },
       };
+    },
+  },
+  GET: {
+    authenticatedOnly: true,
+    handler: async (req, ctx) => {
+      const { searchParams } = new URL(req.url);
+
+      const input = Object.fromEntries(
+        searchParams.entries(),
+      ) as unknown as CareerListInputSchema & { filter: string };
+      const parsedInput = validateInput(
+        {
+          ...input,
+          filter:
+            input.filter &&
+            input.filter !== "undefined" &&
+            typeof input.filter === "string"
+              ? JSON.parse(input.filter)
+              : undefined,
+        },
+        careerListInputSchema,
+      );
+
+      const result = await careerService.find(ctx, parsedInput);
+      const careers = validateOutput(result, careerListOutputSchema);
+      return { body: careers, init: { status: 200 } };
     },
   },
 });

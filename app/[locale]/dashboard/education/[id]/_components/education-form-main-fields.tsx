@@ -21,7 +21,9 @@ export function EducationFormMainFields() {
           control={form.control}
           name={"school"}
           label={"School"}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+          )}
         />
         <TranslatableFormField
           control={form.control}
@@ -34,6 +36,7 @@ export function EducationFormMainFields() {
               fieldName="slug"
               watchFieldName="school"
               entityId={form.getValues("id")}
+              disabled={form.formState.isSubmitting}
             />
           )}
         />
@@ -43,20 +46,29 @@ export function EducationFormMainFields() {
           control={form.control}
           name={"degree"}
           label={"Degree"}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+          )}
         />
         <TranslatableFormField
           control={form.control}
           name={"location"}
           label={"Location"}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+          )}
         />
         <FormField
           control={form.control}
           name={"gpa"}
           label={"GPA"}
           render={({ field }) => (
-            <Input {...(field as any)} type="number" inputMode="numeric" />
+            <Input
+              {...(field as any)}
+              type="number"
+              inputMode="numeric"
+              disabled={form.formState.isSubmitting}
+            />
           )}
         />
       </FieldGroup>

@@ -13,7 +13,9 @@ export function NameField() {
       control={form.control}
       name="name"
       label="Asset Name"
-      render={({ field }) => <Input {...(field as any)} />}
+      render={({ field }) => (
+        <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+      )}
     />
   );
 }

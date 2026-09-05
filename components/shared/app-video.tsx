@@ -5,11 +5,14 @@ import { getCloudinaryAssetUrl } from "@/lib/helpers/cloudinary-url";
 import { resolveSize } from "@/lib/helpers/image";
 import type { AssetLike, ImageMode, ImagePreset } from "@/lib/types/image";
 import { cn } from "@/lib/utils";
-import { VideoPlayer } from "./video-player/video-player";
 import { isDevelopmentMode } from "@/lib/utils/is-env";
+import { VideoPlayer } from "./video-player/video-player";
 
 interface AppVideoProps
-  extends Omit<React.VideoHTMLAttributes<HTMLVideoElement>, "src" | "poster"> {
+  extends Omit<
+    React.VideoHTMLAttributes<HTMLVideoElement>,
+    "src" | "poster" | "className"
+  > {
   asset: AssetLike | undefined;
   placeholder?: React.ReactNode;
   width?: number;
@@ -20,6 +23,8 @@ interface AppVideoProps
     quality?: number;
   };
   ref?: React.Ref<HTMLVideoElement>;
+  containerClassName?: string;
+  videoClassName?: string;
 }
 
 export function AppVideo({
@@ -29,7 +34,8 @@ export function AppVideo({
   transform = {},
   width,
   height,
-  className,
+  containerClassName,
+  videoClassName,
   controls,
   preload,
   ...props
@@ -47,7 +53,7 @@ export function AppVideo({
           preset={preset}
           width={size.width}
           height={size.height}
-          className={className}
+          className={containerClassName}
         />
       )
     );
@@ -68,7 +74,8 @@ export function AppVideo({
       width={videoWidth}
       height={videoHeight}
       {...props}
-      className={cn("size-full object-contain", className)}
+      containerClassName={cn(containerClassName)}
+      videoClassName={cn(videoClassName)}
     >
       <source
         src={

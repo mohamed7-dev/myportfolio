@@ -7,6 +7,7 @@ import {
 } from "@/components/page-layout/page-action-bar";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { PendingSubmitButton } from "@/components/shared/pending-submit-button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { type Asset, asset as assetSchema } from "@/lib/dto/asset";
@@ -15,7 +16,6 @@ import { assetService } from "@/services/domain/asset.service";
 import { AssetPreview } from "./_components/asset-preview";
 import { DownloadButton } from "./_components/download-button";
 import { NameField } from "./_components/name-field";
-import { SubmitButton } from "./_components/submit-button";
 import { TagsField } from "./_components/tags-field";
 import { UpdateAssetForm } from "./_components/update-asset-form";
 
@@ -46,7 +46,11 @@ export default async function AssetDetailPage({
         <PageTitle pageTitleBlockId="dashboard-asset-title">Asset</PageTitle>
         <PageActionBar pageActionBarBlockId="dashboard-asset-action-bar">
           <PageActionBarItem actionBarItemBlockId="update-button">
-            <SubmitButton />
+            <PendingSubmitButton
+              formName="update-asset-form"
+              createEntityLabel=""
+              updateEntityLabel="update asset"
+            />
           </PageActionBarItem>
           <PageActionBarItem actionBarItemBlockId="download-button">
             <DownloadButton asset={asset} />

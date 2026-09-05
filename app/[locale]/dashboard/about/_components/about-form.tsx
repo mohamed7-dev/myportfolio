@@ -44,7 +44,7 @@ export function AboutForm({
     resolver: zodResolver(updateProfileInputSchema),
   });
 
-  const { mutate: updateProfile } = useMutation({
+  const { mutateAsync: updateProfile } = useMutation({
     mutationKey: ["update-profile"],
     mutationFn: async (input: UpdateProfileInputSchema) => {
       const res = await api(apiRoutes.profile.update, input, true);
@@ -68,8 +68,8 @@ export function AboutForm({
     },
   });
 
-  const onSubmit = (values: UpdateProfileInputSchema) => {
-    updateProfile(values);
+  const onSubmit = async (values: UpdateProfileInputSchema) => {
+    await updateProfile(values);
   };
 
   return (

@@ -30,7 +30,9 @@ export function CareerFormMainFields() {
           control={form.control}
           name={"name"}
           label={"Career Name"}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+          )}
         />
         <TranslatableFormField
           control={form.control}
@@ -43,6 +45,7 @@ export function CareerFormMainFields() {
               fieldName="slug"
               watchFieldName="name"
               entityId={form.getValues("id")}
+              disabled={form.formState.isSubmitting}
             />
           )}
         />
@@ -53,13 +56,17 @@ export function CareerFormMainFields() {
           control={form.control}
           name={"location"}
           label={"Location"}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+          )}
         />
         <TranslatableFormField
           control={form.control}
           name={"organization"}
           label={"Organization"}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+          )}
         />
       </FieldGroup>
       <FieldGroup>
@@ -67,19 +74,25 @@ export function CareerFormMainFields() {
           control={form.control}
           name={"learned"}
           label={"What have you learned?"}
-          render={({ field }) => <RichTextInput {...field} />}
+          render={({ field }) => (
+            <RichTextInput {...field} disabled={form.formState.isSubmitting} />
+          )}
         />
         <TranslatableFormField
           control={form.control}
           name={"impact"}
           label={"What was your impact?"}
-          render={({ field }) => <RichTextInput {...field} />}
+          render={({ field }) => (
+            <RichTextInput {...field} disabled={form.formState.isSubmitting} />
+          )}
         />
         <TranslatableFormField
           control={form.control}
           name={"responsibilities"}
           label={"What was your responsibilities?"}
-          render={({ field }) => <RichTextInput {...field} />}
+          render={({ field }) => (
+            <RichTextInput {...field} disabled={form.formState.isSubmitting} />
+          )}
         />
       </FieldGroup>
     </FieldGroup>

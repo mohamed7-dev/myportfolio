@@ -20,6 +20,7 @@ export function ProjectFormStatusField() {
               {...(field as any)}
               checked={field.value}
               onCheckedChange={field.onChange}
+              disabled={form.formState.isSubmitting}
             />
           )}
         />
@@ -34,6 +35,7 @@ export function ProjectFormStatusField() {
               {...(field as any)}
               checked={field.value}
               onCheckedChange={field.onChange}
+              disabled={form.formState.isSubmitting}
             />
           )}
         />
@@ -48,6 +50,7 @@ export function ProjectFormStatusField() {
               {...(field as any)}
               checked={field.value}
               onCheckedChange={field.onChange}
+              disabled={form.formState.isSubmitting}
             />
           )}
         />

@@ -6,6 +6,9 @@ import {
   createSkillOutputSchema,
   deleteSkillsInputSchema,
   deleteSkillsOutputSchema,
+  type SkillListInputSchema,
+  skillListInputSchema,
+  skillListOutputSchema,
   updateSkillInputSchema,
   updateSkillOutputSchema,
 } from "@/lib/dto/skill";
@@ -13,7 +16,7 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { skillService } from "@/services/domain/skill.service";
 
-export const { POST, PATCH, DELETE } = createRouter({
+export const { POST, PATCH, DELETE, GET } = createRouter({
   POST: {
     authenticatedOnly: true,
     handler: async (req, ctx) => {
@@ -69,6 +72,32 @@ export const { POST, PATCH, DELETE } = createRouter({
       revalidateTag(cacheKeys.publicSkills[0], "max");
 
       return { body: parsedResult, init: { status: 200 } };
+    },
+  },
+  GET: {
+    authenticatedOnly: true,
+    handler: async (req, ctx) => {
+      const { searchParams } = new URL(req.url);
+
+      const input = Object.fromEntries(
+        searchParams.entries(),
+      ) as unknown as SkillListInputSchema & { filter: string };
+      const parsedInput = validateInput(
+        {
+          ...input,
+          filter:
+            input.filter &&
+            input.filter !== "undefined" &&
+            typeof input.filter === "string"
+              ? JSON.parse(input.filter)
+              : undefined,
+        },
+        skillListInputSchema,
+      );
+
+      const result = await skillService.find(ctx, parsedInput);
+      const skills = validateOutput(result, skillListOutputSchema);
+      return { body: skills, init: { status: 200 } };
     },
   },
 });

@@ -7,6 +7,7 @@ import {
 } from "@/components/page-layout/page-action-bar";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { PendingSubmitButton } from "@/components/shared/pending-submit-button";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type Education,
@@ -18,7 +19,6 @@ import { EducationForm } from "./_components/education-form";
 import { EducationFormAssetField } from "./_components/education-form-asset-field";
 import EducationFormDateFields from "./_components/education-form-date-fields";
 import { EducationFormMainFields } from "./_components/education-form-main-fields";
-import { EducationFormSubmitButton } from "./_components/education-form-submit-button";
 
 export const metadata = {
   title: "Dashboard - Edit Education",
@@ -56,7 +56,11 @@ export default async function EducationPage({
         </PageTitle>
         <PageActionBar pageActionBarBlockId="dashboard-education-entry-action-bar">
           <PageActionBarItem actionBarItemBlockId="create-edit-education-entry">
-            <EducationFormSubmitButton />
+            <PendingSubmitButton
+              formName="education-form"
+              createEntityLabel="create education entry"
+              updateEntityLabel="update education entry"
+            />
           </PageActionBarItem>
         </PageActionBar>
         <PageLayout>

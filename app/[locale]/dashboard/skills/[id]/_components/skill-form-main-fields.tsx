@@ -20,7 +20,9 @@ export function SkillFormMainFields() {
           control={form.control}
           name={"name"}
           label={"Skill Name"}
-          render={({ field }) => <Input {...(field as any)} />}
+          render={({ field }) => (
+            <Input disabled={form.formState.isSubmitting} {...(field as any)} />
+          )}
         />
         <TranslatableFormField
           control={form.control}
@@ -33,6 +35,7 @@ export function SkillFormMainFields() {
               fieldName="slug"
               watchFieldName="name"
               entityId={form.getValues("id")}
+              disabled={form.formState.isSubmitting}
             />
           )}
         />

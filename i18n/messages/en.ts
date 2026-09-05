@@ -28,7 +28,7 @@ export default {
     actionLabel: "Try again",
   },
   home: {
-    location: "Based in {location}",
+    location: "Based in {location}, working worldwide",
     cv: "Download CV",
     connect: "Connect",
     welcome: "welcome",
@@ -44,19 +44,21 @@ export default {
         title: "Current focus",
       },
       projects: {
-        title: "Featured Work",
-        description: "A selection of real apps built to solve real problems.",
+        title: "Featured Projects",
+        description:
+          "A collection of applications I've built to solve real-world problems.",
       },
       career: {
         title: "Career",
-        description: "My professional journey and work experience.",
+        description:
+          "A look at my professional journey, experience, and growth as a developer.",
       },
     },
   },
   about: {
     title: "about me",
     description:
-      "Learn about my engineering mindset, technical skills, and professional background.",
+      "Explore my approach to engineering, technical expertise, and professional experience.",
     summary: {
       title: "The Architect Mindset",
     },
@@ -78,6 +80,7 @@ export default {
     description: "Explore the applications and systems I have built.",
   },
   project: {
+    viewProject: "view project",
     backToProjects: "Back To Projects",
     source: "source",
     liveDemo: "live demo",

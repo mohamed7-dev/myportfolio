@@ -7,6 +7,7 @@ import {
 } from "@/components/page-layout/page-action-bar";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { PendingSubmitButton } from "@/components/shared/pending-submit-button";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import { type Skill, skill as skillSchema } from "@/lib/dto/skill";
 import { validateOutput } from "@/lib/helpers/validate-output";
@@ -16,7 +17,6 @@ import { SkillFormAssetField } from "./_components/skill-form-asset-field";
 import { SkillFormCategoryField } from "./_components/skill-form-category-field";
 import { SkillFormMainFields } from "./_components/skill-form-main-fields";
 import { SkillFormStatusField } from "./_components/skill-form-status-field";
-import { SubmitButton } from "./_components/submit-button";
 
 export const metadata = {
   title: "Dashboard - Edit Skill",
@@ -53,7 +53,11 @@ export default async function SkillPage({
         </PageTitle>
         <PageActionBar pageActionBarBlockId="dashboard-skill-action-bar">
           <PageActionBarItem actionBarItemBlockId="create-edit-skill">
-            <SubmitButton />
+            <PendingSubmitButton
+              formName="skill-form"
+              createEntityLabel="Create skill"
+              updateEntityLabel="Update skill"
+            />
           </PageActionBarItem>
         </PageActionBar>
         <PageLayout>

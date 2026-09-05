@@ -1,3 +1,4 @@
+import type { HTMLAttributes } from "react";
 import {
   Pagination as BasePagination,
   PaginationContent,
@@ -14,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface PaginationProps {
   goToPage: (page: number) => void;
@@ -22,6 +24,7 @@ interface PaginationProps {
   pageSize: number;
   onPageSizeChange: (newPageSize: number) => void;
   resetPage: () => void;
+  containerClassName?: HTMLAttributes<HTMLDivElement>["className"];
 }
 
 export function PaginationBar({
@@ -31,11 +34,14 @@ export function PaginationBar({
   pageSize,
   onPageSizeChange,
   resetPage,
+  containerClassName,
 }: PaginationProps) {
   return (
-    <div className="flex items-center justify-between">
+    <div
+      className={cn("flex items-center justify-between", containerClassName)}
+    >
       <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">Items Per Page</span>
+        <span className="text-sm text-foreground/80">Items Per Page</span>
         <Select
           value={pageSize.toString()}
           onValueChange={(value) => {

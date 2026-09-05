@@ -7,6 +7,7 @@ import {
 } from "@/components/page-layout/page-action-bar";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { PendingSubmitButton } from "@/components/shared/pending-submit-button";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type ContactMethod,
@@ -18,7 +19,6 @@ import { ContactMethodForm } from "./_components/contact-method-form";
 import { ContactMethodFormAssetField } from "./_components/contact-method-form-asset-field";
 import { ContactMethodFormMainFields } from "./_components/contact-method-form-main-fields";
 import { ContactMethodFormStatusField } from "./_components/contact-method-form-status-field";
-import { ContactMethodFormSubmitButton } from "./_components/contact-method-form-submit-button";
 
 export const metadata = {
   title: "Dashboard - Edit Contact Method",
@@ -56,7 +56,11 @@ export default async function ContactMethodPage({
         </PageTitle>
         <PageActionBar pageActionBarBlockId="dashboard-contact-method-action-bar">
           <PageActionBarItem actionBarItemBlockId="dashboard-contact-method-submit-button">
-            <ContactMethodFormSubmitButton />
+            <PendingSubmitButton
+              formName="contact-method-form"
+              createEntityLabel="create contact method"
+              updateEntityLabel="update contact method"
+            />
           </PageActionBarItem>
         </PageActionBar>
         <PageLayout>

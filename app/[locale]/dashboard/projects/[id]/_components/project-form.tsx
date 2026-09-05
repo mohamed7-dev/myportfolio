@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useLocaleUtils } from "@/hooks/use-locale-utils";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type CreateProjectInputSchema,
@@ -30,6 +31,7 @@ export function ProjectForm({
   const params = useParams();
   const creatingNewEntity = params.id === NEW_ENTITY_PATH;
   const router = useRouter();
+  const { contentLanguage } = useLocaleUtils();
 
   const form = useForm<CreateProjectInputSchema>({
     defaultValues: {
@@ -39,7 +41,20 @@ export function ProjectForm({
       enabled: true,
       featured: false,
       finished: false,
-      translations: [],
+      translations: [
+        {
+          languageCode: contentLanguage,
+          name: "",
+          slug: "",
+          description: "",
+          overview: "",
+          features: "",
+          techStack: "",
+          contributions: "",
+          challengesAndSolutions: "",
+          technicalHighlights: "",
+        },
+      ],
       skillIds: [],
       achievementIds: [],
     },
@@ -67,7 +82,7 @@ export function ProjectForm({
     resolver: zodResolver(updateProjectInputSchema),
   });
 
-  const { mutate: createProject } = useMutation({
+  const { mutateAsync: createProject } = useMutation({
     mutationKey: ["create-project"],
     mutationFn: async (input: CreateProjectInputSchema) => {
       const res = await api(apiRoutes.projects.create, input, true);
@@ -87,7 +102,7 @@ export function ProjectForm({
     },
   });
 
-  const { mutate: updateProject } = useMutation({
+  const { mutateAsync: updateProject } = useMutation({
     mutationKey: ["update-project"],
     mutationFn: async (input: UpdateProjectInputSchema) => {
       const res = await api(apiRoutes.projects.update, input, true);
@@ -107,15 +122,15 @@ export function ProjectForm({
     },
   });
 
-  const onSubmit = (
+  const onSubmit = async (
     values: CreateProjectInputSchema | UpdateProjectInputSchema,
   ) => {
     if (creatingNewEntity) {
-      createProject({
+      await createProject({
         ...values,
       } as CreateProjectInputSchema);
     } else {
-      updateProject({
+      await updateProject({
         ...values,
         id: params.id as string,
       } as UpdateProjectInputSchema);

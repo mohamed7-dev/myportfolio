@@ -50,6 +50,7 @@ export function TagsField() {
                 variant={"neutralNoShadow"}
                 onClick={() => remove(tag)}
                 aria-label={`Remove tag ${tag}`}
+                disabled={form.formState.isSubmitting}
               >
                 <XIcon className="size-3.5" />
               </Button>
@@ -72,7 +73,7 @@ export function TagsField() {
           size={"icon"}
           variant={"noShadow"}
           onClick={() => addTag(value)}
-          disabled={!value.trim()}
+          disabled={!value.trim() || form.formState.isSubmitting}
         >
           Add
         </Button>

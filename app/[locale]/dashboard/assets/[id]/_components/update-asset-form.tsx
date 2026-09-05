@@ -33,7 +33,7 @@ export function UpdateAssetForm({
     resolver: zodResolver(updateAssetInputSchema),
   });
 
-  const { mutate } = useMutation({
+  const { mutateAsync } = useMutation({
     mutationKey: ["update-asset"],
     mutationFn: async (input: UpdateAssetInputSchema) => {
       const res = await api(apiRoutes.assets.update, input, true);
@@ -52,8 +52,8 @@ export function UpdateAssetForm({
     },
   });
 
-  const onSubmit = (values: UpdateAssetInputSchema) => {
-    mutate(values);
+  const onSubmit = async (values: UpdateAssetInputSchema) => {
+    await mutateAsync(values);
   };
 
   return (

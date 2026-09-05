@@ -5,8 +5,12 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type VideoPlayerProps = React.VideoHTMLAttributes<HTMLVideoElement> & {
-  className?: string;
+type VideoPlayerProps = Omit<
+  React.VideoHTMLAttributes<HTMLVideoElement>,
+  "className"
+> & {
+  containerClassName?: string;
+  videoClassName?: string;
   volume?: number;
 };
 
@@ -25,7 +29,8 @@ function formatTime(seconds: number) {
 }
 
 export function VideoPlayer({
-  className,
+  containerClassName,
+  videoClassName,
   onPlay,
   onPause,
   onTimeUpdate,
@@ -197,7 +202,6 @@ export function VideoPlayer({
   const handleLoadedMetadata = (
     event: React.SyntheticEvent<HTMLVideoElement>,
   ) => {
-    console.log({ event });
     setDuration(event.currentTarget.duration);
     setVolume(event.currentTarget.volume);
 
@@ -237,11 +241,11 @@ export function VideoPlayer({
       onMouseEnter={resetIdleTimer}
       onTouchStart={resetIdleTimer}
       className={cn(
-        "group relative w-full overflow-hidden",
+        "group relative w-full overflow-hidden flex items-center",
         "border-2 border-border bg-black",
         "shadow-[8px_8px_0_0_#000]",
         !controlsVisible && "cursor-none",
-        className,
+        containerClassName,
       )}
     >
       <video
@@ -258,10 +262,7 @@ export function VideoPlayer({
         tabIndex={0}
         onKeyDown={handleVideoKeyDown}
         playsInline
-        className={cn(
-          "block aspect-video w-full bg-black object-contain",
-          className,
-        )}
+        className={cn("w-full bg-black object-contain", videoClassName)}
       />
 
       {/* Controls */}

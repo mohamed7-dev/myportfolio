@@ -7,6 +7,7 @@ import {
 } from "@/components/page-layout/page-action-bar";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { PendingSubmitButton } from "@/components/shared/pending-submit-button";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type Achievement,
@@ -18,7 +19,6 @@ import { AchievementForm } from "./_components/achievement-form";
 import { AchievementFormAssetField } from "./_components/achievement-form-asset-field";
 import AchievementFormDateField from "./_components/achievement-form-date-field";
 import { AchievementFormMainFields } from "./_components/achievement-form-main-fields";
-import { AchievementFormSubmitButton } from "./_components/achievement-form-submit-button";
 import { AchievementFormTypeField } from "./_components/achievement-form-type-field";
 
 export const metadata = {
@@ -57,7 +57,11 @@ export default async function AchievementPage({
         </PageTitle>
         <PageActionBar pageActionBarBlockId="dashboard-achievement-action-bar">
           <PageActionBarItem actionBarItemBlockId="create-edit-achievement">
-            <AchievementFormSubmitButton />
+            <PendingSubmitButton
+              formName="achievement-form"
+              createEntityLabel="create achievement"
+              updateEntityLabel="update achievement"
+            />
           </PageActionBarItem>
         </PageActionBar>
         <PageLayout>

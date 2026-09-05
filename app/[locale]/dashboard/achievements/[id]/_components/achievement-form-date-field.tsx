@@ -14,7 +14,13 @@ export default function AchievementFormDateField() {
         control={form.control}
         name={"issueDate"}
         label={"Issue Date"}
-        render={({ field }) => <Input {...(field as any)} type="date" />}
+        render={({ field }) => (
+          <Input
+            {...(field as any)}
+            type="date"
+            disabled={form.formState.isSubmitting}
+          />
+        )}
       />
     </FieldGroup>
   );

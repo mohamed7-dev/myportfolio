@@ -11,7 +11,9 @@ export function CvAssetIdField() {
       control={form.control}
       name="cvAssetId"
       label="CV asset id"
-      render={({ field }) => <Input {...field} />}
+      render={({ field }) => (
+        <Input {...field} disabled={form.formState.isSubmitting} />
+      )}
     />
   );
 }

@@ -14,19 +14,25 @@ export function ContactMethodFormMainFields() {
         control={form.control}
         name={"name"}
         label={"Contact Method Name"}
-        render={({ field }) => <Input {...(field as any)} />}
+        render={({ field }) => (
+          <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+        )}
       />
       <FormField
         control={form.control}
         name={"url"}
         label={"URL"}
-        render={({ field }) => <Input {...(field as any)} />}
+        render={({ field }) => (
+          <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+        )}
       />
       <FormField
         control={form.control}
         name={"copyableText"}
         label={"Copyable Text"}
-        render={({ field }) => <Input {...(field as any)} />}
+        render={({ field }) => (
+          <Input {...(field as any)} disabled={form.formState.isSubmitting} />
+        )}
       />
     </FieldGroup>
   );

@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useLocaleUtils } from "@/hooks/use-locale-utils";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type ContactMethod,
@@ -30,14 +31,19 @@ export function ContactMethodForm({
   const params = useParams();
   const creatingNewEntity = params.id === NEW_ENTITY_PATH;
   const router = useRouter();
-
+  const { contentLanguage } = useLocaleUtils();
   const form = useForm<CreateContactMethodInputSchema>({
     defaultValues: {
       url: "",
       copyableText: "",
       assetIds: [],
       featuredAssetId: undefined,
-      translations: [],
+      translations: [
+        {
+          languageCode: contentLanguage,
+          name: "",
+        },
+      ],
       enabled: true,
       primary: false,
     },
@@ -58,7 +64,7 @@ export function ContactMethodForm({
     resolver: zodResolver(updateContactMethodInputSchema),
   });
 
-  const { mutate: createContactMethod } = useMutation({
+  const { mutateAsync: createContactMethod } = useMutation({
     mutationKey: ["create-contact-method"],
     mutationFn: async (input: CreateContactMethodInputSchema) => {
       const res = await api(apiRoutes.contactMethods.create, input, true);
@@ -78,7 +84,7 @@ export function ContactMethodForm({
     },
   });
 
-  const { mutate: updateContactMethod } = useMutation({
+  const { mutateAsync: updateContactMethod } = useMutation({
     mutationKey: ["update-contact-method"],
     mutationFn: async (input: UpdateContactMethodInputSchema) => {
       const res = await api(apiRoutes.contactMethods.update, input, true);
@@ -98,15 +104,15 @@ export function ContactMethodForm({
     },
   });
 
-  const onSubmit = (
+  const onSubmit = async (
     values: CreateContactMethodInputSchema | UpdateContactMethodInputSchema,
   ) => {
     if (creatingNewEntity) {
-      createContactMethod({
+      await createContactMethod({
         ...values,
       } as CreateContactMethodInputSchema);
     } else {
-      updateContactMethod({
+      await updateContactMethod({
         ...values,
         id: params.id,
       } as UpdateContactMethodInputSchema);

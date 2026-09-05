@@ -15,13 +15,25 @@ export default function EducationFormDateFields() {
         control={form.control}
         name={"startDate"}
         label={"Start Date"}
-        render={({ field }) => <Input {...(field as any)} type="date" />}
+        render={({ field }) => (
+          <Input
+            {...(field as any)}
+            type="date"
+            disabled={form.formState.isSubmitting}
+          />
+        )}
       />
       <FormField
         control={form.control}
         name={"endDate"}
         label={"End Date"}
-        render={({ field }) => <Input {...(field as any)} type="date" />}
+        render={({ field }) => (
+          <Input
+            {...(field as any)}
+            type="date"
+            disabled={form.formState.isSubmitting}
+          />
+        )}
       />
       <FormField
         control={form.control}
@@ -33,6 +45,7 @@ export default function EducationFormDateFields() {
               {...(field as any)}
               checked={field.value}
               onCheckedChange={field.onChange}
+              disabled={form.formState.isSubmitting}
             />
           </div>
         )}

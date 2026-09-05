@@ -6,6 +6,9 @@ import {
   createEducationOutputSchema,
   deleteEducationsInputSchema,
   deleteEducationsOutputSchema,
+  type EducationListInputSchema,
+  educationListInputSchema,
+  educationListOutputSchema,
   updateEducationInputSchema,
   updateEducationOutputSchema,
 } from "@/lib/dto/education";
@@ -13,7 +16,7 @@ import { validateInput } from "@/lib/helpers/validate-input";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { educationService } from "@/services/domain/education.service";
 
-export const { POST, PATCH, DELETE } = createRouter({
+export const { POST, PATCH, DELETE, GET } = createRouter({
   POST: {
     authenticatedOnly: true,
     handler: async (req, ctx) => {
@@ -58,6 +61,35 @@ export const { POST, PATCH, DELETE } = createRouter({
       revalidatePath("/career", "page");
       revalidateTag(cacheKeys.publicEducation[0], "max");
       return { body: parsedResult, init: { status: 200 } };
+    },
+  },
+  GET: {
+    authenticatedOnly: true,
+    handler: async (req, ctx) => {
+      const { searchParams } = new URL(req.url);
+
+      const input = Object.fromEntries(
+        searchParams.entries(),
+      ) as unknown as EducationListInputSchema & { filter: string };
+      const parsedInput = validateInput(
+        {
+          ...input,
+          filter:
+            input.filter &&
+            input.filter !== "undefined" &&
+            typeof input.filter === "string"
+              ? JSON.parse(input.filter)
+              : undefined,
+        },
+        educationListInputSchema,
+      );
+
+      const result = await educationService.find(ctx, parsedInput);
+      const educationEntries = validateOutput(
+        result,
+        educationListOutputSchema,
+      );
+      return { body: educationEntries, init: { status: 200 } };
     },
   },
 });

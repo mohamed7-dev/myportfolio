@@ -27,8 +27,12 @@ export function AchievementFormTypeField() {
           <Select
             value={field.value}
             onValueChange={(value) => field.onChange(value)}
+            disabled={form.formState.isSubmitting}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
               <SelectValue placeholder={"Achievement Type"} />
             </SelectTrigger>
             <SelectContent>

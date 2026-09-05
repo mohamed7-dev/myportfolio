@@ -4,12 +4,15 @@ import { useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useLocaleUtils } from "@/hooks/use-locale-utils";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type Achievement,
+  type CreateAchievementFormInputSchema,
   type CreateAchievementInputSchema,
   type CreateAchievementOutputSchema,
   createAchievementInputSchema,
+  type UpdateAchievementFormInputSchema,
   type UpdateAchievementInputSchema,
   type UpdateAchievementOutputSchema,
   updateAchievementInputSchema,
@@ -30,20 +33,28 @@ export function AchievementForm({
   const params = useParams();
   const creatingNewEntity = params.id === NEW_ENTITY_PATH;
   const router = useRouter();
+  const { contentLanguage } = useLocaleUtils();
 
-  const form = useForm<CreateAchievementInputSchema>({
+  const form = useForm<CreateAchievementFormInputSchema>({
     defaultValues: {
       credentialUrl: "",
       issueDate: undefined,
-      type: undefined,
+      type: "",
       assetIds: [],
       featuredAssetId: undefined,
-      translations: [],
+      translations: [
+        {
+          languageCode: contentLanguage,
+          name: "",
+          slug: "",
+          organization: "",
+        },
+      ],
     },
     resolver: zodResolver(createAchievementInputSchema),
   });
 
-  const updateForm = useForm<UpdateAchievementInputSchema>({
+  const updateForm = useForm<UpdateAchievementFormInputSchema>({
     defaultValues: {
       id: initialValues?.id ?? "",
       credentialUrl: initialValues?.credentialUrl ?? "",
@@ -56,7 +67,7 @@ export function AchievementForm({
     resolver: zodResolver(updateAchievementInputSchema),
   });
 
-  const { mutate: createAchievement } = useMutation({
+  const { mutateAsync: createAchievement } = useMutation({
     mutationKey: ["create-achievement"],
     mutationFn: async (input: CreateAchievementInputSchema) => {
       const res = await api(apiRoutes.achievements.create, input, true);
@@ -76,7 +87,7 @@ export function AchievementForm({
     },
   });
 
-  const { mutate: updateAchievement } = useMutation({
+  const { mutateAsync: updateAchievement } = useMutation({
     mutationKey: ["update-achievement"],
     mutationFn: async (input: UpdateAchievementInputSchema) => {
       const res = await api(apiRoutes.achievements.update, input, true);
@@ -96,15 +107,15 @@ export function AchievementForm({
     },
   });
 
-  const onSubmit = (
-    values: CreateAchievementInputSchema | UpdateAchievementInputSchema,
+  const onSubmit = async (
+    values: CreateAchievementFormInputSchema | UpdateAchievementFormInputSchema,
   ) => {
     if (creatingNewEntity) {
-      createAchievement({
+      await createAchievement({
         ...values,
       } as CreateAchievementInputSchema);
     } else {
-      updateAchievement({
+      await updateAchievement({
         ...values,
         id: params.id,
       } as UpdateAchievementInputSchema);

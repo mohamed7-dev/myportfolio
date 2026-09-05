@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useLocaleUtils } from "@/hooks/use-locale-utils";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
   type CreateEducationInputSchema,
@@ -30,11 +31,20 @@ export function EducationForm({
   const params = useParams();
   const creatingNewEntity = params.id === NEW_ENTITY_PATH;
   const router = useRouter();
+  const { contentLanguage } = useLocaleUtils();
 
   const form = useForm<CreateEducationInputSchema>({
     defaultValues: {
       assetIds: [],
-      translations: [],
+      translations: [
+        {
+          languageCode: contentLanguage,
+          school: "",
+          slug: "",
+          degree: "",
+          location: "",
+        },
+      ],
       isPresent: false,
       startDate: undefined,
       endDate: undefined,
@@ -57,7 +67,7 @@ export function EducationForm({
     resolver: zodResolver(updateEducationInputSchema),
   });
 
-  const { mutate: createEducation } = useMutation({
+  const { mutateAsync: createEducation } = useMutation({
     mutationKey: ["create-education"],
     mutationFn: async (input: CreateEducationInputSchema) => {
       const res = await api(apiRoutes.education.create, input, true);
@@ -77,7 +87,7 @@ export function EducationForm({
     },
   });
 
-  const { mutate: updateEducation } = useMutation({
+  const { mutateAsync: updateEducation } = useMutation({
     mutationKey: ["update-education"],
     mutationFn: async (input: UpdateEducationInputSchema) => {
       const res = await api(apiRoutes.education.update, input, true);
@@ -97,15 +107,15 @@ export function EducationForm({
     },
   });
 
-  const onSubmit = (
+  const onSubmit = async (
     values: CreateEducationInputSchema | UpdateEducationInputSchema,
   ) => {
     if (creatingNewEntity) {
-      createEducation({
+      await createEducation({
         ...values,
       } as CreateEducationInputSchema);
     } else {
-      updateEducation({
+      await updateEducation({
         ...values,
         id: params.id,
       } as UpdateEducationInputSchema);

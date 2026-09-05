@@ -6,6 +6,7 @@ import {
 } from "@/components/page-layout/page-action-bar";
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
+import { PendingSubmitButton } from "@/components/shared/pending-submit-button";
 import { type ClientSafeProfile, clientSafeSchema } from "@/lib/dto/profile";
 import { InternalServerError } from "@/lib/errors/errors";
 import { validateOutput } from "@/lib/helpers/validate-output";
@@ -14,7 +15,6 @@ import { AboutForm } from "./_components/about-form";
 import { AssetField } from "./_components/asset-field";
 import { CvAssetIdField } from "./_components/cv-field";
 import { MainFields } from "./_components/main-fields";
-import { SubmitButton } from "./_components/submit-button";
 
 export const metadata = {
   title: "Dashboard - About Me",
@@ -45,7 +45,11 @@ export default async function AboutPage() {
         <PageTitle pageTitleBlockId="dashboard-about-title">About Me</PageTitle>
         <PageActionBar pageActionBarBlockId="dashboard-about-action-bar">
           <PageActionBarItem actionBarItemBlockId="submit-button">
-            <SubmitButton />
+            <PendingSubmitButton
+              formName="update-profile-form"
+              createEntityLabel=""
+              updateEntityLabel="update profile"
+            />
           </PageActionBarItem>
         </PageActionBar>
         <PageLayout>

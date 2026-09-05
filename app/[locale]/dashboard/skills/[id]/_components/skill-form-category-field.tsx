@@ -8,10 +8,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { type CreateSkillInputSchema, SkillCategory } from "@/lib/dto/skill";
+import { type CreateSkillFormInput, SkillCategory } from "@/lib/dto/skill";
 
 export function SkillFormCategoryField() {
-  const form = useFormContext<CreateSkillInputSchema>();
+  const form = useFormContext<CreateSkillFormInput>();
 
   return (
     <div className="w-4.5">
@@ -23,8 +23,12 @@ export function SkillFormCategoryField() {
           <Select
             value={field.value}
             onValueChange={(value) => field.onChange(value)}
+            disabled={form.formState.isSubmitting}
           >
-            <SelectTrigger className="w-full md:w-45">
+            <SelectTrigger
+              className="w-full md:w-45"
+              disabled={form.formState.isSubmitting}
+            >
               <SelectValue placeholder={"Skill Category"} />
             </SelectTrigger>
             <SelectContent>
