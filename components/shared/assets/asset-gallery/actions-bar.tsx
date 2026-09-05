@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Tag } from "@/lib/dto/tag";
+import type { Tag, TagListOutputSchema } from "@/lib/dto/tag";
 import { isAppError } from "@/lib/errors/app-error";
 import { api } from "@/lib/helpers/api";
 import { apiRoutes } from "@/lib/helpers/router";
@@ -77,9 +77,9 @@ export function ActionsBar({
       // we should display the error to the UI, not throwing it
       throw data;
     } else {
-      const successResult = data as any; // TODO: change type from any to TagListOutputSchema
+      const successResult = data as TagListOutputSchema;
       return {
-        items: successResult.items.map((item: any) => ({
+        items: successResult.items.map((item) => ({
           ...item,
           label: item.value,
         })),
@@ -106,6 +106,7 @@ export function ActionsBar({
         onOpenChange={setOpen}
         onSelectChange={(tag) => {
           onSelectingTag(tag);
+          setOpen(false);
         }}
         selectedIds={[tags.find((t) => t.id === currentTag)?.id ?? ""]}
       />

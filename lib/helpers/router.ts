@@ -195,21 +195,6 @@ export const apiRoutes = {
       method: "GET",
       contentType: null,
     },
-    create: {
-      url: apiUrl("tags"),
-      method: "POST",
-      contentType: "application/json",
-    },
-    update: {
-      url: apiUrl("tags"),
-      method: "PATCH",
-      contentType: "application/json",
-    },
-    delete: {
-      url: apiUrl("tags"),
-      method: "DELETE",
-      contentType: "application/json",
-    },
   },
   profile: {
     update: {
