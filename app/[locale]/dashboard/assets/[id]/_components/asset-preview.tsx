@@ -11,7 +11,8 @@ export function AssetPreview({ asset }: { asset: Asset }) {
         <AppVideo
           asset={asset}
           transform={{ preset: "full" }}
-          className="size-full object-contain"
+          containerClassName="size-full object-contain"
+          videoClassName="aspect-video"
         />
       )}
       {(asset.type === ObjectStorageResourceType.image ||
