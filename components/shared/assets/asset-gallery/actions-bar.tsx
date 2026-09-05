@@ -79,7 +79,7 @@ export function ActionsBar({
     } else {
       const successResult = data as any; // TODO: change type from any to TagListOutputSchema
       return {
-        items: successResult.items.map((item) => ({
+        items: successResult.items.map((item: any) => ({
           ...item,
           label: item.value,
         })),

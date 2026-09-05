@@ -5,10 +5,12 @@ import {
   type AchievementListInputSchema,
   achievementListInputSchema,
   achievementListOutputSchema,
+  type CreateAchievementInputSchema,
   createAchievementInputSchema,
   createAchievementOutputSchema,
   deleteAchievementsInputSchema,
   deleteAchievementsOutputSchema,
+  type UpdateAchievementInputSchema,
   updateAchievementInputSchema,
   updateAchievementOutputSchema,
 } from "@/lib/dto/achievement";
@@ -23,7 +25,10 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
       const body = await req.json();
 
       const parsedData = validateInput(body, createAchievementInputSchema);
-      const result = await achievementService.create(ctx, parsedData);
+      const result = await achievementService.create(
+        ctx,
+        parsedData as CreateAchievementInputSchema,
+      );
 
       const parsedResult = validateOutput(
         result,
@@ -43,7 +48,10 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const parsedData = validateInput(body, updateAchievementInputSchema);
 
-      const result = await achievementService.update(ctx, parsedData);
+      const result = await achievementService.update(
+        ctx,
+        parsedData as UpdateAchievementInputSchema,
+      );
 
       const parsedResult = validateOutput(
         result,

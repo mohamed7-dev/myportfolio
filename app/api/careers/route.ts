@@ -3,12 +3,14 @@ import { createRouter } from "@/api/common/create-router";
 import { cacheKeys } from "@/lib/constants";
 import {
   type CareerListInputSchema,
+  type CreateCareerInputSchema,
   careerListInputSchema,
   careerListOutputSchema,
   createCareerInputSchema,
   createCareerOutputSchema,
   deleteCareersInputSchema,
   deleteCareersOutputSchema,
+  type UpdateCareerInputSchema,
   updateCareerInputSchema,
   updateCareerOutputSchema,
 } from "@/lib/dto/career";
@@ -23,7 +25,10 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
       const body = await req.json();
 
       const parsedData = validateInput(body, createCareerInputSchema);
-      const result = await careerService.create(ctx, parsedData);
+      const result = await careerService.create(
+        ctx,
+        parsedData as CreateCareerInputSchema,
+      );
 
       const parsedResult = validateOutput(result, createCareerOutputSchema);
 
@@ -47,7 +52,10 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const parsedData = validateInput(body, updateCareerInputSchema);
 
-      const result = await careerService.update(ctx, parsedData);
+      const result = await careerService.update(
+        ctx,
+        parsedData as UpdateCareerInputSchema,
+      );
 
       const parsedResult = validateOutput(result, updateCareerOutputSchema);
 

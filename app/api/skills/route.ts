@@ -2,6 +2,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { createRouter } from "@/api/common/create-router";
 import { cacheKeys } from "@/lib/constants";
 import {
+  type CreateSkillInputSchema,
   createSkillInputSchema,
   createSkillOutputSchema,
   deleteSkillsInputSchema,
@@ -9,6 +10,7 @@ import {
   type SkillListInputSchema,
   skillListInputSchema,
   skillListOutputSchema,
+  type UpdateSkillInputSchema,
   updateSkillInputSchema,
   updateSkillOutputSchema,
 } from "@/lib/dto/skill";
@@ -24,7 +26,10 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const parsedData = validateInput(body, createSkillInputSchema);
 
-      const result = await skillService.create(ctx, parsedData);
+      const result = await skillService.create(
+        ctx,
+        parsedData as CreateSkillInputSchema,
+      );
 
       const parsedResult = validateOutput(result, createSkillOutputSchema);
 
@@ -43,7 +48,10 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const parsedData = validateInput(body, updateSkillInputSchema);
 
-      const result = await skillService.update(ctx, parsedData);
+      const result = await skillService.update(
+        ctx,
+        parsedData as UpdateSkillInputSchema,
+      );
 
       const parsedResult = validateOutput(result, updateSkillOutputSchema);
 
