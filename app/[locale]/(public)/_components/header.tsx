@@ -27,7 +27,7 @@ export async function HomePageHeader({
 
   return (
     <div>
-      <div className="overflow-hidden w-full bg-background relative h-60 border-2 border-border">
+      <div className="overflow-hidden w-full bg-secondary-background relative h-60 border-2 border-border">
         <AppImage
           asset={cover}
           transform={{ preset: "full", mode: "resize" }}
