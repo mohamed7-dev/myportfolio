@@ -107,7 +107,9 @@ const publicProjectInList = project
     translations: true,
   })
   .extend({
-    skills: z.array(skill.pick({ id: true, name: true, slug: true })),
+    skills: z.array(
+      skill.pick({ id: true, name: true, slug: true, isFeatured: true }),
+    ),
   });
 
 export const getPublicProjectsOutputSchema =

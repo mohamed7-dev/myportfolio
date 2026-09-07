@@ -12,6 +12,9 @@ export async function ProjectCard({
   project: GetPublicProjectsOutputSchema["items"][number];
 }) {
   const i18n = await getI18n();
+  const skills = project.skills
+    .sort((a, b) => +b.isFeatured - +a.isFeatured)
+    .slice(0, 5);
   return (
     <Link href={`/projects/${project.slug}`}>
       <CardWrapper interactive={true} className="p-0">
@@ -47,8 +50,8 @@ export async function ProjectCard({
             {project.description}
           </p>
 
-          <div className="flex gap-2 overflow-x-auto">
-            {project.skills.map((skill) => (
+          <div className="flex gap-2 flex-wrap">
+            {skills.map((skill) => (
               <Badge key={skill.id} variant={"neutral"}>
                 {skill.name}
               </Badge>

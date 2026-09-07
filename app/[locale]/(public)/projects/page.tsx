@@ -47,7 +47,9 @@ const getPublicProjects = localizedCache(
 export default async function ProjectsPage() {
   const i18n = await getScopedI18n("projects");
   const result = await getPublicProjects(await getCurrentLocale());
-  const sorted = result.items.sort((a, b) => (a === b ? 0 : a ? -1 : 1));
+
+  const projects = result.items.sort((a, b) => +b.featured - +a.featured);
+
   return (
     <Page pageId="public-projects">
       <PageTitle pageTitleBlockId="public-projects-title">
@@ -64,7 +66,7 @@ export default async function ProjectsPage() {
       <PageLayout>
         <PageBlock column="full" id="projects-cards">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {sorted.map((project) => (
+            {projects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>
