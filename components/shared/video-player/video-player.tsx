@@ -243,7 +243,6 @@ export function VideoPlayer({
       className={cn(
         "group relative w-full overflow-hidden flex items-center",
         "border-2 border-border bg-black",
-        "shadow-[8px_8px_0_0_#000]",
         !controlsVisible && "cursor-none",
         containerClassName,
       )}

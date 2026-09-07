@@ -44,9 +44,9 @@ export function MediaGalleryDialog({
     >
       <DialogContent
         showCloseButton={false}
-        className="max-w-[98vw]! lg:max-w-[80vw]! rounded-none border-0 bg-transparent p-0 shadow-none"
+        className="sm:max-w-3xl rounded-none border-0 p-0! shadow-none gap-2"
       >
-        <div className="relative flex flex-col overflow-hidden rounded-base border-2 border-border bg-background">
+        <div className="relative flex flex-col overflow-hidden">
           <div className="absolute right-3 top-3 z-10 flex gap-2">
             <Button
               type="button"
@@ -59,7 +59,7 @@ export function MediaGalleryDialog({
             </Button>
           </div>
 
-          <div className="flex items-center justify-center bg-background">
+          <div className="flex items-center justify-center bg-background p-2">
             {(currentItem.asset.type === ObjectStorageResourceType.image ||
               currentItem.asset.type === ObjectStorageResourceType.raw) && (
               <AppImage
@@ -85,27 +85,26 @@ export function MediaGalleryDialog({
               />
             )}
           </div>
-
-          <div className="absolute inset-s-1/2 -translate-x-1/3 md:-translate-x-1/2 bottom-3 flex justify-center gap-2 px-4">
-            <Button
-              type="button"
-              size="icon-sm"
-              variant="neutralNoShadow"
-              onClick={onClickPrev}
-              aria-label="Previous media"
-            >
-              <ChevronLeftIcon />
-            </Button>
-            <Button
-              type="button"
-              size="icon-sm"
-              variant="neutralNoShadow"
-              onClick={onClickNext}
-              aria-label="Next media"
-            >
-              <ChevronRightIcon />
-            </Button>
-          </div>
+        </div>
+        <div className="flex items-center justify-center gap-2 py-2">
+          <Button
+            type="button"
+            size="icon-sm"
+            variant="neutralNoShadow"
+            onClick={onClickPrev}
+            aria-label="Previous media"
+          >
+            <ChevronLeftIcon />
+          </Button>
+          <Button
+            type="button"
+            size="icon-sm"
+            variant="neutralNoShadow"
+            onClick={onClickNext}
+            aria-label="Next media"
+          >
+            <ChevronRightIcon />
+          </Button>
         </div>
         <DialogHeader className="sr-only">
           <DialogTitle>{dialogTitle ?? i18n("dialogTitle")}</DialogTitle>
