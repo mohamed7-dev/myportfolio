@@ -157,15 +157,15 @@ class ProjectService {
     return await this.findOne(
       ctx,
       { id: project.id },
-      {
-        skills: {
-          featuredAsset: true,
-        },
-      },
+      { featuredAsset: false, assets: false },
     );
   }
 
-  public async update(ctx: RequestContext, input: UpdateProjectInputSchema) {
+  public async update(
+    ctx: RequestContext,
+    input: UpdateProjectInputSchema,
+    relations?: FindOptionsRelations<Project>,
+  ) {
     const repo = await ormService.getRepository(ctx, Project);
     const project = await repo.findOne({
       where: {
@@ -184,7 +184,7 @@ class ProjectService {
 
     await slugValidator.validateSlug(ctx, input, ProjectTranslation);
 
-    const updatedProject = await translatableSaver.update({
+    await translatableSaver.update({
       ctx,
       input,
       entityType: Project,
@@ -202,11 +202,7 @@ class ProjectService {
       },
     });
 
-    return await this.findOne(
-      ctx,
-      { id: updatedProject.id },
-      { skills: { featuredAsset: true } },
-    );
+    return await this.findOne(ctx, { id: input.id }, relations);
   }
 
   public async softDelete(

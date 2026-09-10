@@ -43,7 +43,10 @@ export function MediaGallery({
   staticImageProps,
   overlayImageProps,
 }: MediaGalleryProps) {
-  const mediaItems = entityAssets.filter((entry) => !!entry.asset) ?? [];
+  const mediaItems =
+    entityAssets
+      .sort((a, b) => a.position - b.position)
+      .filter((entry) => !!entry.asset) ?? [];
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
@@ -142,7 +145,7 @@ export function MediaGallery({
             <Button
               type="button"
               size="icon-sm"
-              variant="neutralNoShadow"
+              variant="neutral"
               className="pointer-events-auto"
               onClick={() => updateIndex(currentIndex - 1)}
               aria-label="Previous media"
@@ -152,7 +155,7 @@ export function MediaGallery({
             <Button
               type="button"
               size="icon-sm"
-              variant="neutralNoShadow"
+              variant="neutral"
               className="pointer-events-auto"
               onClick={() => updateIndex(currentIndex + 1)}
               aria-label="Next media"

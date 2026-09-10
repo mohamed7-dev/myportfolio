@@ -63,13 +63,18 @@ export default async function AchievementsPage() {
         {i18n("description")}
       </PageDescription>
       <PageLayout>
-        <PageBlock column="full" id="achievements-list">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {result.items.map((achievement) => (
-              <AchievementCard key={achievement.id} achievement={achievement} />
-            ))}
-          </div>
-        </PageBlock>
+        {result?.items?.length && (
+          <PageBlock column="full" id="achievements-list">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {result.items.map((achievement) => (
+                <AchievementCard
+                  key={achievement.id}
+                  achievement={achievement}
+                />
+              ))}
+            </div>
+          </PageBlock>
+        )}
       </PageLayout>
     </Page>
   );

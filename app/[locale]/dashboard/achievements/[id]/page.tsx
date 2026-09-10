@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { wrapService } from "@/api/common/create-router";
+import { EntityAssetsFormField } from "@/components/data-input/entity-assets-form-field";
 import { Page, PageTitle } from "@/components/page-layout/page";
 import {
   PageActionBar,
@@ -16,8 +17,7 @@ import {
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { achievementService } from "@/services/domain/achievement.service";
 import { AchievementForm } from "./_components/achievement-form";
-import { AchievementFormAssetField } from "./_components/achievement-form-asset-field";
-import AchievementFormDateField from "./_components/achievement-form-date-field";
+import { AchievementFormDateField } from "./_components/achievement-form-date-field";
 import { AchievementFormMainFields } from "./_components/achievement-form-main-fields";
 import { AchievementFormTypeField } from "./_components/achievement-form-type-field";
 
@@ -69,8 +69,8 @@ export default async function AchievementPage({
             <AchievementFormMainFields />
           </PageBlock>
           <PageBlock column="side" id="achievement-asset-field">
-            <AchievementFormAssetField
-              achievementAssets={achievement?.assets ?? []}
+            <EntityAssetsFormField
+              entityAssets={achievement?.assets ?? []}
               featuredAsset={achievement?.featuredAsset ?? undefined}
             />
           </PageBlock>

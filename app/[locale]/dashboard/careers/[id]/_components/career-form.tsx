@@ -7,11 +7,11 @@ import { toast } from "sonner";
 import { useLocaleUtils } from "@/hooks/use-locale-utils";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
 import {
-  type Career,
   type CreateCareerFormInputSchema,
   type CreateCareerInputSchema,
   type CreateCareerOutputSchema,
   createCareerInputSchema,
+  type FindOneCareerOutputSchema,
   type UpdateCareerFormInputSchema,
   type UpdateCareerInputSchema,
   type UpdateCareerOutputSchema,
@@ -28,7 +28,7 @@ export function CareerForm({
   initialValues,
 }: {
   children: React.ReactNode;
-  initialValues?: Career;
+  initialValues?: FindOneCareerOutputSchema;
 }) {
   const params = useParams();
   const creatingNewEntity = params.id === NEW_ENTITY_PATH;
@@ -51,11 +51,13 @@ export function CareerForm({
         },
       ],
       isPresent: false,
-      startDate: undefined,
-      endDate: undefined,
+      startDate: null,
+      endDate: null,
       isFeatured: false,
       mode: "",
       type: "",
+      featuredAssetId: "",
+      achievementIds: [],
     },
     resolver: zodResolver(createCareerInputSchema),
   });
@@ -63,15 +65,16 @@ export function CareerForm({
   const updateForm = useForm<UpdateCareerFormInputSchema>({
     defaultValues: {
       id: initialValues?.id ?? "",
-      mode: initialValues?.mode ?? undefined,
-      type: initialValues?.type ?? undefined,
-      isPresent: initialValues?.isPresent,
-      isFeatured: initialValues?.isFeatured,
-      startDate: initialValues?.startDate,
-      endDate: initialValues?.endDate ?? undefined,
+      mode: initialValues?.mode ?? "",
+      type: initialValues?.type ?? "",
+      isPresent: initialValues?.isPresent ?? false,
+      isFeatured: initialValues?.isFeatured ?? false,
+      startDate: initialValues?.startDate ?? null,
+      endDate: initialValues?.endDate ?? null,
       translations: initialValues?.translations ?? [],
       assetIds: initialValues?.assets.map((asset) => asset.id) ?? [],
       featuredAssetId: initialValues?.featuredAsset?.id ?? "",
+      achievementIds: initialValues?.achievements?.map((item) => item.id) ?? [],
     },
     resolver: zodResolver(updateCareerInputSchema),
   });
@@ -108,8 +111,9 @@ export function CareerForm({
     },
     onSuccess: (data) => {
       toast.success("Career was updated successfully");
-      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
       router.refresh();
+      updateForm.reset(updateForm.getValues());
+      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
     },
     onError: (error) => {
       toast.error(error.message);

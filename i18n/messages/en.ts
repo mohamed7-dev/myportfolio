@@ -38,7 +38,9 @@ export default {
         experience: "Experience",
         projectsShipped: "Projects shipped",
         openSourceContributions: "Open source Contributions",
-        years: "yrs",
+        "years#zero": "No years of experience",
+        "years#one": "A year",
+        "years#other": "{formattedCount} years",
       },
       currentFocus: {
         title: "Current focus",
@@ -90,8 +92,8 @@ export default {
       career: "career",
       education: "education",
       achievements: "achievements",
-      careerMessage: "Built during",
-      educationMessage: "While studying in",
+      careerMessage: "Built during this role",
+      educationMessage: "Built while studying",
     },
     summary: { title: "Overview" },
     features: { title: "Features" },
@@ -166,6 +168,7 @@ export default {
     careerCard: {
       impact: "Technical Impact",
       learned: "What I Learned",
+      achievements: "Achievements",
     },
     educationBlock: {
       title: "Education",

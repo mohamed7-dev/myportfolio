@@ -46,6 +46,7 @@ export function UpdateAssetForm({
     onSuccess: () => {
       toast.success("Asset was updated successfully");
       router.refresh();
+      form.reset(form.getValues());
     },
     onError: (error) => {
       toast.error(error.message);

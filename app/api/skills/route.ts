@@ -51,6 +51,12 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
       const result = await skillService.update(
         ctx,
         parsedData as UpdateSkillInputSchema,
+        {
+          featuredAsset: true,
+          assets: {
+            asset: true,
+          },
+        },
       );
 
       const parsedResult = validateOutput(result, updateSkillOutputSchema);

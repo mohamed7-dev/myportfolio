@@ -67,13 +67,15 @@ export function ProjectFormCareerField() {
       <FieldLabel>Career</FieldLabel>
       <EntityRelation
         queryFn={queryFn}
-        selectedIds={[form.getValues("careerId")]}
+        selectedIds={
+          form.getValues("careerId") ? [form.getValues("careerId")] : []
+        }
         entityName="career"
         searchLabel="Search by career name"
         open={open}
         onOpenChange={setOpen}
         onSelectChange={(value) => {
-          form.setValue("careerId", value ?? undefined, {
+          form.setValue("careerId", value?.[0] ?? undefined, {
             shouldDirty: true,
             shouldValidate: true,
           });

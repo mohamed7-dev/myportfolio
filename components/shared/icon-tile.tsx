@@ -13,7 +13,7 @@ export function IconTile({
   return (
     <Comp
       className={cn(
-        "flex size-12 items-center justify-center rounded-base bg-primary text-primary-foreground transition duration-300 group-hover:scale-105",
+        "flex size-12 items-center justify-center border-2 rounded-base bg-secondary-background text-foreground transition duration-300 group-hover:scale-105",
         className,
       )}
     >

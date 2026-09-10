@@ -7,7 +7,7 @@ export function SummaryCard() {
   const ctx = usePublicLayout("SummaryCard");
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div className="col-span-1 flex justify-center sm:flex-none h-fit shrink-0 relative rounded-base overflow-hidden border-2 border-border">
+      <div className="col-span-1 flex justify-center sm:flex-none h-fit shrink-0 relative bg-secondary-background p-1 rounded-base overflow-hidden border-2">
         <AppImage
           asset={ctx.profile.avatar ?? undefined}
           transform={{ preset: "small", mode: "resize" }}

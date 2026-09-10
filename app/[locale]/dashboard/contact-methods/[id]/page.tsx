@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { wrapService } from "@/api/common/create-router";
+import { EntityAssetsFormField } from "@/components/data-input/entity-assets-form-field";
 import { Page, PageTitle } from "@/components/page-layout/page";
 import {
   PageActionBar,
@@ -16,7 +17,6 @@ import {
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { contactMethodService } from "@/services/domain/contact-method.service";
 import { ContactMethodForm } from "./_components/contact-method-form";
-import { ContactMethodFormAssetField } from "./_components/contact-method-form-asset-field";
 import { ContactMethodFormMainFields } from "./_components/contact-method-form-main-fields";
 import { ContactMethodFormStatusField } from "./_components/contact-method-form-status-field";
 
@@ -68,8 +68,8 @@ export default async function ContactMethodPage({
             <ContactMethodFormMainFields />
           </PageBlock>
           <PageBlock column="side" id="assets-field">
-            <ContactMethodFormAssetField
-              contactMethodAssets={contactMethod?.assets ?? []}
+            <EntityAssetsFormField
+              entityAssets={contactMethod?.assets ?? []}
               featuredAsset={contactMethod?.featuredAsset ?? undefined}
             />
           </PageBlock>

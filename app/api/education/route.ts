@@ -40,7 +40,12 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
 
       const parsedData = validateInput(body, updateEducationInputSchema);
 
-      const result = await educationService.update(ctx, parsedData);
+      const result = await educationService.update(ctx, parsedData, {
+        assets: {
+          asset: true,
+        },
+        featuredAsset: true,
+      });
 
       const parsedResult = validateOutput(result, updateEducationOutputSchema);
       revalidatePath("/career", "page");

@@ -104,8 +104,8 @@ export function ActionsBar({
         entityName="tag"
         open={open}
         onOpenChange={setOpen}
-        onSelectChange={(tag) => {
-          onSelectingTag(tag);
+        onSelectChange={(tags) => {
+          onSelectingTag(tags?.[0] ?? "");
           setOpen(false);
         }}
         selectedIds={[tags.find((t) => t.id === currentTag)?.id ?? ""]}

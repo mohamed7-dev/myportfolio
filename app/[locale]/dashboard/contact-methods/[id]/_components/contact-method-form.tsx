@@ -37,7 +37,7 @@ export function ContactMethodForm({
       url: "",
       copyableText: "",
       assetIds: [],
-      featuredAssetId: undefined,
+      featuredAssetId: "",
       translations: [
         {
           languageCode: contentLanguage,
@@ -58,8 +58,8 @@ export function ContactMethodForm({
       primary: initialValues?.primary === false ? false : true,
       copyableText: initialValues?.copyableText ?? "",
       translations: initialValues?.translations ?? [],
-      assetIds: initialValues?.assets.map((asset) => asset.id) ?? undefined,
-      featuredAssetId: initialValues?.featuredAsset?.id ?? undefined,
+      assetIds: initialValues?.assets.map((asset) => asset.id) ?? [],
+      featuredAssetId: initialValues?.featuredAsset?.id ?? "",
     },
     resolver: zodResolver(updateContactMethodInputSchema),
   });
@@ -96,6 +96,7 @@ export function ContactMethodForm({
     },
     onSuccess: (data) => {
       toast.success("Contact method was updated successfully");
+      updateForm.reset(updateForm.getValues());
       formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
       router.refresh();
     },

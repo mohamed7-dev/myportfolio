@@ -1,6 +1,12 @@
 import { z } from "@/lib/helpers/zod";
 import { languageCodeSchema } from "./language-code";
 
+//############################ ID ##################################
+export const idSchema = z.string().uuid({ message: "Invalid UUID" });
+export const nullableOptionalIdInputSchema = z.preprocess(
+  (value) => (value === "" ? null : value),
+  idSchema.nullable().optional(),
+);
 //############################ Deletion Response ##########################
 
 export const deletionResponseSchema = z.object({

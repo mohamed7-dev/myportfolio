@@ -40,7 +40,12 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedData = validateInput(body, updateContactMethodInputSchema);
 
-      const result = await contactMethodService.update(ctx, parsedData);
+      const result = await contactMethodService.update(ctx, parsedData, {
+        assets: {
+          asset: true,
+        },
+        featuredAsset: true,
+      });
 
       const parsedResult = validateOutput(
         result,

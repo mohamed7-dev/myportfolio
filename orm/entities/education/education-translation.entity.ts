@@ -25,10 +25,10 @@ export class EducationTranslation
   @Column()
   slug: string;
 
-  @Column({ nullable: true, type: "varchar" })
+  @Column({ nullable: true, type: "varchar", default: null })
   degree: string;
 
-  @Column({ nullable: true, type: "varchar" })
+  @Column({ nullable: true, type: "varchar", default: null })
   location: string;
 
   @Index()

@@ -60,13 +60,6 @@ export class Achievement extends AppEntity {
   )
   featuredAsset: Relation<Asset>;
 
-  @ManyToOne(
-    () => Career,
-    (career) => career.achievements,
-    { nullable: true },
-  )
-  career?: Relation<Career | null>;
-
   // @ManyToMany(
   //   () => Project,
   //   (project) => project.achievements,

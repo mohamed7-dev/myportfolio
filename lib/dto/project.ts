@@ -101,15 +101,13 @@ export const createProjectInputSchema = z.object({
 export type CreateProjectInputSchema = z.infer<typeof createProjectInputSchema>;
 
 export const createProjectOutputSchema = z.union([
-  project.extend({
-    skills: z.array(
-      skill.pick({
-        id: true,
-        name: true,
-        slug: true,
-        featuredAsset: true,
-      }),
-    ),
+  project.omit({
+    featuredAsset: true,
+    assets: true,
+    skills: true,
+    career: true,
+    education: true,
+    achievements: true,
   }),
   apiErrorSchema,
 ]);
@@ -145,15 +143,11 @@ export const updateProjectInputSchema = z.object({
 export type UpdateProjectInputSchema = z.infer<typeof updateProjectInputSchema>;
 
 export const updateProjectOutputSchema = z.union([
-  project.extend({
-    skills: z.array(
-      skill.pick({
-        id: true,
-        name: true,
-        slug: true,
-        featuredAsset: true,
-      }),
-    ),
+  project.omit({
+    skills: true,
+    career: true,
+    education: true,
+    achievements: true,
   }),
   apiErrorSchema,
 ]);
@@ -263,7 +257,6 @@ export const findOneProjectOutputSchema = project.extend({
       id: true,
       name: true,
       slug: true,
-      featuredAsset: true,
     })
     .nullish(),
   education: education
@@ -271,7 +264,6 @@ export const findOneProjectOutputSchema = project.extend({
       id: true,
       school: true,
       slug: true,
-      featuredAsset: true,
     })
     .nullish(),
   achievements: z
@@ -280,7 +272,6 @@ export const findOneProjectOutputSchema = project.extend({
         id: true,
         name: true,
         slug: true,
-        featuredAsset: true,
       }),
     )
     .nullish(),
@@ -289,7 +280,6 @@ export const findOneProjectOutputSchema = project.extend({
       id: true,
       name: true,
       slug: true,
-      featuredAsset: true,
     }),
   ),
 });

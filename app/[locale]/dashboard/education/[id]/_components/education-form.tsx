@@ -36,6 +36,7 @@ export function EducationForm({
   const form = useForm<CreateEducationInputSchema>({
     defaultValues: {
       assetIds: [],
+      featuredAssetId: "",
       translations: [
         {
           languageCode: contentLanguage,
@@ -46,9 +47,9 @@ export function EducationForm({
         },
       ],
       isPresent: false,
-      startDate: undefined,
-      endDate: undefined,
-      gpa: undefined,
+      startDate: null,
+      endDate: null,
+      gpa: 0,
     },
     resolver: zodResolver(createEducationInputSchema),
   });
@@ -56,10 +57,10 @@ export function EducationForm({
   const updateForm = useForm<UpdateEducationInputSchema>({
     defaultValues: {
       id: initialValues?.id ?? "",
-      isPresent: initialValues?.isPresent,
-      startDate: initialValues?.startDate,
-      endDate: initialValues?.endDate ?? undefined,
-      gpa: initialValues?.gpa ?? undefined,
+      isPresent: initialValues?.isPresent ?? false,
+      startDate: initialValues?.startDate ?? null,
+      endDate: initialValues?.endDate ?? null,
+      gpa: initialValues?.gpa ?? 0,
       translations: initialValues?.translations ?? [],
       assetIds: initialValues?.assets.map((asset) => asset.id) ?? [],
       featuredAssetId: initialValues?.featuredAsset?.id ?? "",
@@ -99,8 +100,9 @@ export function EducationForm({
     },
     onSuccess: (data) => {
       toast.success("Education item was updated successfully");
-      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
       router.refresh();
+      updateForm.reset(updateForm.getValues());
+      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
     },
     onError: (error) => {
       toast.error(error.message);

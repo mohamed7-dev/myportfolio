@@ -118,10 +118,18 @@ class EducationService {
     });
     await assetService.updateEntityAssets(ctx, edu, input);
 
-    return await this.findOne(ctx, { id: edu.id });
+    return await this.findOne(
+      ctx,
+      { id: edu.id },
+      { featuredAsset: false, assets: false },
+    );
   }
 
-  public async update(ctx: RequestContext, input: UpdateEducationInputSchema) {
+  public async update(
+    ctx: RequestContext,
+    input: UpdateEducationInputSchema,
+    relations?: FindOptionsRelations<Education>,
+  ) {
     const repo = await ormService.getRepository(ctx, Education);
     const edu = await repo.findOne({
       where: {
@@ -151,7 +159,7 @@ class EducationService {
       },
     });
 
-    return await this.findOne(ctx, { id: updatedEdu.id });
+    return await this.findOne(ctx, { id: updatedEdu.id }, relations);
   }
 
   async delete(
@@ -204,20 +212,23 @@ class EducationService {
 
   private translateEducation(ctx: RequestContext, education: Education) {
     const translatedEdu = translator.translate(ctx.languageCode, education);
-    const translatedAssets = translatedEdu.assets.flatMap((eduAsset) => {
-      return {
-        ...eduAsset,
-        asset: translator.translate(ctx.languageCode, eduAsset.asset),
-      };
-    });
 
     return {
       ...translatedEdu,
-      assets: translatedAssets,
-      featuredAsset: translator.translate(
-        ctx.languageCode,
-        translatedEdu.featuredAsset,
-      ),
+      ...(translatedEdu.assets?.length && {
+        assets: translatedEdu.assets?.flatMap((eduAsset) => {
+          return {
+            ...eduAsset,
+            asset: translator.translate(ctx.languageCode, eduAsset.asset),
+          };
+        }),
+      }),
+      ...(translatedEdu.featuredAsset && {
+        featuredAsset: translator.translate(
+          ctx.languageCode,
+          translatedEdu.featuredAsset,
+        ),
+      }),
     };
   }
 }

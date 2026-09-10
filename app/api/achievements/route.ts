@@ -51,6 +51,7 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
       const result = await achievementService.update(
         ctx,
         parsedData as UpdateAchievementInputSchema,
+        { featuredAsset: true, assets: { asset: true } },
       );
 
       const parsedResult = validateOutput(

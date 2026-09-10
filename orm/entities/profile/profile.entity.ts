@@ -53,7 +53,7 @@ export class Profile extends AppEntity implements Translatable {
   @Column()
   handle: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: null })
   cvAssetId: string;
 
   @Column()

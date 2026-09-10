@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import { CheckIcon, ChevronsUpDownIcon, Loader2Icon } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
@@ -11,7 +11,6 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { notNullOrUndefined } from "@/lib/utils/not-null-or-undefined";
 import { PaginationBar } from "../shared/data-table/pagination-bar";
 
 type Item = { id: string; label: string };
@@ -20,7 +19,7 @@ export type EntityList = { items: Item[]; totalItemsCount: number };
 
 interface EntityRelationProps<Data extends EntityList> {
   selectedIds: string[];
-  onSelectChange: (value: string) => void;
+  onSelectChange: (values: string[]) => void;
   entityName: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -58,14 +57,13 @@ export function EntityRelation<Data extends EntityList>({
     },
   });
 
-  const labels =
-    data?.items
-      ?.filter((item) => selectedIds.includes(item.id))
-      .map((item) => item.label) ?? [];
-
-  const hasSelectedIds =
-    selectedIds.filter((item) => notNullOrUndefined(item) && item.length > 0)
-      .length > 0;
+  const labels = useMemo(() => {
+    return (
+      data?.items
+        ?.filter((item) => selectedIds.includes(item.id))
+        .map((item) => item.label) ?? []
+    );
+  }, [data, selectedIds]);
 
   const totalItemsCount = data?.totalItemsCount || 0;
 
@@ -92,7 +90,7 @@ export function EntityRelation<Data extends EntityList>({
         aria-expanded={open}
         onClick={() => onOpenChange(true)}
       >
-        {hasSelectedIds ? labels.join(", ") : `Select ${entityName}`}
+        {labels.length ? labels.join(", ") : `Select ${entityName}`}
         <ChevronsUpDownIcon className="ml-2 size-4 shrink-0" />
       </Button>
       <CommandDialog
@@ -126,7 +124,13 @@ export function EntityRelation<Data extends EntityList>({
               key={item.id}
               value={item.id}
               onSelect={(currentValue) => {
-                onSelectChange(currentValue);
+                if (selectedIds.includes(currentValue)) {
+                  onSelectChange(
+                    selectedIds.filter((item) => item !== currentValue),
+                  );
+                } else {
+                  onSelectChange(selectedIds.concat(currentValue));
+                }
               }}
               disabled={isPending}
             >

@@ -1,11 +1,12 @@
 "use client";
-import { BrainCircuitIcon, MapPinIcon, ZapIcon } from "lucide-react";
+import { AwardIcon, BrainCircuitIcon, MapPinIcon, ZapIcon } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import React, { useRef } from "react";
 import { AppImage } from "@/components/shared/app-image";
 import { IconTile } from "@/components/shared/icon-tile";
-import { RichTextDisplay } from "@/components/shared/rich-text-editor/rich-text-display";
 import { RichTextListDisplay } from "@/components/shared/rich-text-editor/rich-text-list-display";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { useLocalFormatter } from "@/hooks/use-locale-formatter";
 import { useI18n } from "@/i18n/client";
 import { CareerMode, CareerType } from "@/lib/dto/career";
@@ -18,6 +19,10 @@ export function CareerCard({
 }) {
   const { formatDate } = useLocalFormatter();
   const i18n = useI18n();
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const searchParams = useSearchParams();
+
+  const isActive = searchParams.get("career") === careerItem.slug;
 
   const resolveCareerType = (type: CareerType) => {
     switch (type) {
@@ -47,15 +52,21 @@ export function CareerCard({
     }
   };
 
+  React.useEffect(() => {
+    if (isActive) {
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [isActive]);
+
   return (
-    <article className="space-y-6">
+    <article className="space-y-6" ref={cardRef}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="group flex items-center gap-4">
-          <IconTile className="shrink-0 border-2 border-border rounded-base">
+          <IconTile className="shrink-0">
             <AppImage
               asset={careerItem.featuredAsset}
               transform={{ preset: "icon", mode: "resize" }}
-              className="size-14 object-contain rounded-base"
+              className="size-8 object-contain rounded-base"
             />
           </IconTile>
           <div>
@@ -66,11 +77,11 @@ export function CareerCard({
           </div>
         </div>
         <div className="space-y-2 flex sm:block justify-between flex-wrap">
-          <Badge>
-            {formatDate(careerItem.startDate, { dateStyle: "long" })}
+          <Badge variant={"neutral"}>
+            {formatDate(careerItem.startDate, { dateStyle: "medium" })}
             {" - "}
             {!careerItem.isPresent && careerItem.endDate
-              ? formatDate(careerItem.endDate, { dateStyle: "long" })
+              ? formatDate(careerItem.endDate, { dateStyle: "medium" })
               : i18n("present")}
           </Badge>
           <p className="flex items-center sm:gap-1 capitalize">
@@ -86,18 +97,50 @@ export function CareerCard({
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-4">
-        <section className="space-y-2">
+        {!!careerItem.achievements?.length && (
+          <section className="col-span-2 space-y-4 mb-2">
+            <h4 className="group font-base flex items-center gap-2">
+              <IconTile className="size-8">
+                <AwardIcon className="size-4" />
+              </IconTile>
+              {i18n("career.careerCard.achievements")}
+            </h4>
+            <ul className="flex flex-wrap items-center gap-2">
+              {careerItem.achievements?.map((item) => (
+                <li
+                  key={item.id}
+                  className="bg-background p-2 rounded-base border-2"
+                >
+                  <Link
+                    href={`/achievements?slug=${item.slug}`}
+                    className="underline text-foreground font-base flex items-center gap-2 group"
+                  >
+                    <IconTile className="size-10">
+                      <AppImage
+                        asset={item.featuredAsset}
+                        transform={{ preset: "icon", mode: "resize" }}
+                        className="size-8 object-contain"
+                      />
+                    </IconTile>
+                    <span className="whitespace-nowrap">{item.name}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        <section className="space-y-4">
           <h4 className="group font-base flex items-center gap-2">
-            <IconTile className="size-6">
+            <IconTile className="size-8">
               <ZapIcon className="size-4" />
             </IconTile>
             {i18n("career.careerCard.impact")}
           </h4>
           <RichTextListDisplay html={careerItem.impact} />
         </section>
-        <section className="space-y-2">
+        <section className="space-y-4">
           <h4 className="group font-base flex items-center gap-2">
-            <IconTile className="size-6">
+            <IconTile className="size-8">
               <BrainCircuitIcon className="size-4" />
             </IconTile>
             {i18n("career.careerCard.learned")}

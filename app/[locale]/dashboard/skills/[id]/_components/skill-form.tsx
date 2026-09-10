@@ -40,6 +40,7 @@ export function SkillForm({
       isFeatured: false,
       category: "",
       assetIds: [],
+      featuredAssetId: "",
       translations: [
         {
           languageCode: contentLanguage,
@@ -57,7 +58,7 @@ export function SkillForm({
       isFeatured: initialValues?.isFeatured ?? false,
       assetIds: initialValues?.assets?.map((asset) => asset.asset.id) ?? [],
       featuredAssetId: initialValues?.featuredAsset?.id ?? "",
-      category: initialValues?.category ?? undefined,
+      category: initialValues?.category ?? "",
       translations: initialValues?.translations ?? [],
     },
     resolver: zodResolver(updateSkillInputSchema),
@@ -95,6 +96,7 @@ export function SkillForm({
     },
     onSuccess: (data) => {
       toast.success("Skill was updated successfully");
+      updateForm.reset(updateForm.getValues());
       formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
       router.refresh();
     },

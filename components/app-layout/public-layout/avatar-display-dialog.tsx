@@ -15,7 +15,7 @@ export function AvatarDisplayDialog() {
     >
       <DialogContent
         showCloseButton={false}
-        className="p-0 shadow-none border-0 max-w-[80vw] max-h-[80vh]"
+        className="shadow-none border-0 rounded-none max-w-[80vw] max-h-[80vh] p-2"
       >
         {ctx.profile.avatar && (
           <AppImage

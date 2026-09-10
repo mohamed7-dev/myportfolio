@@ -69,13 +69,17 @@ export function ProjectFormEducationField() {
       <FieldLabel>Education</FieldLabel>
       <EntityRelation
         queryFn={queryFn}
-        selectedIds={[form.getValues("educationItemId")]}
+        selectedIds={
+          form.getValues("educationItemId")
+            ? [form.getValues("educationItemId")]
+            : []
+        }
         entityName="education"
         searchLabel="Search by school name"
         open={open}
         onOpenChange={setOpen}
         onSelectChange={(value) => {
-          form.setValue("educationItemId", value ?? undefined, {
+          form.setValue("educationItemId", value?.[0] ?? undefined, {
             shouldDirty: true,
             shouldValidate: true,
           });

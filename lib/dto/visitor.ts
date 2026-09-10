@@ -230,22 +230,35 @@ export type GetPublicAchievementsOutputSchema = z.infer<
 >;
 
 // ################### Career ############################
-const publicCareerInList = career.pick({
-  id: true,
-  name: true,
-  slug: true,
-  location: true,
-  organization: true,
-  responsibilities: true,
-  learned: true,
-  impact: true,
-  featuredAsset: true,
-  type: true,
-  mode: true,
-  startDate: true,
-  endDate: true,
-  isPresent: true,
-});
+const publicCareerInList = career
+  .pick({
+    id: true,
+    name: true,
+    slug: true,
+    location: true,
+    organization: true,
+    responsibilities: true,
+    learned: true,
+    impact: true,
+    featuredAsset: true,
+    type: true,
+    mode: true,
+    startDate: true,
+    endDate: true,
+    isPresent: true,
+  })
+  .extend({
+    achievements: z
+      .array(
+        achievement.pick({
+          name: true,
+          slug: true,
+          id: true,
+          featuredAsset: true,
+        }),
+      )
+      .nullish(),
+  });
 
 export const getPublicCareerOutputSchema =
   createPaginatedListOutputSchema(publicCareerInList);

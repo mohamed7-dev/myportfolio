@@ -1,7 +1,8 @@
 "use client";
 import { AwardIcon, BriefcaseIcon, SchoolIcon } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import { useSearchParams } from "next/navigation";
+import React, { useRef } from "react";
 import { CardWrapper } from "@/components/shared/card-wrapper";
 import { IconTile } from "@/components/shared/icon-tile";
 import { MediaGallery } from "@/components/shared/media-gallery";
@@ -11,14 +12,19 @@ import { useLocalFormatter } from "@/hooks/use-locale-formatter";
 import { useScopedI18n } from "@/i18n/client";
 import { AchievementType } from "@/lib/dto/achievement";
 import type { GetPublicAchievementsOutputSchema } from "@/lib/dto/visitor";
+import { cn } from "@/lib/utils";
 
 export function AchievementCard({
   achievement,
 }: {
   achievement: GetPublicAchievementsOutputSchema["items"][number];
 }) {
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const i18n = useScopedI18n("achievements");
   const { formatDate } = useLocalFormatter();
+  const searchParams = useSearchParams();
+
+  const isActive = searchParams.get("slug") === achievement.slug;
   const resolveCardTitle = React.useCallback(() => {
     switch (achievement.type) {
       case AchievementType.CERTIFICATE:
@@ -51,9 +57,22 @@ export function AchievementCard({
     }
   }, [achievement, i18n]);
 
+  React.useEffect(() => {
+    if (isActive) {
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [isActive]);
+
   return (
-    <CardWrapper cardTitle={resolveCardTitle()} interactive={true}>
-      <div className="w-full overflow-hidden">
+    <CardWrapper
+      cardTitle={resolveCardTitle()}
+      className={cn(
+        isActive &&
+          "bg-primary shadow-none translate-x-box-shadow-x translate-y-box-shadow-y",
+      )}
+      autoFocus={isActive}
+    >
+      <div className="w-full overflow-hidden" ref={cardRef}>
         <MediaGallery
           entityAssets={achievement.assets}
           staticImageProps={{
@@ -72,7 +91,7 @@ export function AchievementCard({
             {formatDate(achievement.issueDate)}
           </Badge>
         </div>
-        <Button className="mt-4 w-full" asChild>
+        <Button className="mt-4 w-full" variant={"neutral"} size="sm" asChild>
           <Link href={achievement.credentialUrl} target="_blank">
             {i18n("verifyCredentialsLabel")}
           </Link>

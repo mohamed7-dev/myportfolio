@@ -79,7 +79,6 @@ export function StackedImages({ assets }: StackedImagesProps) {
                 asset={image}
                 transform={{ preset: "thumb", mode: "resize" }}
                 className="size-full object-cover select-none"
-                draggable={false}
               />
             </div>
           );

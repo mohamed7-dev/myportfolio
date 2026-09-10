@@ -115,6 +115,7 @@ export function ProjectForm({
     onSuccess: (data) => {
       toast.success("Project was updated successfully");
       router.refresh();
+      updateForm.reset(updateForm.getValues());
       formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
     },
     onError: (error) => {

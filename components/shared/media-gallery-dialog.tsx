@@ -90,7 +90,7 @@ export function MediaGalleryDialog({
           <Button
             type="button"
             size="icon-sm"
-            variant="neutralNoShadow"
+            variant="neutral"
             onClick={onClickPrev}
             aria-label="Previous media"
           >
@@ -99,7 +99,7 @@ export function MediaGalleryDialog({
           <Button
             type="button"
             size="icon-sm"
-            variant="neutralNoShadow"
+            variant="neutral"
             onClick={onClickNext}
             aria-label="Next media"
           >

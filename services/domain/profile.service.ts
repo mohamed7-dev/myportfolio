@@ -84,8 +84,12 @@ class ProfileService {
       where: {
         id,
       },
-      relations: relations ?? {
+      relations: {
         featuredAsset: true,
+        assets: {
+          asset: true,
+        },
+        ...relations,
       },
     });
 
@@ -142,7 +146,11 @@ class ProfileService {
     return this.translate(ctx, profile);
   }
 
-  public async update(ctx: RequestContext, input: UpdateProfileInputSchema) {
+  public async update(
+    ctx: RequestContext,
+    input: UpdateProfileInputSchema,
+    relations?: FindOptionsRelations<Profile>,
+  ) {
     const updatedProfile = await translatableSaver.update({
       ctx,
       input,
@@ -172,7 +180,7 @@ class ProfileService {
       },
     });
 
-    return await this.findOne(ctx, updatedProfile.id);
+    return await this.findOne(ctx, updatedProfile.id, relations);
   }
 
   public translate(ctx: RequestContext, profile: Profile) {

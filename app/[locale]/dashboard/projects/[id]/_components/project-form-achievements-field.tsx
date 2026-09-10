@@ -74,16 +74,11 @@ export function ProjectFormAchievementsField() {
         searchLabel="Search by achievement name"
         open={open}
         onOpenChange={setOpen}
-        onSelectChange={(value) => {
-          form.setValue(
-            "achievementIds",
-            Array.isArray(value) ? value : [value],
-            {
-              shouldDirty: true,
-              shouldValidate: true,
-            },
-          );
-          setOpen(false);
+        onSelectChange={(achievementIds) => {
+          form.setValue("achievementIds", achievementIds, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
         }}
       />
     </Field>

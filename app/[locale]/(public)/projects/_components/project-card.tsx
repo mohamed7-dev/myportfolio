@@ -18,7 +18,7 @@ export async function ProjectCard({
   return (
     <Link href={`/projects/${project.slug}`}>
       <CardWrapper interactive={true} className="p-0">
-        <div className="h-60 w-full overflow-hidden relative border-2 border-border">
+        <div className="h-60 w-full overflow-hidden relative">
           {project.featured && (
             <Badge
               variant={"neutral"}
@@ -28,8 +28,8 @@ export async function ProjectCard({
               <span>{i18n("featured")}</span>
             </Badge>
           )}
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out">
-            <p className="text-primary-foreground font-base text-lg capitalize">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-base bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out">
+            <p className="text-primary-foreground font-base text-lg capitalize border-2 border-border rounded-base px-4 py-2">
               {i18n("project.viewProject")}
             </p>
           </div>

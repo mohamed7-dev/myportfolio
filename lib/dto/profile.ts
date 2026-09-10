@@ -1,13 +1,11 @@
 import { z } from "@/lib/helpers/zod";
 import { asset, entityAssetSchema } from "./asset";
 import {
+  apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
-  baseTranslationEntityInput,
-  entityNotFoundErrorSchema,
-  forbiddenErrorSchema,
-  internalServerErrorSchema,
-  unAuthorizedErrorSchema,
+  idSchema,
+  nullableOptionalIdInputSchema,
 } from "./common";
 import { languageCodeSchema } from "./language-code";
 
@@ -19,112 +17,87 @@ export enum ProfileAssetType {
 const profileAssetTypeSchema = z.nativeEnum(ProfileAssetType);
 
 const profileTranslationSchema = baseTranslationEntity.extend({
-  displayName: z.string(),
-  summary: z.string(),
-  intro: z.string(),
-  subHeading: z.string(),
-  subtitle: z.string(),
-  jobTitle: z.string(),
-  location: z.string(),
-  currentFocus: z.string(),
+  displayName: z.string().min(1, { message: "Display name is required" }),
+  summary: z.string().min(1, { message: "Summary is required" }),
+  intro: z.string().min(1, { message: "Intro is required" }),
+  subHeading: z.string().min(1, { message: "Subheading is required" }),
+  subtitle: z.string().min(1, { message: "Subtitle is required" }),
+  jobTitle: z.string().min(1, { message: "Job title is required" }),
+  location: z.string().min(1, { message: "Location is required" }),
+  currentFocus: z.string().min(1, { message: "Current focus is required" }),
 });
 
 const profileAssetSchema = entityAssetSchema.extend({
-  profileId: z.string(),
+  profileId: idSchema,
   type: profileAssetTypeSchema,
 });
 
 export type ProfileAsset = z.infer<typeof profileAssetSchema>;
 
-export const profile = baseSchema.extend({
-  displayName: z.string(),
-  summary: z.string(),
-  username: z.string(),
-  handle: z.string(),
-  cvAssetId: z.string().nullish(),
-  intro: z.string(),
-  subHeading: z.string(),
-  subtitle: z.string(),
-  jobTitle: z.string(),
-  location: z.string(),
-  currentFocus: z.string(),
-  projectsShipped: z.number(),
-  openSourceContributions: z.number(),
-  yearsOfExperience: z.number(),
-  languageCode: languageCodeSchema,
-  translations: z.array(profileTranslationSchema),
-  assets: z.array(profileAssetSchema),
-  featuredAsset: asset.nullish(),
-});
+export const profile = baseSchema
+  .extend(
+    profileTranslationSchema.omit({
+      createdAt: true,
+      updatedAt: true,
+      id: true,
+    }).shape,
+  )
+  .extend({
+    username: z.string().min(1, { message: "Username can't be empty" }),
+    handle: z.string().min(1, { message: "Handle is required" }),
+    cvAssetId: idSchema.nullable(),
+    projectsShipped: z.coerce.number().nonnegative(),
+    openSourceContributions: z.coerce.number().nonnegative(),
+    yearsOfExperience: z.coerce.number().nonnegative(),
+    translations: z.array(profileTranslationSchema),
+    assets: z.array(profileAssetSchema).nullable(),
+    featuredAsset: asset.nullable(),
+  });
 
 export type Profile = z.infer<typeof profile>;
 
-const profileTranslationInputSchema = baseTranslationEntityInput.extend({
-  displayName: z.string(),
-  summary: z.string(),
-  intro: z.string(),
-  subHeading: z.string(),
-  subtitle: z.string(),
-  jobTitle: z.string(),
-  location: z.string(),
-  currentFocus: z.string(),
+const profileTranslationInputSchema = profileTranslationSchema.omit({
+  createdAt: true,
+  updatedAt: true,
+  id: true,
 });
 
 // ###################### ClientSafe #####################
-export const clientSafeSchema = z.object({
-  id: z.string(),
-  handle: z.string(),
-  cvAssetId: z.string().nullish(),
-  projectsShipped: z.number(),
-  openSourceContributions: z.number(),
-  yearsOfExperience: z.number(),
-  summary: z.string(),
-  intro: z.string(),
-  subHeading: z.string(),
-  subtitle: z.string(),
-  jobTitle: z.string(),
-  location: z.string(),
-  currentFocus: z.string(),
-  displayName: z.string(),
-  languageCode: languageCodeSchema,
-  username: z.string(),
-  assets: z.array(profileAssetSchema).optional(),
-  featuredAsset: asset.nullable().optional(),
-  translations: z.array(profileTranslationSchema),
-});
+export const clientSafeSchema = profile;
 
 export type ClientSafeProfile = z.infer<typeof clientSafeSchema>;
 
 // ######################## Update ############################
 
-export const updateProfileInputSchema = z.object({
-  id: z.string(),
-  handle: z.string().optional(),
-  cvAssetId: z.string().optional(),
-  projectsShipped: z.coerce.number().optional(),
-  openSourceContributions: z.coerce.number().optional(),
-  yearsOfExperience: z.coerce.number().optional(),
-  assetIds: z
-    .array(z.object({ id: z.string(), type: profileAssetTypeSchema }))
-    .optional(),
-  featuredAssetId: z.string().optional(),
-  translations: z
-    .array(
-      profileTranslationInputSchema
-        .partial()
-        .extend({ languageCode: languageCodeSchema }),
-    )
-    .optional(),
-});
+export const updateProfileInputSchema = profile
+  .pick({
+    handle: true,
+    projectsShipped: true,
+    openSourceContributions: true,
+    yearsOfExperience: true,
+  })
+  .partial()
+  .extend({
+    id: idSchema,
+    cvAssetId: nullableOptionalIdInputSchema,
+    assetIds: z
+      .array(z.object({ id: idSchema, type: profileAssetTypeSchema }))
+      .optional(),
+    featuredAssetId: idSchema.optional(),
+    translations: z
+      .array(
+        profileTranslationInputSchema
+          .partial()
+          .extend({ languageCode: languageCodeSchema }),
+      )
+      .optional(),
+  });
 
 export type UpdateProfileInputSchema = z.infer<typeof updateProfileInputSchema>;
 
 export const updateProfileOutputSchema = z.union([
   clientSafeSchema,
-  entityNotFoundErrorSchema,
-  internalServerErrorSchema,
-  unAuthorizedErrorSchema,
-  forbiddenErrorSchema,
+  apiErrorSchema,
 ]);
 export type UpdateProfileOutputSchema = z.infer<
   typeof updateProfileOutputSchema

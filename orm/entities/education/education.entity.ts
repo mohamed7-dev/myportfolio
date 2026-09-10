@@ -38,7 +38,7 @@ export class Education extends AppEntity {
   @Column()
   isPresent: boolean;
 
-  @Column({ nullable: true, type: "real" })
+  @Column({ nullable: true, type: "real", default: null })
   gpa: number;
 
   @OneToMany(

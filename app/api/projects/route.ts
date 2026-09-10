@@ -40,7 +40,10 @@ export const { POST, PATCH, DELETE } = createRouter({
 
       const parsedData = validateInput(body, updateProjectInputSchema);
 
-      const result = await projectService.update(ctx, parsedData);
+      const result = await projectService.update(ctx, parsedData, {
+        featuredAsset: true,
+        assets: { asset: true },
+      });
 
       const parsedResult = validateOutput(result, updateProjectOutputSchema);
 

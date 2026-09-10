@@ -161,10 +161,13 @@ class VisitorService {
   }
 
   public async getCareer(ctx: RequestContext) {
-    const career = await careerService.find(ctx, {
-      sort: { updatedAt: SortDirection.DESC },
-    });
-
+    const career = await careerService.find(
+      ctx,
+      {
+        sort: { updatedAt: SortDirection.DESC },
+      },
+      { achievements: { featuredAsset: true } },
+    );
     const result = validateOutput(career, getPublicCareerOutputSchema);
     return result;
   }

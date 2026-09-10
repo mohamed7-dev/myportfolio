@@ -12,7 +12,7 @@ export function RichTextListDisplay({
     <RichTextDisplay
       html={html}
       className={cn(
-        "[&_li]:bg-background [&_li]:p-2 [&_li]:rounded-base [&_p]:m-0 [&_li]:mb-2 [&_li_p>strong:first-child]:block",
+        "[&_li]:bg-background [&_li]:p-2 [&_li]:rounded-base [&_li]:border-2 [&_p]:m-0 [&_li]:mb-2 [&_li_p>strong:first-child]:block",
         className,
       )}
     />

@@ -41,7 +41,7 @@ export function AboutForm({
       featuredAssetId: initialValues?.featuredAsset?.id ?? "",
       translations: initialValues?.translations ?? [],
     },
-    resolver: zodResolver(updateProfileInputSchema),
+    resolver: zodResolver(updateProfileInputSchema) as any,
   });
 
   const { mutateAsync: updateProfile } = useMutation({
@@ -56,12 +56,13 @@ export function AboutForm({
     },
     onSuccess: (data) => {
       toast.success("Profile was updated successfully");
+      form.reset(form.getValues());
+      router.refresh();
       formSubmittedEvent().emit(
         "update",
-        data.assets,
+        data.assets ?? [],
         data.featuredAsset ?? undefined,
       );
-      router.refresh();
     },
     onError: (error) => {
       toast.error(error.message);

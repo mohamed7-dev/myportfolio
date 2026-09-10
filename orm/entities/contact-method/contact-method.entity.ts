@@ -25,7 +25,7 @@ export class ContactMethod extends AppEntity {
   @Column()
   url: string;
 
-  @Column({ nullable: true, type: "text" })
+  @Column({ nullable: true, type: "text", default: null })
   copyableText: string;
 
   @Column({ default: true })

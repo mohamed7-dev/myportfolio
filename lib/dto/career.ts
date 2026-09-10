@@ -1,13 +1,14 @@
 import { z } from "@/lib/helpers/zod";
+import { achievement } from "./achievement";
 import { asset, entityAssetSchema } from "./asset";
 import {
   apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
-  baseTranslationEntityInput,
   booleanFilterOperators,
   dateTimeFilterOperators,
   deletionResponseSchema,
+  idSchema,
   inputIdSchema,
   inputIdsSchema,
   sortDirection,
@@ -37,104 +38,173 @@ export const careerTypeSchema = z.nativeEnum(CareerType);
 export const careerModeSchema = z.nativeEnum(CareerMode);
 
 const careerTranslationSchema = baseTranslationEntity.extend({
-  name: z.string().nonempty(),
-  slug: z.string().nonempty(),
-  location: z.string().nullish(),
-  organization: z.string().nonempty(),
-  responsibilities: z.string().nonempty(),
-  learned: z.string().nonempty(),
-  impact: z.string().nonempty(),
+  name: z.string().nonempty({ message: "Career name is required" }),
+  slug: z.string().nonempty({ message: "Career slug is required" }),
+  organization: z.string().nonempty({ message: "Organization is required" }),
+  location: z.string().nullable(),
+  responsibilities: z.string().nonempty({
+    message: "Your responsibilities during this career is required",
+  }),
+  learned: z
+    .string()
+    .nonempty({ message: "What you have learned in this career is required" }),
+  impact: z
+    .string()
+    .nonempty({ message: "Your impact on this career is required" }),
+});
+
+const careerTranslationFieldsSchema = careerTranslationSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 const careerAssetSchema = entityAssetSchema.extend({
-  careerId: z.string(),
+  careerId: idSchema,
 });
 
 export type CareerAsset = z.infer<typeof careerAssetSchema>;
 
-export const career = baseSchema.extend({
-  name: z.string().nonempty(),
-  slug: z.string().nonempty(),
-  location: z.string().nullish(),
-  organization: z.string().nonempty(),
-  responsibilities: z.string().nonempty(),
-  learned: z.string().nonempty(),
-  impact: z.string().nonempty(),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date().nullish(),
-  isPresent: z.boolean(),
-  isFeatured: z.boolean(),
-  mode: careerModeSchema,
-  type: careerTypeSchema,
-  translations: z.array(careerTranslationSchema),
-  assets: z.array(careerAssetSchema),
-  featuredAsset: asset,
-});
+export const career = baseSchema
+  .extend(careerTranslationFieldsSchema.shape)
+  .extend({
+    startDate: z.coerce.date(),
+    endDate: z.coerce.date().nullable(),
+    isPresent: z.boolean(),
+    isFeatured: z.boolean(),
+    mode: careerModeSchema,
+    type: careerTypeSchema,
+    translations: z.array(careerTranslationSchema),
+    assets: z.array(careerAssetSchema),
+    featuredAsset: asset,
+    achievements: z.array(achievement).optional(),
+  });
 
 export type Career = z.infer<typeof career>;
 
-const careerTranslationInputSchema = baseTranslationEntityInput.extend({
-  name: z.string().nonempty(),
-  slug: z.string().nonempty(),
-  organization: z.string().nonempty(),
-  responsibilities: z.string().nonempty(),
-  learned: z.string().nonempty(),
-  impact: z.string().nonempty(),
-  location: z.string().nullish(),
-});
+const careerTranslationInputSchema = careerTranslationFieldsSchema;
 
 //############################ Create #############################
-export const createCareerInputSchema = z.object({
-  assetIds: z.array(z.string()),
-  translations: z.array(careerTranslationInputSchema),
-  featuredAssetId: z.string(),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date().nullish(),
-  isPresent: z.boolean(),
-  isFeatured: z.boolean().optional(),
-  type: z.string().min(1, "Career type is required").pipe(careerTypeSchema),
-  mode: z.string().min(1, "Career mode is required").pipe(careerModeSchema),
-  achievementIds: z.array(z.string()).optional(),
-});
+export const createCareerInputSchema = z
+  .object({
+    assetIds: z.array(idSchema).min(1, { message: "Assets are required" }),
+    translations: z.array(careerTranslationInputSchema).min(1),
+    featuredAssetId: idSchema.min(1, { message: "Featured asset is required" }),
+    startDate: z.coerce.date().nullable(),
+    endDate: z.coerce.date().nullable(),
+    isPresent: z.boolean(),
+    isFeatured: z.boolean().optional(),
+    type: z.string().min(1, "Career type is required").pipe(careerTypeSchema),
+    mode: z.string().min(1, "Career mode is required").pipe(careerModeSchema),
+    achievementIds: z.array(idSchema).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.startDate === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["startDate"],
+        message: "Start date is required.",
+      });
+    }
+
+    if (data.isPresent) {
+      if (data.endDate !== null) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["endDate"],
+          message: "End date must be empty when currently active.",
+        });
+      }
+
+      return;
+    }
+
+    if (data.endDate === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: "End date is required.",
+      });
+
+      return;
+    }
+
+    if (data.startDate !== null && data.endDate < data.startDate) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: "End date must be after the start date.",
+      });
+    }
+  });
 export type CreateCareerFormInputSchema = z.input<
   typeof createCareerInputSchema
 >;
 export type CreateCareerInputSchema = z.output<typeof createCareerInputSchema>;
 
-export const createCareerOutputSchema = z.union([career, apiErrorSchema]);
+export const createCareerOutputSchema = z.union([
+  career.omit({ achievements: true, featuredAsset: true, assets: true }),
+  apiErrorSchema,
+]);
 
 export type CreateCareerOutputSchema = z.infer<typeof createCareerOutputSchema>;
 
 //############################ Update #############################
-export const updateCareerInputSchema = z.object({
-  id: z.string(),
-  translations: z
-    .array(
-      careerTranslationInputSchema
-        .partial()
-        .extend(
-          careerTranslationInputSchema.pick({ languageCode: true }).shape,
-        ),
-    )
-    .optional(),
-  assetIds: z.array(z.string()).optional(),
-  featuredAssetId: z.string().optional(),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().nullish().optional(),
-  isPresent: z.boolean().optional(),
-  isFeatured: z.boolean().optional(),
-  type: z
-    .string()
-    .min(1, "Career type is required")
-    .pipe(careerTypeSchema)
-    .optional(),
-  mode: z
-    .string()
-    .min(1, "Career mode is required")
-    .pipe(careerModeSchema)
-    .optional(),
-  achievementIds: z.array(z.string()).optional(),
-});
+export const updateCareerInputSchema = z
+  .object({
+    id: idSchema,
+    translations: z
+      .array(
+        careerTranslationInputSchema
+          .partial()
+          .extend(
+            careerTranslationInputSchema.pick({ languageCode: true }).shape,
+          ),
+      )
+      .optional(),
+    assetIds: z.array(idSchema).optional(),
+    featuredAssetId: idSchema.optional(),
+    startDate: z.coerce.date().nullish(),
+    endDate: z.coerce.date().nullish(),
+    isPresent: z.boolean().optional(),
+    isFeatured: z.boolean().optional(),
+    type: z
+      .string()
+      .min(1, "Career type is required")
+      .pipe(careerTypeSchema)
+      .optional(),
+    mode: z
+      .string()
+      .min(1, "Career mode is required")
+      .pipe(careerModeSchema)
+      .optional(),
+    achievementIds: z.array(idSchema).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isPresent) {
+      if (data.endDate !== null) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["endDate"],
+          message: "End date must be empty when currently active.",
+        });
+      }
+
+      return;
+    }
+
+    if (
+      data.startDate != null &&
+      data.endDate != null &&
+      data.endDate < data.startDate
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: "End date must be after the start date.",
+      });
+    }
+  });
 
 export type UpdateCareerFormInputSchema = z.input<
   typeof updateCareerInputSchema
@@ -142,7 +212,10 @@ export type UpdateCareerFormInputSchema = z.input<
 
 export type UpdateCareerInputSchema = z.output<typeof updateCareerInputSchema>;
 
-export const updateCareerOutputSchema = z.union([career, apiErrorSchema]);
+export const updateCareerOutputSchema = z.union([
+  career.omit({ achievements: true }),
+  apiErrorSchema,
+]);
 
 export type UpdateCareerOutputSchema = z.infer<typeof updateCareerOutputSchema>;
 
@@ -212,7 +285,15 @@ export const findOneCareerInputSchema = inputIdSchema;
 
 export type FindOneCareerInputSchema = z.infer<typeof findOneCareerInputSchema>;
 
-export const findOneCareerOutputSchema = career;
+export const findOneCareerOutputSchema = career
+  .omit({
+    achievements: true,
+  })
+  .extend({
+    achievements: z
+      .array(achievement.pick({ id: true, name: true, slug: true }))
+      .nullish(),
+  });
 
 export type FindOneCareerOutputSchema = z.infer<
   typeof findOneCareerOutputSchema

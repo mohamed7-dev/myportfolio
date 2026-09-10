@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { wrapService } from "@/api/common/create-router";
+import { EntityAssetsFormField } from "@/components/data-input/entity-assets-form-field";
 import { Page, PageTitle } from "@/components/page-layout/page";
 import {
   PageActionBar,
@@ -13,7 +14,6 @@ import { type Skill, skill as skillSchema } from "@/lib/dto/skill";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { skillService } from "@/services/domain/skill.service";
 import { SkillForm } from "./_components/skill-form";
-import { SkillFormAssetField } from "./_components/skill-form-asset-field";
 import { SkillFormCategoryField } from "./_components/skill-form-category-field";
 import { SkillFormMainFields } from "./_components/skill-form-main-fields";
 import { SkillFormStatusField } from "./_components/skill-form-status-field";
@@ -65,8 +65,8 @@ export default async function SkillPage({
             <SkillFormMainFields />
           </PageBlock>
           <PageBlock column="side" id="skill-assets">
-            <SkillFormAssetField
-              skillAssets={skill?.assets ?? []}
+            <EntityAssetsFormField
+              entityAssets={skill?.assets ?? []}
               featuredAsset={skill?.featuredAsset ?? undefined}
             />
           </PageBlock>

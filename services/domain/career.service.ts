@@ -9,6 +9,8 @@ import type {
 } from "@/lib/dto/career";
 import type { DeletionResponse } from "@/lib/dto/common";
 import { EntityNotFoundError } from "@/lib/errors/errors";
+import type { Translated } from "@/lib/types/translatable";
+import type { Achievement } from "@/orm/entities/achievement/achievement.entity";
 import type { AppEntity } from "@/orm/entities/app-entity";
 import { Career } from "@/orm/entities/career/career.entity";
 import { CareerTranslation } from "@/orm/entities/career/career.translation";
@@ -120,29 +122,25 @@ class CareerService {
     });
     await assetService.updateEntityAssets(ctx, career, input);
 
-    return await this.findOne(ctx, { id: career.id });
+    return await this.findOne(
+      ctx,
+      { id: career.id },
+      { assets: false, featuredAsset: false },
+    );
   }
 
-  public async update(ctx: RequestContext, input: UpdateCareerInputSchema) {
-    const repo = await ormService.getRepository(ctx, Career);
-    const career = await repo.findOne({
-      where: {
-        id: input.id,
-      },
-      relations: {
-        assets: {
-          asset: true,
-        },
-        featuredAsset: true,
-      },
-    });
+  public async update(
+    ctx: RequestContext,
+    input: UpdateCareerInputSchema,
+    relations?: FindOptionsRelations<Career>,
+  ) {
+    const career = await this.findOne(ctx, { id: input.id });
     if (!career) {
       throw new EntityNotFoundError("Career not found");
     }
 
     await slugValidator.validateSlug(ctx, input, CareerTranslation);
-
-    const updatedCareer = await translatableSaver.update({
+    await translatableSaver.update({
       ctx,
       input,
       entityType: Career,
@@ -154,7 +152,7 @@ class CareerService {
       },
     });
 
-    return await this.findOne(ctx, { id: updatedCareer.id });
+    return await this.findOne(ctx, { id: input.id }, relations);
   }
 
   async delete(
@@ -207,20 +205,43 @@ class CareerService {
 
   private translateCareer(ctx: RequestContext, career: Career) {
     const translatedCareer = translator.translate(ctx.languageCode, career);
-    const translatedAssets = translatedCareer.assets.flatMap((careerAsset) => {
-      return {
-        ...careerAsset,
-        asset: translator.translate(ctx.languageCode, careerAsset.asset),
-      };
-    });
 
     return {
       ...translatedCareer,
-      assets: translatedAssets,
-      featuredAsset: translator.translate(
-        ctx.languageCode,
-        translatedCareer.featuredAsset,
-      ),
+      ...(translatedCareer.assets?.length && {
+        assets: translatedCareer.assets?.flatMap((careerAsset) => {
+          return {
+            ...careerAsset,
+            asset: translator.translate(ctx.languageCode, careerAsset.asset),
+          };
+        }),
+      }),
+      ...(translatedCareer.featuredAsset && {
+        featuredAsset: translator.translate(
+          ctx.languageCode,
+          translatedCareer.featuredAsset,
+        ),
+      }),
+      ...(career.achievements?.length && {
+        achievements: career.achievements.map((achievement) =>
+          translator.translate<any>(ctx.languageCode, {
+            ...achievement,
+            featuredAsset: translator.translate(
+              ctx.languageCode,
+              achievement.featuredAsset,
+            ),
+            assets: achievement.assets?.flatMap((achievementAsset) => {
+              return {
+                ...achievementAsset,
+                asset: translator.translate(
+                  ctx.languageCode,
+                  achievementAsset.asset,
+                ),
+              };
+            }),
+          }),
+        ) as Translated<Achievement>[],
+      }),
     };
   }
 }

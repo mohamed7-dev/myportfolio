@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { wrapService } from "@/api/common/create-router";
+import { EntityAssetsFormField } from "@/components/data-input/entity-assets-form-field";
 import { Page, PageTitle } from "@/components/page-layout/page";
 import {
   PageActionBar,
@@ -9,12 +10,14 @@ import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { PendingSubmitButton } from "@/components/shared/pending-submit-button";
 import { NEW_ENTITY_PATH } from "@/lib/constants";
-import { type Career, findOneCareerOutputSchema } from "@/lib/dto/career";
+import {
+  type FindOneCareerOutputSchema,
+  findOneCareerOutputSchema,
+} from "@/lib/dto/career";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { careerService } from "@/services/domain/career.service";
 import { CareerForm } from "./_components/career-form";
 import { CareerFormAchievementsField } from "./_components/career-form-achievements-field";
-import { CareerFormAssetField } from "./_components/career-form-asset-field";
 import CareerFormDateFields from "./_components/career-form-date-fields";
 import { CareerFormMainFields } from "./_components/career-form-main-fields";
 import { CareerFormModeTypeFields } from "./_components/career-form-mode-type-fields";
@@ -32,14 +35,14 @@ export default async function CareerPage({
   const { id } = await params;
   const creatingNewEntity = id === NEW_ENTITY_PATH;
 
-  let career: Career | undefined;
+  let career: FindOneCareerOutputSchema | undefined;
 
   if (!creatingNewEntity) {
     const findOne = wrapService({
       authenticatedOnly: true,
       handler: careerService.findOne.bind(careerService),
     });
-    const result = await findOne({ id });
+    const result = await findOne({ id }, { achievements: true });
     career = validateOutput(result, findOneCareerOutputSchema);
   }
 
@@ -67,8 +70,8 @@ export default async function CareerPage({
             <CareerFormMainFields />
           </PageBlock>
           <PageBlock column="side" id="career-assets">
-            <CareerFormAssetField
-              careerAssets={career?.assets ?? []}
+            <EntityAssetsFormField
+              entityAssets={career?.assets ?? []}
               featuredAsset={career?.featuredAsset ?? undefined}
             />
           </PageBlock>

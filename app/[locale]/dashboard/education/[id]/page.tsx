@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { wrapService } from "@/api/common/create-router";
+import { EntityAssetsFormField } from "@/components/data-input/entity-assets-form-field";
 import { Page, PageTitle } from "@/components/page-layout/page";
 import {
   PageActionBar,
@@ -16,7 +17,6 @@ import {
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { educationService } from "@/services/domain/education.service";
 import { EducationForm } from "./_components/education-form";
-import { EducationFormAssetField } from "./_components/education-form-asset-field";
 import EducationFormDateFields from "./_components/education-form-date-fields";
 import { EducationFormMainFields } from "./_components/education-form-main-fields";
 
@@ -68,8 +68,8 @@ export default async function EducationPage({
             <EducationFormMainFields />
           </PageBlock>
           <PageBlock column="side" id="assets">
-            <EducationFormAssetField
-              educationItemAssets={education?.assets ?? []}
+            <EntityAssetsFormField
+              entityAssets={education?.assets ?? []}
               featuredAsset={education?.featuredAsset ?? undefined}
             />
           </PageBlock>

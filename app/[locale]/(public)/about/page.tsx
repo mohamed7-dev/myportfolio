@@ -1,4 +1,5 @@
 import {
+  Code2Icon,
   CodeIcon,
   PaintRollerIcon,
   ServerIcon,
@@ -82,29 +83,37 @@ export default async function AboutPage() {
     switch (category) {
       case SkillCategory.FRONTEND:
         return (
-          <span className="flex items-center gap-2">
-            <PaintRollerIcon className="stroke-primary" />
+          <span className="flex items-center gap-2 mb-6">
+            <IconTile className="size-10">
+              <PaintRollerIcon />
+            </IconTile>
             {i18n("skills.categories.frontend")}
           </span>
         );
       case SkillCategory.BACKEND:
         return (
-          <span className="flex items-center gap-2">
-            <ServerIcon className="stroke-primary" />
+          <span className="flex items-center gap-2 mb-6">
+            <IconTile className="size-10">
+              <ServerIcon />
+            </IconTile>
             {i18n("skills.categories.backend")}
           </span>
         );
       case SkillCategory.PROGRAMMING_LANGUAGES:
         return (
-          <span className="flex items-center gap-2">
-            <CodeIcon className="stroke-primary" />
+          <span className="flex items-center gap-2 mb-6">
+            <IconTile className="size-10">
+              <Code2Icon />
+            </IconTile>
             {i18n("skills.categories.programmingLanguages")}
           </span>
         );
       case SkillCategory.TOOLS:
         return (
-          <span className="flex items-center gap-2">
-            <WrenchIcon className="stroke-primary" />
+          <span className="flex items-center gap-2 mb-6">
+            <IconTile className="size-10">
+              <WrenchIcon />
+            </IconTile>
             {i18n("skills.categories.tools")}
           </span>
         );
@@ -166,7 +175,7 @@ export default async function AboutPage() {
           title={
             <span className="group flex items-center gap-2">
               <IconTile asSpan={true}>
-                <WrenchIcon />
+                <CodeIcon />
               </IconTile>
               <span>{i18n("skills.title")}</span>
             </span>

@@ -118,10 +118,18 @@ export class SkillService {
     });
     await assetService.updateEntityAssets(ctx, skill, input);
 
-    return await this.findOne(ctx, { id: skill.id });
+    return await this.findOne(
+      ctx,
+      { id: skill.id },
+      { assets: true, featuredAsset: true },
+    );
   }
 
-  public async update(ctx: RequestContext, input: UpdateSkillInputSchema) {
+  public async update(
+    ctx: RequestContext,
+    input: UpdateSkillInputSchema,
+    relations?: FindOptionsRelations<Skill>,
+  ) {
     const repo = await ormService.getRepository(ctx, Skill);
     const skill = await repo.findOne({
       where: {
@@ -151,7 +159,7 @@ export class SkillService {
       },
     });
 
-    return await this.findOne(ctx, { id: updatedSkill.id });
+    return await this.findOne(ctx, { id: updatedSkill.id }, relations);
   }
 
   async delete(

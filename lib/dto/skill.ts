@@ -7,12 +7,12 @@ import {
   baseTranslationEntityInput,
   booleanFilterOperators,
   deletionResponseSchema,
+  idSchema,
   inputIdSchema,
   inputIdsSchema,
   sortDirection,
   stringFilterOperators,
 } from "./common";
-import { languageCodeSchema } from "./language-code";
 import {
   createPaginatedListInputSchema,
   createPaginatedListOutputSchema,
@@ -28,39 +28,44 @@ export enum SkillCategory {
 const skillCategorySchema = z.nativeEnum(SkillCategory);
 
 const skillTranslationSchema = baseTranslationEntity.extend({
-  name: z.string().nonempty(),
-  slug: z.string().optional(),
+  name: z.string().min(1, { message: "Skill name is required" }),
+  slug: z.string().min(1, { message: "Skill slug is required" }),
+});
+
+const skillTranslationFieldsSchema = skillTranslationSchema.omit({
+  createdAt: true,
+  updatedAt: true,
+  id: true,
 });
 
 const skillAssetSchema = entityAssetSchema.extend({
-  skillId: z.string(),
+  skillId: idSchema,
 });
 
 export type SkillAsset = z.infer<typeof skillAssetSchema>;
 
-export const skill = baseSchema.extend({
-  name: z.string(),
-  slug: z.string(),
-  isFeatured: z.boolean(),
-  category: skillCategorySchema,
-  assets: z.array(skillAssetSchema),
-  featuredAsset: asset,
-  translations: z.array(skillTranslationSchema),
-});
+export const skill = baseSchema
+  .extend(skillTranslationFieldsSchema.shape)
+  .extend({
+    isFeatured: z.boolean(),
+    category: skillCategorySchema,
+    assets: z.array(skillAssetSchema),
+    featuredAsset: asset,
+    translations: z.array(skillTranslationSchema),
+  });
 
 export type Skill = z.infer<typeof skill>;
 
-const skillTranslationInputSchema = baseTranslationEntityInput.extend({
-  name: z.string(),
-  slug: z.string(),
-});
+const skillTranslationInputSchema = baseTranslationEntityInput.extend(
+  skillTranslationFieldsSchema.shape,
+);
 
 //############################ Create #############################
 export const createSkillInputSchema = z.object({
   category: z.string().min(1, "Category is required").pipe(skillCategorySchema),
-  assetIds: z.array(z.string()),
+  assetIds: z.array(idSchema).min(1, { message: "Assets are required" }),
   translations: z.array(skillTranslationInputSchema),
-  featuredAssetId: z.string(),
+  featuredAssetId: idSchema.min(1, { message: "Featured asset is required" }),
   isFeatured: z.boolean().optional(),
 });
 
@@ -68,28 +73,16 @@ export type CreateSkillFormInput = z.input<typeof createSkillInputSchema>;
 
 export type CreateSkillInputSchema = z.output<typeof createSkillInputSchema>;
 
-export const createSkillOutputSchema = z.union([skill, apiErrorSchema]);
+export const createSkillOutputSchema = z.union([
+  skill.omit({ assets: true, featuredAsset: true }),
+  apiErrorSchema,
+]);
 
 export type CreateSkillOutputSchema = z.infer<typeof createSkillOutputSchema>;
 
 //############################ Update #############################
-export const updateSkillInputSchema = z.object({
-  id: z.string(),
-  category: z
-    .string()
-    .min(1, "Category is required")
-    .pipe(skillCategorySchema)
-    .optional(),
-  assetIds: z.array(z.string()).optional(),
-  featuredAssetId: z.string().optional(),
-  translations: z
-    .array(
-      skillTranslationInputSchema
-        .partial()
-        .extend({ languageCode: languageCodeSchema }),
-    )
-    .optional(),
-  isFeatured: z.boolean().optional(),
+export const updateSkillInputSchema = createSkillInputSchema.partial().extend({
+  id: idSchema,
 });
 
 export type UpdateSkillFormInput = z.input<typeof updateSkillInputSchema>;

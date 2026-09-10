@@ -120,6 +120,7 @@ class ContactMethodService {
   public async update(
     ctx: RequestContext,
     input: UpdateContactMethodInputSchema,
+    relations?: FindOptionsRelations<ContactMethod>,
   ) {
     const repo = await ormService.getRepository(ctx, ContactMethod);
     const contactMethod = await repo.findOne({
@@ -148,7 +149,7 @@ class ContactMethodService {
       },
     });
 
-    return await this.findOne(ctx, { id: updatedContactMethod.id });
+    return await this.findOne(ctx, { id: updatedContactMethod.id }, relations);
   }
 
   async delete(

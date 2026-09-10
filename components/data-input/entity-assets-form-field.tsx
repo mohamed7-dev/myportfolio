@@ -1,10 +1,10 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useFormContext } from "react-hook-form";
-import { DynamicLoader } from "@/components/shared/dynamic-loader";
-import { Field } from "@/components/ui/field";
-import type { Asset } from "@/lib/dto/asset";
-import type { CareerAsset } from "@/lib/dto/career";
+import type { Asset, EntityAsset } from "@/lib/dto/asset";
+import { notNullOrUndefined } from "@/lib/utils/not-null-or-undefined";
+import { DynamicLoader } from "../shared/dynamic-loader";
+import { Field, FieldError } from "../ui/field";
 
 const EntityAssets = dynamic(
   () =>
@@ -14,19 +14,23 @@ const EntityAssets = dynamic(
   { ssr: false, loading: () => <DynamicLoader /> },
 );
 
-interface CreateProjectFormAssetFieldProps {
-  careerAssets: CareerAsset[];
-  featuredAsset?: Asset;
-}
-
-export function CareerFormAssetField({
-  careerAssets,
+export function EntityAssetsFormField({
+  entityAssets,
   featuredAsset,
-}: CreateProjectFormAssetFieldProps) {
+}: {
+  entityAssets: EntityAsset[];
+  featuredAsset?: Asset;
+}) {
   const form = useFormContext();
-  const assets = careerAssets
+  const assets = entityAssets
     .sort((a, b) => a.position - b.position)
     ?.map((pa) => pa.asset);
+
+  const errors = [
+    form.formState.errors?.assetIds?.message,
+    form.formState.errors?.featuredAssetId?.message,
+  ].filter(notNullOrUndefined);
+
   return (
     <Field>
       <EntityAssets
@@ -45,6 +49,9 @@ export function CareerFormAssetField({
           });
         }}
       />
+      {!!errors.length && (
+        <FieldError errors={errors.map((e) => ({ message: e as string }))} />
+      )}
     </Field>
   );
 }

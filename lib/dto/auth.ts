@@ -48,3 +48,8 @@ export const logoutOutputSchema = z.union([
   apiErrorSchema,
 ]);
 export type LogoutOutputSchema = z.infer<typeof logoutOutputSchema>;
+
+//####################### Me ################################
+export const meOutputSchema = clientSafeSchema;
+
+export type MeOutputSchema = z.infer<typeof meOutputSchema>;

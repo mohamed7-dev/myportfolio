@@ -17,6 +17,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { AppImage } from "@/components/shared/app-image";
+import { IconTile } from "@/components/shared/icon-tile";
 import { MediaGallery } from "@/components/shared/media-gallery";
 import { RichTextDisplay } from "@/components/shared/rich-text-editor/rich-text-display";
 import { RichTextListDisplay } from "@/components/shared/rich-text-editor/rich-text-list-display";
@@ -155,111 +156,121 @@ export default async function ProjectPage({
       </PageActionBar>
       <PageLayout>
         <PageBlock id="relations" column="full" title={i18n("relations.title")}>
-          <div className="space-y-4 overflow-x-auto pb-4">
-            <section
-              className={
-                "flex items-center gap-2 md:gap-6 flex-wrap overflow-x-auto"
-              }
-            >
-              <h3 className="font-base text-sm md:text-lg text-foreground mb-2 capitalize">
-                {i18n("relations.techStack")}:
+          <div className="space-y-6 overflow-x-auto pb-4">
+            <section className={"flex flex-col gap-2"}>
+              <h3 className="font-base text-sm md:text-base text-foreground mb-2 capitalize">
+                {i18n("relations.techStack")}
               </h3>
-              {project.skills?.map((skill) => (
-                <Tooltip key={skill.id}>
-                  <TooltipTrigger>
-                    <AppImage
-                      asset={skill.featuredAsset}
-                      transform={{ preset: "tiny", mode: "resize" }}
-                      className="size-6 sm:size-8 md:size-10 object-contain"
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent>{skill.name}</TooltipContent>
-                </Tooltip>
-              ))}
+              <ul className="flex items-center gap-2 flex-wrap">
+                {project.skills?.map((skill) => (
+                  <li
+                    key={skill.id}
+                    className="border-2 rounded-base bg-background p-2 flex items-center"
+                  >
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <AppImage
+                          asset={skill.featuredAsset}
+                          transform={{ preset: "tiny", mode: "resize" }}
+                          className="size-6 sm:size-8 object-contain"
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>{skill.name}</TooltipContent>
+                    </Tooltip>
+                  </li>
+                ))}
+              </ul>
             </section>
 
-            {project.career && (
-              <section
-                className={
-                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap"
-                }
-              >
-                <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
-                  {i18n("relations.career")}:
-                </h3>
-                <Button variant={"neutral"} size="xs" asChild>
-                  <Link href={`/career#${project.career.slug}`}>
-                    {project.career.featuredAsset && (
+            <div className="flex gap-4 flex-wrap">
+              {project.career && (
+                <section
+                  className={
+                    "flex-1 flex flex-col gap-4 bg-background p-2 border-2 rounded-base"
+                  }
+                >
+                  <h3 className="font-base text-sm md:text-base text-foreground capitalize">
+                    {i18n("relations.career")}
+                  </h3>
+                  <Link
+                    href={`/career?career=${project.career.slug}`}
+                    className="underline text-foreground font-base flex items-center gap-2 group"
+                  >
+                    <IconTile className="bg-secondary-background border-2">
                       <AppImage
                         asset={project.career.featuredAsset}
                         transform={{ preset: "icon", mode: "resize" }}
-                        className="size-4.5 object-cover"
+                        className="size-4.5 object-contain"
                       />
-                    )}
-                    <span className="text-foreground/80">
-                      {i18n("relations.careerMessage")}:{" "}
+                    </IconTile>
+                    <span className="whitespace-nowrap">
+                      {project.career.name}
                     </span>
-                    <span>{project.career.name}</span>
                   </Link>
-                </Button>
-              </section>
-            )}
-            {project.education && (
-              <section
-                className={
-                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap"
-                }
-              >
-                <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
-                  {i18n("relations.education")}:
-                </h3>
-                <Button variant={"neutral"} size="xs" asChild>
-                  <Link href={`/career#${project.education.slug}`}>
-                    {project.education.featuredAsset && (
+                  <span className="text-foreground text-xs">
+                    {i18n("relations.careerMessage")}
+                  </span>
+                </section>
+              )}
+              {project.education && (
+                <section
+                  className={
+                    "flex-1 flex flex-col gap-4 bg-background p-2 border-2 rounded-base"
+                  }
+                >
+                  <h3 className="font-base text-sm md:text-base text-foreground capitalize">
+                    {i18n("relations.education")}
+                  </h3>
+                  <Link
+                    href={`/career?education=${project.education.slug}`}
+                    className="underline text-foreground font-base flex items-center gap-2 group"
+                  >
+                    <IconTile className="bg-secondary-background border-2">
                       <AppImage
                         asset={project.education.featuredAsset}
                         transform={{ preset: "icon", mode: "resize" }}
-                        className="size-4.5 object-cover"
+                        className="size-4.5 object-contain"
                       />
-                    )}
-                    <span className="text-foreground/80">
-                      {i18n("relations.educationMessage")}:{" "}
+                    </IconTile>
+                    <span className="whitespace-nowrap">
+                      {project.education.school}
                     </span>
-                    <span>{project.education.school}</span>
                   </Link>
-                </Button>
-              </section>
-            )}
+                  <span className="text-foreground text-xs">
+                    {i18n("relations.educationMessage")}
+                  </span>
+                </section>
+              )}
+            </div>
             {!!project.achievements?.length && (
-              <section
-                className={
-                  "min-h-14 flex items-center gap-2 md:gap-6 flex-wrap"
-                }
-              >
-                <h3 className="font-base text-sm md:text-lg text-foreground capitalize">
-                  {i18n("relations.achievements")}:
+              <section className={cn("flex flex-col gap-2")}>
+                <h3 className="font-base text-sm md:text-base text-foreground capitalize">
+                  {i18n("relations.achievements")}
                 </h3>
-                <div className="flex flex-wrap gap-2 items-center">
+                <ul className="flex items-center gap-2 flex-wrap">
                   {project.achievements.map((achievement) => (
-                    <Button
+                    <li
                       key={achievement.id}
-                      variant={"neutral"}
-                      size="xs"
-                      asChild
+                      className="bg-background p-2 rounded-base border-2"
                     >
-                      <Link href={`/achievements#${achievement.slug}`}>
-                        {achievement.featuredAsset && (
+                      <Link
+                        href={`/achievements?slug=${achievement.slug}`}
+                        className="underline text-foreground font-base flex items-center gap-2 group"
+                      >
+                        <IconTile className="size-10 bg-secondary-background border-2">
                           <AppImage
                             asset={achievement.featuredAsset}
                             transform={{ preset: "icon", mode: "resize" }}
-                            className="size-4.5 object-cover"
+                            className="size-8 object-contain"
                           />
-                        )}
-                        <span>{achievement.name}</span>
+                        </IconTile>
+                        <span className="whitespace-nowrap">
+                          {achievement.name}
+                        </span>
                       </Link>
-                    </Button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </section>
             )}
           </div>
@@ -296,14 +307,16 @@ export default async function ProjectPage({
         <PageBlock id="features" column="main" title={i18n("features.title")}>
           <RichTextListDisplay html={project.features} />
         </PageBlock>
-        <PageBlock
-          id="challenges"
-          column="full"
-          title={i18n("challenges.title")}
-        >
-          <ChallengesSlider challenges={challenges} />
-        </PageBlock>
-        {project.technicalHighlights.length && (
+        {!!challenges.length && (
+          <PageBlock
+            id="challenges"
+            column="full"
+            title={i18n("challenges.title")}
+          >
+            <ChallengesSlider challenges={challenges} />
+          </PageBlock>
+        )}
+        {!!project.technicalHighlights.length && (
           <PageBlock
             id="technical-highlights"
             column="main"
@@ -312,7 +325,7 @@ export default async function ProjectPage({
             <RichTextListDisplay html={project.technicalHighlights} />
           </PageBlock>
         )}
-        {project.contributions.length && (
+        {!!project.contributions.length && (
           <PageBlock
             id="contributions"
             column="side"

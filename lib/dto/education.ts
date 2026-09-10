@@ -4,10 +4,10 @@ import {
   apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
-  baseTranslationEntityInput,
   booleanFilterOperators,
   dateTimeFilterOperators,
   deletionResponseSchema,
+  idSchema,
   inputIdSchema,
   inputIdsSchema,
   numericFilterOperators,
@@ -20,81 +20,155 @@ import {
 } from "./paginated-list";
 
 const educationTranslationSchema = baseTranslationEntity.extend({
-  school: z.string().nonempty(),
-  slug: z.string().nonempty(),
-  degree: z.string().optional(),
-  location: z.string().optional(),
+  school: z.string().nonempty({ message: "School name is required" }),
+  slug: z.string().nonempty({ message: "School slug is required" }),
+  degree: z.string().nullable(),
+  location: z.string().nullable(),
+});
+
+const educationTranslationFieldsSchema = educationTranslationSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 const educationAssetSchema = entityAssetSchema.extend({
-  educationId: z.string(),
+  educationId: idSchema,
 });
 
 export type EducationAsset = z.infer<typeof educationAssetSchema>;
 
-export const education = baseSchema.extend({
-  school: z.string().nonempty(),
-  slug: z.string().nonempty(),
-  degree: z.string().nullish(),
-  location: z.string().nullish(),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date().nullish(),
-  isPresent: z.boolean(),
-  gpa: z.number().nullish(),
-  translations: z.array(educationTranslationSchema),
-  assets: z.array(educationAssetSchema),
-  featuredAsset: asset,
-});
+export const education = baseSchema
+  .extend(educationTranslationFieldsSchema.shape)
+  .extend({
+    startDate: z.coerce.date(),
+    endDate: z.coerce.date().nullable(),
+    isPresent: z.boolean(),
+    gpa: z.number().nullable(),
+    translations: z.array(educationTranslationSchema),
+    assets: z.array(educationAssetSchema),
+    featuredAsset: asset,
+  });
 
 export type Education = z.infer<typeof education>;
 
-const educationTranslationInputSchema = baseTranslationEntityInput.extend({
-  school: z.string().nonempty(),
-  slug: z.string().nonempty(),
-  degree: z.string().optional(),
-  location: z.string().optional(),
-});
+const educationTranslationInputSchema = educationTranslationFieldsSchema;
 
 //############################ Create #############################
-export const createEducationInputSchema = z.object({
-  assetIds: z.array(z.string()),
-  translations: z.array(educationTranslationInputSchema),
-  featuredAssetId: z.string(),
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date().nullish(),
-  isPresent: z.boolean(),
-  gpa: z.coerce.number().nullish(),
-});
+export const createEducationInputSchema = z
+  .object({
+    assetIds: z.array(idSchema).min(1, { message: "Assets are required" }),
+    translations: z.array(educationTranslationInputSchema),
+    featuredAssetId: idSchema.min(1, { message: "Featured asset is required" }),
+    startDate: z.coerce.date().nullable(),
+    endDate: z.coerce.date().nullable(),
+    isPresent: z.boolean(),
+    gpa: z.coerce
+      .number()
+      .gt(0, { message: "GPA must be greater than 0" })
+      .nullish(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.startDate === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["startDate"],
+        message: "Start date is required.",
+      });
+    }
+
+    if (data.isPresent) {
+      if (data.endDate !== null) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["endDate"],
+          message: "End date must be empty when currently active.",
+        });
+      }
+
+      return;
+    }
+
+    if (data.endDate === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: "End date is required.",
+      });
+
+      return;
+    }
+
+    if (data.startDate !== null && data.endDate < data.startDate) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: "End date must be after the start date.",
+      });
+    }
+  });
 
 export type CreateEducationInputSchema = z.infer<
   typeof createEducationInputSchema
 >;
 
-export const createEducationOutputSchema = z.union([education, apiErrorSchema]);
+export const createEducationOutputSchema = z.union([
+  education.omit({ assets: true, featuredAsset: true }),
+  apiErrorSchema,
+]);
 
 export type CreateEducationOutputSchema = z.infer<
   typeof createEducationOutputSchema
 >;
 
 //############################ Update #############################
-export const updateEducationInputSchema = z.object({
-  id: z.string(),
-  translations: z
-    .array(
-      educationTranslationInputSchema
-        .partial()
-        .extend(
-          educationTranslationInputSchema.pick({ languageCode: true }).shape,
-        ),
-    )
-    .optional(),
-  assetIds: z.array(z.string()).optional(),
-  featuredAssetId: z.string().optional(),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().nullish().optional(),
-  isPresent: z.boolean().optional(),
-  gpa: z.number().nullish().optional(),
-});
+export const updateEducationInputSchema = z
+  .object({
+    id: idSchema,
+    translations: z
+      .array(
+        educationTranslationInputSchema
+          .partial()
+          .extend(
+            educationTranslationInputSchema.pick({ languageCode: true }).shape,
+          ),
+      )
+      .optional(),
+    assetIds: z.array(idSchema).optional(),
+    featuredAssetId: idSchema.optional(),
+    startDate: z.coerce.date().nullish(),
+    endDate: z.coerce.date().nullish(),
+    isPresent: z.boolean().optional(),
+    gpa: z.coerce
+      .number()
+      .gt(0, { message: "GPA must be greater than 0" })
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isPresent) {
+      if (data.endDate !== null) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["endDate"],
+          message: "End date must be empty when currently active.",
+        });
+      }
+
+      return;
+    }
+
+    if (
+      data.startDate != null &&
+      data.endDate != null &&
+      data.endDate < data.startDate
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message: "End date must be after the start date.",
+      });
+    }
+  });
 
 export type UpdateEducationInputSchema = z.infer<
   typeof updateEducationInputSchema

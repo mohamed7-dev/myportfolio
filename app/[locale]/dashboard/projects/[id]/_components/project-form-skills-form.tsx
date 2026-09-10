@@ -76,17 +76,11 @@ export function ProjectFormSkillsField() {
         searchLabel="Search by skill name"
         open={open}
         onOpenChange={setOpen}
-        onSelectChange={(value) => {
-          const currentValues = form.getValues("skillIds");
-          form.setValue(
-            "skillIds",
-            currentValues?.length ? currentValues?.concat(value) : [value],
-            {
-              shouldDirty: true,
-              shouldValidate: true,
-            },
-          );
-          setOpen(false);
+        onSelectChange={(skillIds) => {
+          form.setValue("skillIds", skillIds, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
         }}
       />
     </Field>

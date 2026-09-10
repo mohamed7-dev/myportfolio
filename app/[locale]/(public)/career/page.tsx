@@ -15,7 +15,12 @@ import { PageLayout } from "@/components/page-layout/page-layout";
 import { IconTile } from "@/components/shared/icon-tile";
 import { getCurrentLocale, getScopedI18n } from "@/i18n/server";
 import { cacheKeys } from "@/lib/constants";
+import {
+  getPublicCareerOutputSchema,
+  getPublicEducationOutputSchema,
+} from "@/lib/dto/visitor";
 import { localizedCache } from "@/lib/helpers/localized-cache";
+import { cn } from "@/lib/utils";
 import { visitorService } from "@/services/domain/visitor.service";
 import { PublicSidebarTrigger } from "../_components/public-sidebar-trigger";
 import { CareerCard } from "./_components/career-card";
@@ -61,15 +66,22 @@ const getEdu = localizedCache(
   { revalidate: 3600, tags: cacheKeys.publicEducation },
 );
 
-export default async function CareerPage() {
+export default async function CareerPage({
+  searchParams,
+}: PageProps<"/[locale]/career">) {
+  const params = await searchParams;
+  const isActiveCareerBlock = (slug: string) => params.career === slug;
+
   const i18n = await getScopedI18n("career");
 
   const locale = await getCurrentLocale();
-  const result = await getCareer(locale);
-  const eduResult = await getEdu(locale);
-
-  const sorted = result.items.sort(
-    (a, b) => b.startDate.getTime() - a.startDate.getTime(),
+  const result = getPublicCareerOutputSchema.parse(await getCareer(locale));
+  const eduResult = getPublicEducationOutputSchema.parse(await getEdu(locale));
+  const sorted = result.items?.sort(
+    (a, b) => b.startDate?.getTime() - a.startDate?.getTime(),
+  );
+  const eduSorted = eduResult.items?.sort(
+    (a, b) => b.startDate?.getTime() - a.startDate?.getTime(),
   );
 
   return (
@@ -86,12 +98,20 @@ export default async function CareerPage() {
         {i18n("description")}
       </PageDescription>
       <PageLayout>
-        {sorted.map((careerItem) => (
-          <PageBlock key={careerItem.id} column="full" id="career-list-item">
+        {sorted?.map((careerItem) => (
+          <PageBlock
+            key={careerItem.id}
+            column="full"
+            id="career-list-item"
+            className={cn(
+              isActiveCareerBlock(careerItem.slug) &&
+                "shadow-none translate-x-box-shadow-x translate-y-box-shadow-y",
+            )}
+          >
             <CareerCard careerItem={careerItem} />
           </PageBlock>
         ))}
-        {eduResult.items?.length && (
+        {!!eduSorted?.length && (
           <PageBlock
             column="full"
             id="education-list"
@@ -105,7 +125,7 @@ export default async function CareerPage() {
             }
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {eduResult.items.map((item) => (
+              {eduSorted.map((item) => (
                 <EducationCard key={item.id} educationItem={item} />
               ))}
             </div>

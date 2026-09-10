@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { wrapService } from "@/api/common/create-router";
+import { EntityAssetsFormField } from "@/components/data-input/entity-assets-form-field";
 import { Page, PageTitle } from "@/components/page-layout/page";
 import {
   PageActionBar,
@@ -17,7 +18,6 @@ import { validateOutput } from "@/lib/helpers/validate-output";
 import { projectService } from "@/services/domain/project.service";
 import { ProjectForm } from "./_components/project-form";
 import { ProjectFormAchievementsField } from "./_components/project-form-achievements-field";
-import { ProjectFormAssetField } from "./_components/project-form-asset-field";
 import { ProjectFormCareerField } from "./_components/project-form-career-field";
 import { ProjectFormEducationField } from "./_components/project-form-edu-field";
 import { ProjectFormMainFields } from "./_components/project-form-main-fields";
@@ -46,9 +46,10 @@ export default async function ProjectPage({
     const result = await findOne(
       { id },
       {
-        career: { featuredAsset: true },
-        education: { featuredAsset: true },
-        skills: { featuredAsset: true },
+        career: true,
+        education: true,
+        skills: true,
+        achievements: true,
       },
     );
     project = validateOutput(result, findOneProjectOutputSchema);
@@ -78,8 +79,8 @@ export default async function ProjectPage({
             <ProjectFormMainFields />
           </PageBlock>
           <PageBlock column="side" id="assets">
-            <ProjectFormAssetField
-              projectAssets={project?.assets ?? []}
+            <EntityAssetsFormField
+              entityAssets={project?.assets ?? []}
               featuredAsset={project?.featuredAsset ?? undefined}
             />
           </PageBlock>

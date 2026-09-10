@@ -7,6 +7,7 @@ import {
   baseTranslationEntityInput,
   booleanFilterOperators,
   deletionResponseSchema,
+  idSchema,
   inputIdSchema,
   inputIdsSchema,
   sortDirection,
@@ -18,42 +19,52 @@ import {
 } from "./paginated-list";
 
 const contactMethodTranslationSchema = baseTranslationEntity.extend({
-  name: z.string().nonempty(),
+  name: z.string().nonempty({ message: "Contact method name is required" }),
 });
 
+const contactMethodTranslationFieldsSchema =
+  contactMethodTranslationSchema.omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+  });
+
 const contactMethodAssetSchema = entityAssetSchema.extend({
-  contactMethodId: z.string(),
+  contactMethodId: idSchema,
 });
 
 export type ContactMethodAsset = z.infer<typeof contactMethodAssetSchema>;
 
-export const contactMethod = baseSchema.extend({
-  name: z.string().nonempty(),
-  url: z.string(),
-  enabled: z.boolean(),
-  primary: z.boolean(),
-  copyableText: z.string().nullish(),
-  translations: z.array(contactMethodTranslationSchema),
-  assets: z.array(contactMethodAssetSchema),
-  featuredAsset: asset,
-});
+export const contactMethod = baseSchema
+  .extend(contactMethodTranslationFieldsSchema.shape)
+  .extend({
+    url: z.string().nonempty({ message: "URL is required" }),
+    enabled: z.boolean(),
+    primary: z.boolean(),
+    copyableText: z.string().nullable(),
+    translations: z.array(contactMethodTranslationSchema),
+    assets: z.array(contactMethodAssetSchema),
+    featuredAsset: asset,
+  });
 
 export type ContactMethod = z.infer<typeof contactMethod>;
 
-const contactMethodTranslationInputSchema = baseTranslationEntityInput.extend({
-  name: z.string().nonempty(),
-});
+const contactMethodTranslationInputSchema =
+  contactMethodTranslationFieldsSchema;
 
 //############################ Create #############################
-export const createContactMethodInputSchema = z.object({
-  url: z.string(),
-  copyableText: z.string().optional(),
-  assetIds: z.array(z.string()),
-  translations: z.array(contactMethodTranslationInputSchema),
-  featuredAssetId: z.string(),
-  enabled: z.boolean().optional(),
-  primary: z.boolean().optional(),
-});
+export const createContactMethodInputSchema = contactMethod
+  .pick({
+    url: true,
+  })
+  .extend({
+    copyableText: z.string().optional(),
+    assetIds: z.array(idSchema).min(1, { message: "Assets are required" }),
+    translations: z.array(contactMethodTranslationInputSchema),
+    featuredAssetId: idSchema.min(1, { message: "Featured asset is required" }),
+    enabled: z.boolean().optional(),
+    primary: z.boolean().optional(),
+  });
 
 export type CreateContactMethodInputSchema = z.infer<
   typeof createContactMethodInputSchema
@@ -70,8 +81,8 @@ export type CreateContactMethodOutputSchema = z.infer<
 
 //############################ Update #############################
 export const updateContactMethodInputSchema = z.object({
-  id: z.string(),
-  url: z.string().optional(),
+  id: idSchema,
+  url: z.string().min(1).optional(),
   copyableText: z.string().optional(),
   enabled: z.boolean().optional(),
   primary: z.boolean().optional(),
@@ -85,8 +96,8 @@ export const updateContactMethodInputSchema = z.object({
         ),
     )
     .optional(),
-  assetIds: z.array(z.string()).optional(),
-  featuredAssetId: z.string().optional(),
+  assetIds: z.array(idSchema).optional(),
+  featuredAssetId: idSchema.optional(),
 });
 
 export type UpdateContactMethodInputSchema = z.infer<

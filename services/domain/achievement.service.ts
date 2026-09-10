@@ -127,6 +127,7 @@ class AchievementService {
   public async update(
     ctx: RequestContext,
     input: UpdateAchievementInputSchema,
+    relations?: FindOptionsRelations<Achievement>,
   ) {
     const repo = await ormService.getRepository(ctx, Achievement);
     const achievement = await repo.findOne({
@@ -155,7 +156,7 @@ class AchievementService {
       },
     });
 
-    return await this.findOne(ctx, { id: updatedAchievement.id });
+    return await this.findOne(ctx, { id: updatedAchievement.id }, relations);
   }
 
   async delete(
@@ -230,15 +231,6 @@ class AchievementService {
         ctx.languageCode,
         translatedAchievement.featuredAsset,
       ),
-      ...(achievement.career && {
-        career: translator.translate<any>(ctx.languageCode, {
-          ...achievement.career,
-          featuredAsset: translator.translate(
-            ctx.languageCode,
-            achievement.career.featuredAsset,
-          ),
-        }) as Translated<Career>,
-      }),
     };
   }
 }

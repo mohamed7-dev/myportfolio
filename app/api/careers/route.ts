@@ -55,8 +55,8 @@ export const { POST, PATCH, DELETE, GET } = createRouter({
       const result = await careerService.update(
         ctx,
         parsedData as UpdateCareerInputSchema,
+        { featuredAsset: true, assets: { asset: true } },
       );
-
       const parsedResult = validateOutput(result, updateCareerOutputSchema);
 
       revalidatePath("/", "page");

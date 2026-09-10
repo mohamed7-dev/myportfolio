@@ -192,6 +192,7 @@ export function EntityAssets(props: EntityAssetsProps) {
     setFeaturedAsset(initialFeaturedAsset);
   }, [initialFeaturedAsset]);
 
+  // update internal states when this event gets emitted
   React.useEffect(() => {
     const handler = (e: any) => {
       setAssets(

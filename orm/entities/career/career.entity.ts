@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   Index,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   type Relation,
@@ -75,10 +77,8 @@ export class Career extends AppEntity {
   )
   projects: Project[];
 
-  @OneToMany(
-    () => Achievement,
-    (achievement) => achievement.career,
-  )
+  @ManyToMany(() => Achievement)
+  @JoinTable({ name: "career_achievements_achievement" })
   achievements: Relation<Achievement[]>;
 
   @OneToMany(

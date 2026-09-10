@@ -4,9 +4,9 @@ import {
   apiErrorSchema,
   baseSchema,
   baseTranslationEntity,
-  baseTranslationEntityInput,
   dateTimeFilterOperators,
   deletionResponseSchema,
+  idSchema,
   inputIdSchema,
   inputIdsSchema,
   sortDirection,
@@ -26,49 +26,62 @@ export enum AchievementType {
 export const achievementTypeSchema = z.nativeEnum(AchievementType);
 
 const achievementTranslationSchema = baseTranslationEntity.extend({
-  name: z.string().nonempty(),
-  slug: z.string().nonempty(),
-  organization: z.string().nonempty(),
+  name: z.string().nonempty({ message: "Achievement name is required" }),
+  slug: z.string().nonempty({ message: "Achievement slug is required" }),
+  organization: z
+    .string()
+    .nonempty({ message: "Organization name is required" }),
+});
+
+const achievementTranslationFieldsSchema = achievementTranslationSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 const achievementAssetSchema = entityAssetSchema.extend({
-  achievementId: z.string(),
+  achievementId: idSchema,
 });
 
 export type AchievementAsset = z.infer<typeof achievementAssetSchema>;
 
-export const achievement = baseSchema.extend({
-  name: z.string().nonempty(),
-  slug: z.string().nonempty(),
-  organization: z.string().nonempty(),
-  type: achievementTypeSchema,
-  credentialUrl: z.string(),
-  issueDate: z.coerce.date(),
-  translations: z.array(achievementTranslationSchema),
-  assets: z.array(achievementAssetSchema),
-  featuredAsset: asset,
-});
+export const achievement = baseSchema
+  .extend(achievementTranslationFieldsSchema.shape)
+  .extend({
+    type: achievementTypeSchema,
+    credentialUrl: z.string().min(1, { message: "Credential URL is required" }),
+    issueDate: z.coerce.date(),
+    translations: z.array(achievementTranslationSchema),
+    assets: z.array(achievementAssetSchema),
+    featuredAsset: asset,
+  });
 
 export type Achievement = z.infer<typeof achievement>;
 
-const achievementTranslationInputSchema = baseTranslationEntityInput.extend({
-  name: z.string().nonempty(),
-  slug: z.string().nonempty(),
-  organization: z.string().nonempty(),
-});
+const achievementTranslationInputSchema = achievementTranslationFieldsSchema;
 
 //############################ Create #############################
-export const createAchievementInputSchema = z.object({
-  type: z
-    .string()
-    .min(1, "Achievement type is required")
-    .pipe(achievementTypeSchema),
-  credentialUrl: z.string(),
-  issueDate: z.coerce.date(),
-  assetIds: z.array(z.string()),
-  translations: z.array(achievementTranslationInputSchema),
-  featuredAssetId: z.string(),
-});
+export const createAchievementInputSchema = z
+  .object({
+    type: z
+      .string()
+      .min(1, "Achievement type is required")
+      .pipe(achievementTypeSchema),
+    credentialUrl: z.string().min(1, { message: "Credential URL is required" }),
+    issueDate: z.coerce.date().nullable(),
+    assetIds: z.array(idSchema).min(1, { message: "Assets are required" }),
+    translations: z.array(achievementTranslationInputSchema),
+    featuredAssetId: idSchema.min(1, { message: "Featured asset is required" }),
+  })
+  .superRefine((data, ctx) => {
+    if (data.issueDate === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["issueDate"],
+        message: "Issue date is required.",
+      });
+    }
+  });
 
 export type CreateAchievementFormInputSchema = z.input<
   typeof createAchievementInputSchema
@@ -88,14 +101,19 @@ export type CreateAchievementOutputSchema = z.infer<
 
 //############################ Update #############################
 export const updateAchievementInputSchema = z.object({
-  id: z.string(),
+  id: idSchema,
   type: z
     .string()
     .min(1, "Achievement type is required")
     .pipe(achievementTypeSchema)
     .optional(),
-  credentialUrl: z.string().optional(),
-  issueDate: z.coerce.date().optional(),
+  credentialUrl: z
+    .string()
+    .min(1, {
+      message: "Credential URL is required",
+    })
+    .optional(),
+  issueDate: z.coerce.date().nullish(),
   translations: z
     .array(
       achievementTranslationInputSchema
@@ -105,8 +123,8 @@ export const updateAchievementInputSchema = z.object({
         ),
     )
     .optional(),
-  assetIds: z.array(z.string()).optional(),
-  featuredAssetId: z.string().optional(),
+  assetIds: z.array(idSchema).optional(),
+  featuredAssetId: idSchema.optional(),
 });
 
 export type UpdateAchievementFormInputSchema = z.input<

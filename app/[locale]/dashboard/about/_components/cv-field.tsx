@@ -12,7 +12,11 @@ export function CvAssetIdField() {
       name="cvAssetId"
       label="CV asset id"
       render={({ field }) => (
-        <Input {...field} disabled={form.formState.isSubmitting} />
+        <Input
+          {...field}
+          value={field.value ?? ""}
+          disabled={form.formState.isSubmitting}
+        />
       )}
     />
   );

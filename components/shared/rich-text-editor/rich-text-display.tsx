@@ -38,12 +38,10 @@ export function RichTextDisplay({ html, className }: RichTextProps) {
         [&_code]:whitespace-nowrap
 
         [&_ul]:mb-4
-        [&_ul]:list-disc
-        [&_ul]:pl-6
 
         [&_ol]:mb-4
         [&_ol]:list-decimal
-        [&_ol]:pl-6
+        [&_ol]:ps-6
 
         [&_li]:mb-1
 

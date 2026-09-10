@@ -69,17 +69,16 @@ export function CareerFormAchievementsField() {
       <FieldLabel>Achievement</FieldLabel>
       <EntityRelation
         queryFn={queryFn}
-        selectedIds={[form.getValues("achievementIds")]}
+        selectedIds={form.watch("achievementIds")}
         entityName="achievement"
         searchLabel="Search by achievement name"
         open={open}
         onOpenChange={setOpen}
-        onSelectChange={(value) => {
-          form.setValue("achievementIds", value ?? undefined, {
+        onSelectChange={(achievementIds) => {
+          form.setValue("achievementIds", achievementIds, {
             shouldDirty: true,
             shouldValidate: true,
           });
-          setOpen(false);
         }}
       />
     </Field>

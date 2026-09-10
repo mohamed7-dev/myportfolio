@@ -38,10 +38,10 @@ export function AchievementForm({
   const form = useForm<CreateAchievementFormInputSchema>({
     defaultValues: {
       credentialUrl: "",
-      issueDate: undefined,
+      issueDate: null,
       type: "",
       assetIds: [],
-      featuredAssetId: undefined,
+      featuredAssetId: "",
       translations: [
         {
           languageCode: contentLanguage,
@@ -58,11 +58,11 @@ export function AchievementForm({
     defaultValues: {
       id: initialValues?.id ?? "",
       credentialUrl: initialValues?.credentialUrl ?? "",
-      type: initialValues?.type ?? undefined,
-      issueDate: initialValues?.issueDate ?? undefined,
+      type: initialValues?.type ?? "",
+      issueDate: initialValues?.issueDate ?? null,
       translations: initialValues?.translations ?? [],
       assetIds: initialValues?.assets.map((asset) => asset.id) ?? [],
-      featuredAssetId: initialValues?.featuredAsset?.id ?? undefined,
+      featuredAssetId: initialValues?.featuredAsset?.id ?? "",
     },
     resolver: zodResolver(updateAchievementInputSchema),
   });
@@ -99,8 +99,9 @@ export function AchievementForm({
     },
     onSuccess: (data) => {
       toast.success("Achievement was updated successfully");
-      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
       router.refresh();
+      updateForm.reset(updateForm.getValues());
+      formSubmittedEvent().emit("update", data.assets, data.featuredAsset);
     },
     onError: (error) => {
       toast.error(error.message);

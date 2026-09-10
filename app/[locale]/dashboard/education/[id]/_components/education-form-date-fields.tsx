@@ -1,9 +1,9 @@
 "use client";
 import { useFormContext } from "react-hook-form";
+import { DateFormField } from "@/components/data-input/date-form-field";
 import { FormField } from "@/components/shared/form-field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FieldGroup } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import type { CreateEducationInputSchema } from "@/lib/dto/education";
 
 export default function EducationFormDateFields() {
@@ -11,30 +11,9 @@ export default function EducationFormDateFields() {
 
   return (
     <FieldGroup>
-      <FormField
-        control={form.control}
-        name={"startDate"}
-        label={"Start Date"}
-        render={({ field }) => (
-          <Input
-            {...(field as any)}
-            type="date"
-            disabled={form.formState.isSubmitting}
-          />
-        )}
-      />
-      <FormField
-        control={form.control}
-        name={"endDate"}
-        label={"End Date"}
-        render={({ field }) => (
-          <Input
-            {...(field as any)}
-            type="date"
-            disabled={form.formState.isSubmitting}
-          />
-        )}
-      />
+      <DateFormField name={"startDate"} label={"Start Date"} />
+      <DateFormField name={"endDate"} label={"End Date"} />
+
       <FormField
         control={form.control}
         name="isPresent"

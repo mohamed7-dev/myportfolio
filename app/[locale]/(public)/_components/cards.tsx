@@ -34,8 +34,13 @@ export async function Cards({
             <p className="w-full text-sm font-base flex items-center justify-between">
               <span>{i18n("stats.experience")}:</span>
               <strong className="text-sm font-base">
-                {formatNumber(profile.yearsOfExperience, currentLocale)}{" "}
-                {i18n("stats.years")}
+                {i18n("stats.years", {
+                  count: profile.yearsOfExperience,
+                  formattedCount: formatNumber(
+                    profile.yearsOfExperience,
+                    currentLocale,
+                  ),
+                } as any)}
               </strong>
             </p>
           </li>

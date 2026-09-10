@@ -7,7 +7,7 @@ import {
 import { PageBlock } from "@/components/page-layout/page-block";
 import { PageLayout } from "@/components/page-layout/page-layout";
 import { PendingSubmitButton } from "@/components/shared/pending-submit-button";
-import { type ClientSafeProfile, clientSafeSchema } from "@/lib/dto/profile";
+import { type MeOutputSchema, meOutputSchema } from "@/lib/dto/auth";
 import { InternalServerError } from "@/lib/errors/errors";
 import { validateOutput } from "@/lib/helpers/validate-output";
 import { authService } from "@/services/domain/auth.service";
@@ -29,10 +29,10 @@ export default async function AboutPage() {
 
   const result = await me();
 
-  let profile: ClientSafeProfile | undefined;
+  let profile: MeOutputSchema | undefined;
 
   if (result) {
-    profile = validateOutput(result, clientSafeSchema);
+    profile = validateOutput(result, meOutputSchema);
   }
 
   if (!profile) {
