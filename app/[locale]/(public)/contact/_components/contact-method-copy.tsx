@@ -6,29 +6,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useScopedI18n } from "@/i18n/client";
 import type { GetPublicContactMethodsOutputSchema } from "@/lib/dto/visitor";
+import { cn } from "@/lib/utils";
 
-export function PrimaryContactMethodCopy({
-  primaryContactMethod,
+export function ContactMethodCopy({
+  contactMethod,
+  showInput,
+  containerClassName,
 }: {
-  primaryContactMethod: GetPublicContactMethodsOutputSchema["items"][number];
+  contactMethod: GetPublicContactMethodsOutputSchema["items"][number];
+  showInput?: boolean;
+  containerClassName?: HTMLDivElement["className"];
 }) {
   const i18n = useScopedI18n("contact");
   const copy = React.useCallback(async () => {
-    if (primaryContactMethod.copyableText) {
+    if (contactMethod.copyableText) {
       await navigator.clipboard
-        .writeText(primaryContactMethod.copyableText)
+        .writeText(contactMethod.copyableText)
         .then(() => {
           toast.success(i18n("contactMethods.copiedToClipboard"));
         });
     }
-  }, [primaryContactMethod, i18n]);
-  if (!primaryContactMethod) return null;
+  }, [contactMethod, i18n]);
+  if (!contactMethod) return null;
   return (
-    <div className="flex items-center gap-2 p-2">
-      <Input
-        readOnly={true}
-        defaultValue={primaryContactMethod.copyableText ?? undefined}
-      />
+    <div className={cn("flex items-center gap-2 p-2", containerClassName)}>
+      {showInput && (
+        <Input
+          readOnly={true}
+          defaultValue={contactMethod.copyableText ?? undefined}
+        />
+      )}
       <Button
         size={"icon-sm"}
         variant={"neutral"}

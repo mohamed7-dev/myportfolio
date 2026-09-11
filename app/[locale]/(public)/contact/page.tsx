@@ -23,8 +23,8 @@ import { cacheKeys } from "@/lib/constants";
 import { localizedCache } from "@/lib/helpers/localized-cache";
 import { visitorService } from "@/services/domain/visitor.service";
 import { PublicSidebarTrigger } from "../_components/public-sidebar-trigger";
+import { ContactMethodCopy } from "./_components/contact-method-copy";
 import { DirectMessageForm } from "./_components/direct-message-form";
-import { PrimaryContactMethodCopy } from "./_components/primary-contact-method-copy";
 
 export const revalidate = 3600;
 
@@ -70,7 +70,7 @@ export default async function ContactPage() {
       <PageLayout>
         <PageBlock
           id="direct-message"
-          column="main"
+          column="full"
           title={
             <span className="group flex items-center gap-2">
               <IconTile asSpan={true}>
@@ -81,6 +81,52 @@ export default async function ContactPage() {
           }
         >
           <DirectMessageForm />
+        </PageBlock>
+        <PageBlock
+          column="main"
+          id="contact-methods"
+          title={
+            <span className="group flex items-center gap-2">
+              <IconTile asSpan={true}>
+                <ContactIcon />
+              </IconTile>
+              {i18n("contactMethods.title")}
+            </span>
+          }
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            {contactMethods.map((contactMethod) => (
+              <CardWrapper
+                key={contactMethod.id}
+                cardTitle={contactMethod.name}
+                className="flex flex-col gap-4 items-center"
+              >
+                <AppImage
+                  asset={contactMethod.featuredAsset}
+                  transform={{ preset: "tiny", mode: "resize" }}
+                  className="size-20 object-contain"
+                />
+                <div className="flex items-center gap-2">
+                  <Button size={"sm"} variant={"neutral"} asChild>
+                    <Link
+                      href={contactMethod.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <span>{i18n("contactMethods.goTo")}</span>
+                    </Link>
+                  </Button>
+                  {contactMethod.copyableText && (
+                    <ContactMethodCopy
+                      contactMethod={contactMethod}
+                      showInput={false}
+                      containerClassName="p-0"
+                    />
+                  )}
+                </div>
+              </CardWrapper>
+            ))}
+          </div>
         </PageBlock>
         {primaryContactMethod && (
           <PageBlock
@@ -104,46 +150,14 @@ export default async function ContactPage() {
               />
               <p>{i18n("contactMethods.primaryDescription")}</p>
               {primaryContactMethod.copyableText && (
-                <PrimaryContactMethodCopy
-                  primaryContactMethod={primaryContactMethod}
+                <ContactMethodCopy
+                  contactMethod={primaryContactMethod}
+                  showInput={true}
                 />
               )}
             </CardWrapper>
           </PageBlock>
         )}
-        <PageBlock
-          column="side"
-          id="contact-methods"
-          title={
-            <span className="group flex items-center gap-2">
-              <IconTile asSpan={true}>
-                <ContactIcon />
-              </IconTile>
-              {i18n("contactMethods.title")}
-            </span>
-          }
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {contactMethods.map((contactMethod) => (
-              <CardWrapper
-                key={contactMethod.id}
-                cardTitle={contactMethod.name}
-                className="flex flex-col gap-4 items-center"
-              >
-                <AppImage
-                  asset={contactMethod.featuredAsset}
-                  transform={{ preset: "tiny", mode: "resize" }}
-                  className="size-20 object-contain"
-                />
-                <Button size={"sm"} variant={"neutral"} asChild>
-                  <Link href={contactMethod.url} target="_blank">
-                    <span>{i18n("contactMethods.goTo")}</span>
-                  </Link>
-                </Button>
-              </CardWrapper>
-            ))}
-          </div>
-        </PageBlock>
       </PageLayout>
     </Page>
   );

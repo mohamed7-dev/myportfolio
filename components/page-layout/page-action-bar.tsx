@@ -33,10 +33,12 @@ export function PageActionBar({ children }: PageActionBarProps) {
   return (
     <div className="flex justify-end gap-2">
       {/* Hide direct children on mobile */}
-      {!isMobile &&
-        directChildren.map((child, index) => (
-          <React.Fragment key={index}>{child}</React.Fragment>
-        ))}
+      <div className="hidden lg:block">
+        {!isMobile &&
+          directChildren.map((child, index) => (
+            <React.Fragment key={index}>{child}</React.Fragment>
+          ))}
+      </div>
 
       {/* Render action items */}
       {actionsItemsToRender.map((item, index) =>
@@ -46,9 +48,11 @@ export function PageActionBar({ children }: PageActionBarProps) {
       )}
 
       {/* Dropdown menu */}
-      {menuItems.length > 0 && isMobile && (
-        <PageActionBarDropdownMenu items={menuItems} />
-      )}
+      <div className="block lg:hidden">
+        {menuItems.length > 0 && isMobile && (
+          <PageActionBarDropdownMenu items={menuItems} />
+        )}
+      </div>
     </div>
   );
 }

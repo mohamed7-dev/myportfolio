@@ -92,7 +92,11 @@ export function AchievementCard({
           </Badge>
         </div>
         <Button className="mt-4 w-full" variant={"neutral"} size="sm" asChild>
-          <Link href={achievement.credentialUrl} target="_blank">
+          <Link
+            href={achievement.credentialUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {i18n("verifyCredentialsLabel")}
           </Link>
         </Button>

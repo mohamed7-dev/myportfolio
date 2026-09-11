@@ -19,7 +19,6 @@ import { PageLayout } from "@/components/page-layout/page-layout";
 import { AppImage } from "@/components/shared/app-image";
 import { IconTile } from "@/components/shared/icon-tile";
 import { MediaGallery } from "@/components/shared/media-gallery";
-import { RichTextDisplay } from "@/components/shared/rich-text-editor/rich-text-display";
 import { RichTextListDisplay } from "@/components/shared/rich-text-editor/rich-text-list-display";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -122,7 +121,11 @@ export default async function ProjectPage({
         </PageActionBarMenuItem>
         <PageActionBarItem actionBarItemBlockId="source-code-url">
           <Button size={"sm"} asChild>
-            <Link href={project.repoUrl} target="_blank">
+            <Link
+              href={project.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <CodeIcon />
               {i18n("source")}
             </Link>
@@ -130,14 +133,22 @@ export default async function ProjectPage({
         </PageActionBarItem>
         <PageActionBarMenuItem pageActionBarMenuItemBlockId="source-code-url">
           <DropdownMenuItem>
-            <Link href={project.repoUrl} target="_blank">
+            <Link
+              href={project.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {i18n("source")}
             </Link>
           </DropdownMenuItem>
         </PageActionBarMenuItem>
         <PageActionBarItem actionBarItemBlockId="live-demo-url">
           <Button size={"sm"} asChild>
-            <Link href={project.liveDemoUrl} target="_blank">
+            <Link
+              href={project.liveDemoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <LinkIcon />
               {i18n("liveDemo")}
             </Link>
@@ -145,7 +156,11 @@ export default async function ProjectPage({
         </PageActionBarItem>
         <PageActionBarMenuItem pageActionBarMenuItemBlockId="live-demo-url">
           <DropdownMenuItem>
-            <Link href={project.liveDemoUrl} target="_blank">
+            <Link
+              href={project.liveDemoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {i18n("liveDemo")}
             </Link>
           </DropdownMenuItem>
@@ -157,6 +172,16 @@ export default async function ProjectPage({
       <PageLayout>
         <PageBlock id="relations" column="full" title={i18n("relations.title")}>
           <div className="space-y-6 overflow-x-auto pb-4">
+            <section className={"flex-1 flex flex-col gap-4"}>
+              <h3 className="font-base text-sm md:text-base text-foreground capitalize">
+                {i18n("execution.status")}
+              </h3>
+              <Badge>
+                {project.finished
+                  ? i18n("execution.production")
+                  : i18n("execution.development")}
+              </Badge>
+            </section>
             <section className={"flex flex-col gap-2"}>
               <h3 className="font-base text-sm md:text-base text-foreground mb-2 capitalize">
                 {i18n("relations.techStack")}
@@ -284,18 +309,6 @@ export default async function ProjectPage({
         </PageBlock>
         <PageBlock id="overview" column="full" title={i18n("summary.title")}>
           <RichTextListDisplay html={project.overview} />
-        </PageBlock>
-        <PageBlock id="execution" column="side" title={i18n("execution.title")}>
-          <p className="flex flex-col gap-2">
-            <span className="text-sm font-base text-foreground/80 uppercase">
-              {i18n("execution.status")}
-            </span>
-            <Badge>
-              {project.finished
-                ? i18n("execution.production")
-                : i18n("execution.development")}
-            </Badge>
-          </p>
         </PageBlock>
         <PageBlock
           id="tech-stack"
