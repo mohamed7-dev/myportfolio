@@ -18,7 +18,7 @@ export async function ProjectCard({
   return (
     <Link href={`/projects/${project.slug}`}>
       <CardWrapper interactive={true} className="p-0">
-        <div className="h-60 w-full overflow-hidden relative">
+        <div className="h-60 w-full p-1 overflow-hidden relative">
           {project.featured && (
             <Badge
               variant={"neutral"}
