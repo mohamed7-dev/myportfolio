@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Controller,
   type FieldPath,
@@ -81,6 +81,16 @@ export function TranslatableFormField<
 
   const isNewTrans = contentLanguageTransIndex === -1;
   const index = isNewTrans ? translations?.length : contentLanguageTransIndex;
+
+  useEffect(() => {
+    if (isNewTrans && index !== undefined) {
+      formContext.setValue(
+        `translations.${index}.languageCode`,
+        contentLanguage,
+        { shouldDirty: false },
+      );
+    }
+  }, [contentLanguage, formContext, index, isNewTrans]);
 
   const fallbackPlaceholder = useMemo(
     () =>

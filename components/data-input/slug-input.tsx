@@ -1,7 +1,7 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { EditIcon, LockIcon, RefreshCwIcon } from "lucide-react";
 import React from "react";
-import { useFormContext, useWatch } from "react-hook-form";
+import { useFormContext, useFormState, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouterUtils } from "@/hooks/use-router-utils";
 import { useCurrentLocale } from "@/i18n/client";
@@ -112,7 +112,7 @@ export function SlugInput({
   const [manualReadonly, setManualReadonly] = React.useState(defaultReadonly);
   const [loading, setLoading] = React.useState(false);
 
-  const formReadonly = !disabled;
+  const formReadonly = disabled ?? false;
   const readonly = formReadonly || manualReadonly;
 
   const watchPath = resolveWatchFieldPath(
@@ -129,7 +129,11 @@ export function SlugInput({
 
   const debouncedValue = useDebounce(watchedValue, 500);
 
-  const fieldState = form.getFieldState(watchPath);
+  const formState = useFormState({
+    control: form.control,
+    name: watchPath,
+  });
+  const fieldState = form.getFieldState(watchPath, formState);
 
   const shouldAutoGenerate =
     readonly && !entityId && fieldState.isDirty && !!debouncedValue;
