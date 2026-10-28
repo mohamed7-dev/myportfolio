@@ -260,18 +260,16 @@ class ProjectService {
 
   private translateProject(ctx: RequestContext, project: Project) {
     const translatedProject = translator.translate(ctx.languageCode, project);
-    const translatedAssets = translatedProject.assets.flatMap(
-      (projectAsset) => {
-        return {
-          ...projectAsset,
-          asset: translator.translate(ctx.languageCode, projectAsset.asset),
-        };
-      },
-    );
-
     return {
       ...translatedProject,
-      assets: translatedAssets,
+      ...(project.assets?.length && {
+        assets: project.assets.flatMap((projectAsset) => {
+          return {
+            ...projectAsset,
+            asset: translator.translate(ctx.languageCode, projectAsset.asset),
+          };
+        }),
+      }),
       featuredAsset: translator.translate(
         ctx.languageCode,
         translatedProject.featuredAsset,

@@ -70,6 +70,13 @@ export default {
         backend: "الواجهة الخلفية",
         tools: "الأدوات",
         programmingLanguages: "لغات البرمجة",
+        devOps: "عمليات التطوير",
+        testingQa: "الاختبار وضمان الجودة",
+        databases: "قواعد البيانات",
+        cloudHosting: "الحوسبة السحابية والاستضافة",
+        designPrototyping: "التصميم والنماذج الأولية",
+        mobileDevelopment: "تطوير تطبيقات الهاتف",
+        security: "الأمان",
       },
     },
     mediaGallery: {

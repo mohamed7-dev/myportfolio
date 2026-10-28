@@ -71,6 +71,13 @@ export default {
         backend: "back end",
         tools: "tools",
         programmingLanguages: "programming languages",
+        devOps: "DevOps",
+        testingQa: "Testing & QA",
+        databases: "Databases",
+        cloudHosting: "Cloud & hosting",
+        designPrototyping: "Design & prototyping",
+        mobileDevelopment: "Mobile development",
+        security: "Security",
       },
     },
     mediaGallery: {

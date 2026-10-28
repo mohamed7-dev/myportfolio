@@ -1,12 +1,19 @@
 import {
   Code2Icon,
   CodeIcon,
+  CloudIcon,
+  DatabaseIcon,
+  FlaskConicalIcon,
+  PaletteIcon,
   PaintRollerIcon,
+  ShieldCheckIcon,
   ServerIcon,
+  SmartphoneIcon,
   TerminalSquareIcon,
   WrenchIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { wrapService } from "@/api/common/create-router";
 import {
   Page,
@@ -80,45 +87,63 @@ export default async function AboutPage() {
   });
 
   const resolveCategoryName = (category: SkillCategory) => {
+    const categoryHeading = (icon: ReactNode, label: string) => (
+      <span className="flex items-center gap-2 mb-6">
+        <IconTile className="size-10">{icon}</IconTile>
+        {label}
+      </span>
+    );
+
     switch (category) {
       case SkillCategory.FRONTEND:
-        return (
-          <span className="flex items-center gap-2 mb-6">
-            <IconTile className="size-10">
-              <PaintRollerIcon />
-            </IconTile>
-            {i18n("skills.categories.frontend")}
-          </span>
+        return categoryHeading(
+          <PaintRollerIcon />,
+          i18n("skills.categories.frontend"),
         );
       case SkillCategory.BACKEND:
-        return (
-          <span className="flex items-center gap-2 mb-6">
-            <IconTile className="size-10">
-              <ServerIcon />
-            </IconTile>
-            {i18n("skills.categories.backend")}
-          </span>
-        );
+        return categoryHeading(<ServerIcon />, i18n("skills.categories.backend"));
       case SkillCategory.PROGRAMMING_LANGUAGES:
-        return (
-          <span className="flex items-center gap-2 mb-6">
-            <IconTile className="size-10">
-              <Code2Icon />
-            </IconTile>
-            {i18n("skills.categories.programmingLanguages")}
-          </span>
+        return categoryHeading(
+          <Code2Icon />,
+          i18n("skills.categories.programmingLanguages"),
         );
       case SkillCategory.TOOLS:
-        return (
-          <span className="flex items-center gap-2 mb-6">
-            <IconTile className="size-10">
-              <WrenchIcon />
-            </IconTile>
-            {i18n("skills.categories.tools")}
-          </span>
+        return categoryHeading(<WrenchIcon />, i18n("skills.categories.tools"));
+      case SkillCategory.DEV_OPS:
+        return categoryHeading(
+          <TerminalSquareIcon />,
+          i18n("skills.categories.devOps"),
         );
-      default:
-        return category;
+      case SkillCategory.Testing_QA:
+        return categoryHeading(
+          <FlaskConicalIcon />,
+          i18n("skills.categories.testingQa"),
+        );
+      case SkillCategory.DATABASES:
+        return categoryHeading(
+          <DatabaseIcon />,
+          i18n("skills.categories.databases"),
+        );
+      case SkillCategory.CLOUD_HOSTING:
+        return categoryHeading(
+          <CloudIcon />,
+          i18n("skills.categories.cloudHosting"),
+        );
+      case SkillCategory.DESIGN_PROTOTYPING:
+        return categoryHeading(
+          <PaletteIcon />,
+          i18n("skills.categories.designPrototyping"),
+        );
+      case SkillCategory.MOBILE_DEVELOPMENT:
+        return categoryHeading(
+          <SmartphoneIcon />,
+          i18n("skills.categories.mobileDevelopment"),
+        );
+      case SkillCategory.SECURITY:
+        return categoryHeading(
+          <ShieldCheckIcon />,
+          i18n("skills.categories.security"),
+        );
     }
   };
 

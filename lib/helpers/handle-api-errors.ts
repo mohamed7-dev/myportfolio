@@ -3,6 +3,7 @@ import { AppError } from "../errors/app-error";
 import { InternalServerError } from "../errors/errors";
 
 export function handleApiErrors(error: unknown) {
+  console.log(error);
   if (error instanceof AppError) {
     return NextResponse.json(error, {
       status: error.statusCode,

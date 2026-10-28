@@ -22,9 +22,5 @@ const getFeaturedProjects = localizedCache(
 export async function FeaturedWork() {
   const featuredProjects = await getFeaturedProjects(await getCurrentLocale());
 
-  return (
-    <StackedImages
-      assets={featuredProjects?.items.map((item) => item.featuredAsset) ?? []}
-    />
-  );
+  return <StackedImages projects={featuredProjects?.items ?? []} />;
 }
